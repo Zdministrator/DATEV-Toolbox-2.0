@@ -1,0 +1,79 @@
+{
+  "downloads": [
+    {
+      "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
+      "url": "https://download.datev.de/download/sr_mittelstand/datev_servicerelease_mittelstand_1338.exe",
+      "description": "Service-Release für DATEV Mittelstand Version 13.3"
+    },
+    {
+      "name": "Musterpaket DATEV Unternehmen online",
+      "url": "https://download.datev.de/download/musterpaket_unternehmen_online.zip",
+      "description": "Musterpaket für DATEV Unternehmen online"
+    },
+    {
+      "name": "Musterpaket Zusatzmodul Auftragswesen next",
+      "url": "https://download.datev.de/download/musterpaket_datev_auftragswesen_next.zip",
+      "description": "Musterpaket für das DATEV Auftragswesen next Modul"
+    },
+    {
+      "name": "DATEVnet: Proxyeinstellungen V. 1.8",
+      "url": "https://download.datev.de/download/proxysetter/proxysetter.exe",
+      "description": "Tool zur Konfiguration der DATEVnet Proxy-Einstellungen"
+    },
+    {
+      "name": "SWM-Treibererweiterung V. 7.88",
+      "url": "https://download.datev.de/download/srel/swm-treiber-erweiterung_sr_b0000119_7.88.exe",
+      "description": "Software-Manager Treibererweiterung Version 7.88"
+    },
+    {
+      "name": "Sicherheitspaket V. 7.88",
+      "url": "https://download.datev.de/download/srel/sicherheitspaket_sr_pak00565_7.88.exe",
+      "description": "DATEV Sicherheitspaket Version 7.88"
+    },
+    {
+      "name": "DATEVnet Einzel-/Telearbeitsplatz",
+      "url": "https://download.datev.de/download/datevnet/datevnet_einzel-telearbeitsplatz_compact-full.exe",
+      "description": "DATEVnet Installation für Einzel- und Telearbeitsplätze"
+    },
+    {
+      "name": "Herausgeberzertifikate der DATEV",
+      "url": "https://download.datev.de/download/digcert/datevdigcert_7_81.exe",
+      "description": "Digitale Zertifikate der DATEV eG"
+    },
+    {
+      "name": "DATEV SmartVerify V. 1.4",
+      "url": "https://download.datev.de/download/smartverify/datev.smartverify.exe",
+      "description": "DATEV SmartVerify Authentifizierungstool"
+    },
+    {
+      "name": "DATEVasp Zugangspaket V. 2.14",
+      "url": "https://download.datev.de/download/asp/aspzugangspaket.exe",
+      "description": "Zugangspaket für DATEVasp Services"
+    },
+    {
+      "name": "DATEV-SmartIT Connect V. 3.9",
+      "url": "https://download.datev.de/download/smartit/smartitconnect.exe",
+      "description": "DATEV SmartIT Connect Verwaltungstool"
+    },
+    {
+      "name": "Treiber für SmartCard-Lesegeräte und den DATEV mIDentity",
+      "url": "https://download.datev.de/download/sipacompact/leserins.exe",
+      "description": "Treiber für SmartCard-Lesegeräte und DATEV mIDentity"
+    },
+    {
+      "name": "LohnViewer",
+      "url": "https://download.datev.de/download/lohnview/lohnviewer_145.exe",
+      "description": "Tool zur Anzeige von Lohnabrechnungen"
+    },
+    {
+      "name": "Lohn Vorerfassung V. 7.1",
+      "url": "https://download.datev.de/download/lohn_vorerfassung_pak00683_7.1.exe",
+      "description": "DATEV Lohn Vorerfassung Version 7.1"
+    },
+    {
+      "name": "DATEV Datenübernahme nach LODAS V. 4.22",
+      "url": "https://download.datev.de/download/pak01429/lug2lodas_pak_4_22.exe",
+      "description": "Tool zur Datenübernahme von DATEV nach LODAS"
+    }
+  ]
+}

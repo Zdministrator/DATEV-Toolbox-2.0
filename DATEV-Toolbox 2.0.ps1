@@ -42,10 +42,17 @@ Add-Type -AssemblyName PresentationFramework
                 <Grid>
 
                 </Grid>
-            </TabItem>
-            <TabItem Header="DATEV Cloud">
-                <Grid>
-                    <!-- Hier können zukünftig Tool-Elemente eingefügt werden -->
+            </TabItem>            <TabItem Header="DATEV Cloud">
+                <Grid>                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Direkt Downloads" FontWeight="Bold" Margin="10,10,10,5"/>
+                    <ComboBox Name="cmbDirectDownloads" Grid.Row="1" Margin="10,0,10,10" Height="25"/>
+                    <Button Name="btnDownload" Grid.Row="2" Content="Download starten" Height="30" 
+                            VerticalAlignment="Top" Margin="10,0,10,10" IsEnabled="False"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Einstellungen">
@@ -77,6 +84,10 @@ try {
 
 # Referenz auf das Log-Textfeld holen
 $txtLog = $window.FindName("txtLog")
+
+# Referenzen auf DATEV Cloud Elemente holen
+$cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
+$btnDownload = $window.FindName("btnDownload")
 #endregion
 
 #region Logging-Funktion
@@ -152,8 +163,126 @@ function Get-Settings {
             return @{}
         }
     } catch {
-        Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
-        return @{}
+        Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'        return @{}
+    }
+}
+#endregion
+
+#region DATEV Downloads-Funktion
+# Funktion zum Laden der DATEV Downloads aus datev-downloads.json
+function Get-DATEVDownloads {
+    try {
+        $downloadsFile = Join-Path $PSScriptRoot 'datev-downloads.json'
+        if (Test-Path $downloadsFile) {
+            $json = Get-Content -Path $downloadsFile -Raw -Encoding UTF8
+            $downloadsData = $json | ConvertFrom-Json
+            Write-Log -Message "DATEV Downloads erfolgreich geladen" -Level 'INFO'
+            return $downloadsData.downloads
+        } else {
+            Write-Log -Message "Datei 'datev-downloads.json' nicht gefunden" -Level 'WARN'
+            return @()
+        }
+    } catch {
+        Write-Log -Message "Fehler beim Laden der DATEV Downloads: $($_.Exception.Message)" -Level 'ERROR'
+        return @()
+    }
+}
+
+# Funktion zum Befüllen der Dropdown-Liste
+function Initialize-DownloadsComboBox {
+    try {
+        $downloads = Get-DATEVDownloads
+        $cmbDirectDownloads.Items.Clear()
+        
+        foreach ($download in $downloads) {
+            $item = New-Object System.Windows.Controls.ComboBoxItem
+            $item.Content = $download.name
+            $item.Tag = @{
+                url = $download.url
+                description = $download.description
+            }
+            $cmbDirectDownloads.Items.Add($item) | Out-Null
+        }
+        
+        if ($cmbDirectDownloads.Items.Count -gt 0) {
+            Write-Log -Message "$($cmbDirectDownloads.Items.Count) Downloads geladen" -Level 'INFO'
+        }    } catch {
+        Write-Log -Message "Fehler beim Initialisieren der Downloads-Liste: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+# Funktion zum Herunterladen einer Datei im Hintergrund
+function Start-BackgroundDownload {
+    param(
+        [Parameter(Mandatory = $true)][string]$Url,
+        [Parameter(Mandatory = $true)][string]$FileName
+    )
+    
+    try {
+        # Download-Ordner erstellen
+        $downloadFolder = Join-Path ([Environment]::GetFolderPath("UserProfile")) "Downloads\DATEV-Toolbox"
+        if (-not (Test-Path $downloadFolder)) {
+            New-Item -Path $downloadFolder -ItemType Directory -Force | Out-Null
+            Write-Log -Message "Download-Ordner erstellt: $downloadFolder" -Level 'INFO'
+        }
+        
+        $filePath = Join-Path $downloadFolder $FileName
+        
+        # Prüfen ob Datei bereits existiert
+        if (Test-Path $filePath) {
+            $result = [System.Windows.MessageBox]::Show(
+                "Die Datei '$FileName' existiert bereits im Download-Ordner.`n`nMöchten Sie die Datei überschreiben?", 
+                "Datei bereits vorhanden", 
+                [System.Windows.MessageBoxButton]::YesNo, 
+                [System.Windows.MessageBoxImage]::Question
+            )
+            
+            if ($result -eq [System.Windows.MessageBoxResult]::No) {
+                Write-Log -Message "Download abgebrochen - Datei existiert bereits: $FileName" -Level 'INFO'
+                return
+            } else {
+                Write-Log -Message "Datei wird überschrieben: $FileName" -Level 'INFO'
+            }
+        }
+        
+        # Download-Button während Download deaktivieren
+        $btnDownload.IsEnabled = $false
+        
+        Write-Log -Message "Download gestartet: $FileName" -Level 'INFO'
+          # WebClient für Download erstellen
+        $webClient = New-Object System.Net.WebClient
+        
+        # Event-Handler für Download-Completion
+        $webClient.add_DownloadFileCompleted({
+            param($s, $e)
+            # Dateiname aus UserState oder aus der lokalen Variable extrahieren
+            $currentFileName = if ($e.UserState) { $e.UserState } else { $FileName }
+            
+            if ($null -eq $e.Error -and -not $e.Cancelled) {
+                Write-Log -Message "Download erfolgreich abgeschlossen: $currentFileName" -Level 'INFO'
+            } else {
+                Write-Log -Message "Download fehlgeschlagen: $($e.Error.Message)" -Level 'ERROR'
+            }
+            
+            # UI zurücksetzen
+            $btnDownload.IsEnabled = $true
+            
+            # WebClient sicher entsorgen
+            try {
+                if ($null -ne $s -and $s -is [System.Net.WebClient]) {
+                    $s.Dispose()
+                }
+            } catch {
+                Write-Log -Message "Fehler beim Entsorgen des WebClients: $($_.Exception.Message)" -Level 'WARN'
+            }
+        })
+        
+        # Asynchronen Download starten mit Dateiname als UserState
+        $webClient.DownloadFileAsync($Url, $filePath, $FileName)
+        
+    } catch {
+        Write-Log -Message "Fehler beim Starten des Downloads: $($_.Exception.Message)" -Level 'ERROR'
+        $btnDownload.IsEnabled = $true
     }
 }
 #endregion
@@ -177,6 +306,49 @@ if ($null -ne $btnOpenFolder) {
 } else {
     Write-Log -Message "Button 'btnOpenFolder' konnte nicht gefunden werden" -Level 'WARN'
 }
+
+# Event-Handler für DATEV Downloads ComboBox
+if ($null -ne $cmbDirectDownloads) {
+    $cmbDirectDownloads.Add_SelectionChanged({
+        if ($cmbDirectDownloads.SelectedItem -ne $null) {
+            $btnDownload.IsEnabled = $true
+            $selectedItem = $cmbDirectDownloads.SelectedItem
+            Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'INFO'
+        } else {
+            $btnDownload.IsEnabled = $false
+        }
+    })
+} else {
+    Write-Log -Message "ComboBox 'cmbDirectDownloads' konnte nicht gefunden werden" -Level 'WARN'
+}
+
+# Event-Handler für Download-Button
+if ($null -ne $btnDownload) {
+    $btnDownload.Add_Click({
+        try {
+            if ($cmbDirectDownloads.SelectedItem -ne $null) {
+                $selectedItem = $cmbDirectDownloads.SelectedItem
+                $downloadInfo = $selectedItem.Tag
+                
+                # Dateiname aus URL extrahieren
+                $uri = [System.Uri]$downloadInfo.url
+                $fileName = Split-Path $uri.LocalPath -Leaf
+                if ([string]::IsNullOrEmpty($fileName)) {
+                    $fileName = "download_$(Get-Date -Format 'yyyyMMdd_HHmmss').exe"
+                }
+                
+                Start-BackgroundDownload -Url $downloadInfo.url -FileName $fileName
+            }
+        } catch {
+            Write-Log -Message "Fehler beim Starten des Downloads: $($_.Exception.Message)" -Level 'ERROR'
+        }
+    })
+} else {
+    Write-Log -Message "Button 'btnDownload' konnte nicht gefunden werden" -Level 'WARN'
+}
+
+# Downloads-ComboBox initialisieren
+Initialize-DownloadsComboBox
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet" -Level 'INFO'
