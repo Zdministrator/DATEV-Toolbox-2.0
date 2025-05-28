@@ -1,0 +1,24 @@
+# PowerShell-spezifische Dateien
+# *.ps1  # Entfernt, da Hauptskript versioniert werden soll
+*.psm1
+*.psd1
+
+# Visual Studio Dateien
+*.vspscc
+*.vssscc
+*.user
+*.suo
+*.ncb
+
+# Log-Dateien
+*.log
+Error-Log.txt
+settings.json
+
+# System-Dateien
+*.DS_Store
+Thumbs.db
+
+# IDE-Ordner
+.vscode/settings.json
+.vscode/launch.json
