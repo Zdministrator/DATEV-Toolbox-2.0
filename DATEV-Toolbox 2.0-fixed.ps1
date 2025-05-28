@@ -41,7 +41,9 @@ Add-Type -AssemblyName PresentationFramework
             <TabItem Header="DATEV Tools">
                 <Grid>
 
-                </Grid>            </TabItem>            <TabItem Header="DATEV Cloud">
+                </Grid>
+            </TabItem>
+            <TabItem Header="DATEV Cloud">
                 <Grid>
                     <GroupBox Margin="10">
                         <GroupBox.Header>
@@ -51,7 +53,8 @@ Add-Type -AssemblyName PresentationFramework
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>                            </Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <ComboBox Name="cmbDirectDownloads" Grid.Row="0" Margin="10,10,10,10" Height="25"/>
                             <Button Name="btnDownload" Grid.Row="1" Content="Download starten" Height="30" 
                                     VerticalAlignment="Top" Margin="10,0,10,10" IsEnabled="False"/>
@@ -68,7 +71,8 @@ Add-Type -AssemblyName PresentationFramework
                             Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,10,10,0"/>
                     <!-- Hier können zukünftig Einstellungen ergänzt werden -->
                 </Grid>
-            </TabItem>        </TabControl>
+            </TabItem>
+        </TabControl>
         <TextBox Name="txtLog" Grid.Row="1" Margin="10,5,10,10" 
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                  IsReadOnly="True" TextWrapping="Wrap" FontSize="10"/>
@@ -88,7 +92,7 @@ try {
 # Referenz auf das Log-Textfeld holen
 $txtLog = $window.FindName("txtLog")
 
-# Referenzen auf DATEV Cloud Elemente holen
+# Referenzen auf DATEV Cloud Tab-Elemente holen
 $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
 $btnDownload = $window.FindName("btnDownload")
 #endregion
@@ -166,7 +170,8 @@ function Get-Settings {
             return @{}
         }
     } catch {
-        Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'        return @{}
+        Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
+        return @{}
     }
 }
 #endregion
@@ -197,13 +202,6 @@ function Initialize-DownloadsComboBox {
         $downloads = Get-DATEVDownloads
         $cmbDirectDownloads.Items.Clear()
         
-        # Platzhalter-Element hinzufügen
-        $placeholderItem = New-Object System.Windows.Controls.ComboBoxItem
-        $placeholderItem.Content = "Download auswählen..."
-        $placeholderItem.IsEnabled = $false
-        $placeholderItem.Foreground = "Gray"
-        $cmbDirectDownloads.Items.Add($placeholderItem) | Out-Null
-        
         foreach ($download in $downloads) {
             $item = New-Object System.Windows.Controls.ComboBoxItem
             $item.Content = $download.name
@@ -214,11 +212,8 @@ function Initialize-DownloadsComboBox {
             $cmbDirectDownloads.Items.Add($item) | Out-Null
         }
         
-        # Platzhalter als Standardauswahl setzen
-        $cmbDirectDownloads.SelectedIndex = 0
-        
-        if ($cmbDirectDownloads.Items.Count -gt 1) {
-            Write-Log -Message "$($cmbDirectDownloads.Items.Count - 1) Downloads geladen" -Level 'INFO'
+        if ($cmbDirectDownloads.Items.Count -gt 0) {
+            Write-Log -Message "$($cmbDirectDownloads.Items.Count) Downloads geladen" -Level 'INFO'
         }
     } catch {
         Write-Log -Message "Fehler beim Initialisieren der Downloads-Liste: $($_.Exception.Message)" -Level 'ERROR'
@@ -263,7 +258,8 @@ function Start-BackgroundDownload {
         $btnDownload.IsEnabled = $false
         
         Write-Log -Message "Download gestartet: $FileName" -Level 'INFO'
-          # WebClient für Download erstellen
+        
+        # WebClient für Download erstellen
         $webClient = New-Object System.Net.WebClient
         
         # Event-Handler für Download-Completion
@@ -301,7 +297,7 @@ function Start-BackgroundDownload {
 }
 #endregion
 
-#region Fenster anzeigen
+#region Fenster anzeigen und Event-Handler
 # Referenz auf den Button zum Öffnen des Ordners holen (vor ShowDialog!)
 $btnOpenFolder = $window.FindName("btnOpenFolder")
 if ($null -ne $btnOpenFolder) {
@@ -324,9 +320,7 @@ if ($null -ne $btnOpenFolder) {
 # Event-Handler für DATEV Downloads ComboBox
 if ($null -ne $cmbDirectDownloads) {
     $cmbDirectDownloads.Add_SelectionChanged({
-        if ($null -ne $cmbDirectDownloads.SelectedItem -and 
-            $cmbDirectDownloads.SelectedIndex -gt 0 -and 
-            $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
+        if ($null -ne $cmbDirectDownloads.SelectedItem) {
             $btnDownload.IsEnabled = $true
             $selectedItem = $cmbDirectDownloads.SelectedItem
             Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'INFO'
@@ -342,9 +336,7 @@ if ($null -ne $cmbDirectDownloads) {
 if ($null -ne $btnDownload) {
     $btnDownload.Add_Click({
         try {
-            if ($null -ne $cmbDirectDownloads.SelectedItem -and 
-                $cmbDirectDownloads.SelectedIndex -gt 0 -and 
-                $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
+            if ($null -ne $cmbDirectDownloads.SelectedItem) {
                 $selectedItem = $cmbDirectDownloads.SelectedItem
                 $downloadInfo = $selectedItem.Tag
                 
