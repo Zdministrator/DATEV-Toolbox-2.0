@@ -52,12 +52,12 @@ Add-Type -AssemblyName PresentationFramework
 # XAML-Definition für das Hauptfenster mit Tabs und Log-Bereich
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        Title="DATEV-Toolbox 2.0" Height="550" Width="400">
-    <Grid>
+        Title="DATEV-Toolbox 2.0" Height="550" Width="400">    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
-        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV Tools">
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0"><TabItem Header="DATEV Tools">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Hier können zukünftige DATEV Tools hinzugefügt werden -->
@@ -164,10 +164,12 @@ Add-Type -AssemblyName PresentationFramework
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-        </TabControl>
-        <TextBox Name="txtLog" Grid.Row="1" Margin="10,5,10,10" 
+        </TabControl>        <TextBox Name="txtLog" Grid.Row="1" Margin="10,5,10,5" 
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                  IsReadOnly="True" TextWrapping="Wrap" FontSize="10"/>
+        <TextBlock Grid.Row="2" Text="Norman Zamponi | HEES GmbH | © 2025" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontSize="10" Foreground="Gray" Margin="10,2,10,5"/>
     </Grid>
 </Window>
 "@
