@@ -66,9 +66,9 @@ Add-Type -AssemblyName PresentationFramework
                                 <TextBlock Text="Hilfe und Support" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnHilfeCenter" Content="DATEV Hilfe Center" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnServicekontakte" Content="Servicekontakte" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnMyUpdates" Content="DATEV myUpdates" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnHilfeCenter" Content="DATEV Hilfe Center" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnServicekontakte" Content="Servicekontakte" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnMyUpdates" Content="DATEV myUpdates" Height="25" Margin="0,3,0,3"/>
                             </StackPanel>
                         </GroupBox>
                         
@@ -78,12 +78,12 @@ Add-Type -AssemblyName PresentationFramework
                                 <TextBlock Text="Cloud" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnMyDATEV" Content="myDATEV Portal" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnDUO" Content="DATEV Unternehmen Online" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnLAO" Content="Logistikauftrag Online" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnLizenzverwaltung" Content="Lizenzverwaltung Online" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnRechteraum" Content="DATEV Rechteraum Online" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnRVO" Content="DATEV Rechteverwaltung Online" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnMyDATEV" Content="myDATEV Portal" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnDUO" Content="DATEV Unternehmen Online" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnLAO" Content="Logistikauftrag Online" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnLizenzverwaltung" Content="Lizenzverwaltung Online" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnRechteraum" Content="DATEV Rechteraum Online" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnRVO" Content="DATEV Rechteverwaltung Online" Height="25" Margin="0,3,0,3"/>
                             </StackPanel>
                         </GroupBox>
                         
@@ -93,35 +93,39 @@ Add-Type -AssemblyName PresentationFramework
                                 <TextBlock Text="Verwaltung und Technik" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnSmartLogin" Content="SmartLogin Administration" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="30" Margin="0,3,0,3"/>
-                                <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnSmartLogin" Content="SmartLogin Administration" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="25" Margin="0,3,0,3"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
-            </TabItem>
-            <TabItem Header="Downloads">
-                <Grid>
-                    <GroupBox Margin="10">
+            </TabItem>            <TabItem Header="Downloads">
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <GroupBox Margin="0,0,0,10">
                         <GroupBox.Header>
-                            <TextBlock Text="Direkt Downloads" FontWeight="Bold" FontSize="12"/>
-                        </GroupBox.Header>                        <Grid Margin="10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Button Name="btnUpdateDownloads" Grid.Row="0" Content="Direkt-Downloads aktualisieren" Height="20" 
-                                    Margin="0,0,0,10"/>
-                            <ComboBox Name="cmbDirectDownloads" Grid.Row="1" Margin="0,0,0,10" Height="25"/>
-                            <Button Name="btnDownload" Grid.Row="2" Content="Download starten" Height="30" 
-                                    VerticalAlignment="Top" Margin="0,0,0,0" IsEnabled="False"/>
-                        </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Direkt Downloads" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Name="btnUpdateDownloads" Text="🔄" FontSize="14" Margin="8,0,0,0" 
+                                           ToolTip="Direkt-Downloads aktualisieren" VerticalAlignment="Center" 
+                                           Cursor="Hand" Foreground="Black"/>
+                            </StackPanel>
+                        </GroupBox.Header>                        <StackPanel Orientation="Vertical" Margin="10">                            <ComboBox Name="cmbDirectDownloads" Margin="0,0,0,10" Height="25"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="btnDownload" Grid.Column="0" Content="Download starten" Height="25" 
+                                        VerticalAlignment="Top" Margin="0,0,8,0" IsEnabled="False"/>
+                                <TextBlock Name="btnOpenDownloadFolder" Grid.Column="1" Text="📁" FontSize="16" Margin="0,0,0,0" 
+                                           ToolTip="Download-Ordner öffnen" VerticalAlignment="Center" 
+                                           Cursor="Hand" Foreground="Black"/>
+                            </Grid>
+                        </StackPanel>
                     </GroupBox>
-                </Grid>
-            </TabItem>            <TabItem Header="Einstellungen">
+                </StackPanel>
+            </TabItem><TabItem Header="Einstellungen">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Einstellungen -->
@@ -130,19 +134,21 @@ Add-Type -AssemblyName PresentationFramework
                                 <TextBlock Text="Einstellungen" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnOpenFolder" Content="Einstellungen öffnen" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnOpenFolder" Content="Einstellungen öffnen" Height="25" Margin="0,3,0,3"/>
                                 <!-- Hier können zukünftig Einstellungen ergänzt werden -->
                             </StackPanel>
                         </GroupBox>
-                        
-                        <!-- Anstehende Update-Termine -->
+                          <!-- Anstehende Update-Termine -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
-                                <TextBlock Text="Anstehende Update-Termine" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnUpdateDates" Content="Update-Termine aktualisieren" Height="20" Margin="0,3,0,3"/>
-                                <StackPanel Name="spUpdateDates" Orientation="Vertical" Margin="0,10,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Anstehende Update-Termine" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                    <TextBlock Name="btnUpdateDates" Text="🔄" FontSize="14" Margin="8,0,0,0" 
+                                               ToolTip="Update-Termine aktualisieren" VerticalAlignment="Center" 
+                                               Cursor="Hand" Foreground="Black"/>
+                                </StackPanel>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <StackPanel Name="spUpdateDates" Orientation="Vertical" Margin="0,0,0,0">
                                     <TextBlock Text="Klicken Sie auf 'Update-Termine aktualisieren'." 
                                                FontStyle="Italic" Foreground="Gray"/>
                                 </StackPanel>
@@ -176,6 +182,7 @@ $txtLog = $window.FindName("txtLog")
 $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
 $btnDownload = $window.FindName("btnDownload")
 $btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
+$btnOpenDownloadFolder = $window.FindName("btnOpenDownloadFolder")
 
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
@@ -450,6 +457,28 @@ function Start-BackgroundDownload {
 }
 #endregion
 
+#region Download-Ordner-Funktionen
+# Funktion zum Öffnen des Download-Ordners im Explorer
+function Open-DownloadFolder {
+    try {
+        $downloadFolder = Join-Path ([Environment]::GetFolderPath("UserProfile")) "Downloads\DATEV-Toolbox"
+        
+        # Ordner erstellen falls er nicht existiert
+        if (-not (Test-Path $downloadFolder)) {
+            New-Item -Path $downloadFolder -ItemType Directory -Force | Out-Null
+            Write-Log -Message "Download-Ordner erstellt: $downloadFolder" -Level 'INFO'
+        }
+        
+        # Ordner im Explorer öffnen
+        Start-Process explorer.exe $downloadFolder
+        Write-Log -Message "Download-Ordner im Explorer geöffnet: $downloadFolder" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen des Download-Ordners: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+#endregion
+
 #region Update-Termine-Funktionen
 # Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei
 function Show-NextUpdateDates {
@@ -605,6 +634,27 @@ function Show-NextUpdateDates {
     }
 }
 
+# Funktion zum automatischen Laden der Update-Termine beim Start (falls .ics-Datei vorhanden)
+function Initialize-UpdateDates {
+    $icsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
+    
+    if (Test-Path $icsFile) {
+        Write-Log -Message "Vorhandene ICS-Datei gefunden. Lade Update-Termine automatisch..." -Level 'INFO'
+        Show-NextUpdateDates
+    }
+    else {
+        Write-Log -Message "Keine lokale ICS-Datei gefunden. Update-Termine können manuell aktualisiert werden." -Level 'INFO'
+        if ($null -ne $spUpdateDates) {
+            $spUpdateDates.Children.Clear()
+            $tb = New-Object System.Windows.Controls.TextBlock
+            $tb.Text = "Klicken Sie auf 'Update-Termine aktualisieren'."
+            $tb.FontStyle = 'Italic'
+            $tb.Foreground = 'Gray'
+            $spUpdateDates.Children.Add($tb) | Out-Null
+        }
+    }
+}
+
 # Funktion zum Laden der ICS-Datei von DATEV
 function Update-UpdateDates {
     $icsUrl = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
@@ -750,14 +800,14 @@ else {
     Write-Log -Message "Button 'btnOpenFolder' konnte nicht gefunden werden" -Level 'WARN'
 }
 
-# Event-Handler für Update-Termine-Button
+# Event-Handler für Update-Termine-Button (TextBlock)
 if ($null -ne $btnUpdateDates) {
-    $btnUpdateDates.Add_Click({
+    $btnUpdateDates.Add_MouseLeftButtonDown({
             Update-UpdateDates
         })
 }
 else {
-    Write-Log -Message "Button 'btnUpdateDates' konnte nicht gefunden werden" -Level 'WARN'
+    Write-Log -Message "TextBlock 'btnUpdateDates' konnte nicht gefunden werden" -Level 'WARN'
 }
 
 # Event-Handler für DATEV Downloads ComboBox
@@ -808,18 +858,31 @@ else {
     Write-Log -Message "Button 'btnDownload' konnte nicht gefunden werden" -Level 'WARN'
 }
 
-# Event-Handler für Update-Downloads-Button
+# Event-Handler für Update-Downloads-Button (TextBlock)
 if ($null -ne $btnUpdateDownloads) {
-    $btnUpdateDownloads.Add_Click({
+    $btnUpdateDownloads.Add_MouseLeftButtonDown({
             Update-DATEVDownloads
         })
 }
 else {
-    Write-Log -Message "Button 'btnUpdateDownloads' konnte nicht gefunden werden" -Level 'WARN'
+    Write-Log -Message "TextBlock 'btnUpdateDownloads' konnte nicht gefunden werden" -Level 'WARN'
+}
+
+# Event-Handler für Download-Ordner-Icon (TextBlock)
+if ($null -ne $btnOpenDownloadFolder) {
+    $btnOpenDownloadFolder.Add_MouseLeftButtonDown({
+            Open-DownloadFolder
+        })
+}
+else {
+    Write-Log -Message "TextBlock 'btnOpenDownloadFolder' konnte nicht gefunden werden" -Level 'WARN'
 }
 
 # Downloads-ComboBox initialisieren
 Initialize-DownloadsComboBox
+
+# Update-Termine beim Start laden (falls vorhanden)
+Initialize-UpdateDates
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet" -Level 'INFO'
