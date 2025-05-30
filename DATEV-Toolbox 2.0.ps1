@@ -281,6 +281,36 @@ function Get-Settings {
 #endregion
 
 #region Update-Check-Funktionen
+# Funktion zum Bereinigen alter Update-Backups (behält nur die letzten 5)
+function Clear-OldUpdateBackups {
+    try {
+        $updateDir = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Updates'
+        if (-not (Test-Path $updateDir)) {
+            return
+        }
+        
+        # Alle Backup-Dateien finden und nach Datum sortieren
+        $backupFiles = Get-ChildItem -Path $updateDir -Filter "*.backup" | Sort-Object CreationTime -Descending
+        
+        # Nur die letzten 5 behalten, den Rest löschen
+        if ($backupFiles.Count -gt 5) {
+            $filesToDelete = $backupFiles | Select-Object -Skip 5
+            foreach ($file in $filesToDelete) {
+                try {
+                    Remove-Item $file.FullName -Force
+                    Write-Log -Message "Altes Backup gelöscht: $($file.Name)" -Level 'INFO'
+                }
+                catch {
+                    Write-Log -Message "Konnte altes Backup nicht löschen: $($file.Name) - $($_.Exception.Message)" -Level 'WARN'
+                }
+            }
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Bereinigen alter Backups: $($_.Exception.Message)" -Level 'WARN'
+    }
+}
+
 # Funktion zum Abrufen der aktuellen lokalen Version
 function Get-CurrentVersion {
     return $script:AppVersion
@@ -413,86 +443,140 @@ function Start-UpdateProcess {
     try {
         Write-Log -Message "Starte Update-Prozess für Version $($UpdateInfo.NewVersion)..." -Level 'INFO'
         
-        # Pfade definieren
+        # AppData-Verzeichnis für Updates erstellen
+        $appDataDir = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+        $updateDir = Join-Path $appDataDir 'Updates'
+        if (-not (Test-Path $updateDir)) {
+            New-Item -Path $updateDir -ItemType Directory -Force | Out-Null
+            Write-Log -Message "Update-Verzeichnis erstellt: $updateDir" -Level 'INFO'
+        }
+        
+        # Aktuellen Skript-Pfad ermitteln
         $currentScriptPath = $MyInvocation.ScriptName
         if ([string]::IsNullOrEmpty($currentScriptPath)) {
             $currentScriptPath = $PSCommandPath
         }
         
-        $backupPath = $currentScriptPath + ".backup"
-        $tempUpdatePath = $currentScriptPath + ".update"
-        $updateBatchPath = Join-Path $env:TEMP "DATEV-Toolbox-Update.bat"
+        if ([string]::IsNullOrEmpty($currentScriptPath)) {
+            throw "Kann den aktuellen Skript-Pfad nicht ermitteln"
+        }
         
-        # TLS 1.2 für sichere Downloads erzwingen
+        # Pfade im AppData-Ordner definieren
+        $timestamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
+        $backupPath = Join-Path $updateDir "DATEV-Toolbox-$timestamp.backup"
+        $tempUpdatePath = Join-Path $updateDir "DATEV-Toolbox-$($UpdateInfo.NewVersion).download"
+        $updateBatchPath = Join-Path $updateDir "Update-$timestamp.bat"
+        
+        Write-Log -Message "Update-Pfade: Backup=$backupPath, Download=$tempUpdatePath, Batch=$updateBatchPath" -Level 'INFO'
+          # TLS 1.2 für sichere Downloads erzwingen
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         
         # Neue Version herunterladen
-        Write-Log -Message "Lade neue Version herunter..." -Level 'INFO'
+        Write-Log -Message "Lade neue Version herunter nach: $tempUpdatePath" -Level 'INFO'
         Invoke-WebRequest -Uri $UpdateInfo.VersionInfo.downloadUrl -OutFile $tempUpdatePath -UseBasicParsing -TimeoutSec 30
         
-        # Integrität prüfen (einfache Größenprüfung)
+        # Erweiterte Integrität prüfen
         $downloadedFile = Get-Item $tempUpdatePath
         if ($downloadedFile.Length -lt 1000) {
-            throw "Heruntergeladene Datei ist zu klein und möglicherweise beschädigt"
+            throw "Heruntergeladene Datei ist zu klein ($($downloadedFile.Length) Bytes) und möglicherweise beschädigt"
         }
         
-        Write-Log -Message "Download erfolgreich. Erstelle Update-Batch-Skript..." -Level 'INFO'
+        # PowerShell-Syntax-Check der heruntergeladenen Datei
+        try {
+            $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $tempUpdatePath -Raw), [ref]$null)
+            Write-Log -Message "PowerShell-Syntax-Prüfung der heruntergeladenen Datei erfolgreich" -Level 'INFO'
+        }
+        catch {
+            throw "Heruntergeladene Datei hat ungültige PowerShell-Syntax: $($_.Exception.Message)"
+        }
         
-        # Batch-Skript für verzögertes Update erstellen
+        Write-Log -Message "Download erfolgreich ($($downloadedFile.Length) Bytes). Erstelle Backup und Update-Skript..." -Level 'INFO'
+          # Batch-Skript für verzögertes Update erstellen
         $batchContent = @"
 @echo off
-echo Warte auf Beendigung der DATEV-Toolbox...
-timeout /t 2 /nobreak >nul
+echo ===============================================
+echo DATEV-Toolbox 2.0 Update-Installation
+echo Version: $($UpdateInfo.NewVersion)
+echo ===============================================
+echo.
 
-echo Erstelle Backup der aktuellen Version...
+echo [1/5] Warte auf Beendigung der DATEV-Toolbox...
+timeout /t 3 /nobreak >nul
+
+echo [2/5] Erstelle Backup der aktuellen Version...
 copy "$currentScriptPath" "$backupPath" >nul
 if errorlevel 1 (
-    echo Fehler beim Erstellen des Backups!
+    echo FEHLER: Backup konnte nicht erstellt werden!
+    echo Aktuelle Datei: $currentScriptPath
+    echo Backup-Ziel: $backupPath
     pause
     exit /b 1
 )
+echo Backup erfolgreich erstellt: $backupPath
 
-echo Installiere neue Version...
+echo [3/5] Installiere neue Version...
 copy "$tempUpdatePath" "$currentScriptPath" >nul
 if errorlevel 1 (
-    echo Fehler beim Installieren der neuen Version!
+    echo FEHLER: Installation der neuen Version fehlgeschlagen!
     echo Stelle Backup wieder her...
     copy "$backupPath" "$currentScriptPath" >nul
+    if errorlevel 1 (
+        echo KRITISCHER FEHLER: Rollback fehlgeschlagen!
+        echo Backup manuell wiederherstellen: $backupPath
+        pause
+        exit /b 2
+    )
+    echo Rollback erfolgreich.
     pause
     exit /b 1
 )
+echo Installation erfolgreich.
 
-echo Bereinige temporäre Dateien...
+echo [4/5] Bereinige temporäre Dateien...
 del "$tempUpdatePath" >nul 2>&1
 
-echo Update erfolgreich installiert!
-echo Starte DATEV-Toolbox neu...
+echo [5/5] Starte DATEV-Toolbox neu...
+echo.
+echo Update auf Version $($UpdateInfo.NewVersion) erfolgreich installiert!
 start "" pwsh.exe -File "$currentScriptPath"
 
-echo Bereinige Update-Skript...
+echo.
+echo Bereinige Update-Skript in 5 Sekunden...
+timeout /t 5 /nobreak >nul
 del "%~f0" >nul 2>&1
 "@
-        
-        Set-Content -Path $updateBatchPath -Value $batchContent -Encoding ASCII
+          Set-Content -Path $updateBatchPath -Value $batchContent -Encoding ASCII
         
         Write-Log -Message "Update wird angewendet. Anwendung wird neu gestartet..." -Level 'INFO'
-        
-        # Update-Einstellungen speichern
+        Write-Log -Message "Backup wird erstellt unter: $backupPath" -Level 'INFO'
+          # Update-Einstellungen speichern
         $settings = Get-Settings
         if ($settings -is [PSCustomObject]) {
-            $settings = @{}
+            $settingsHash = @{}
             foreach ($property in $settings.PSObject.Properties) {
-                $settings[$property.Name] = $property.Value
+                $settingsHash[$property.Name] = $property.Value
             }
+            $settings = $settingsHash
         }
         $settings.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         $settings.lastInstalledVersion = $UpdateInfo.NewVersion
+        $settings.lastBackupPath = $backupPath
+        $settings.updateHistory = if ($settings.updateHistory) { $settings.updateHistory } else { @() }
+        $settings.updateHistory += @{
+            version = $UpdateInfo.NewVersion
+            date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+            backupPath = $backupPath
+        }
         Set-Settings -Settings $settings
         
-        # Batch-Skript ausführen und Anwendung beenden
-        Start-Process -FilePath $updateBatchPath -WindowStyle Hidden
+        # Alte Backups bereinigen (behält nur die letzten 5)
+        Clear-OldUpdateBackups
+          # Batch-Skript ausführen und Anwendung beenden
+        Write-Log -Message "Starte Update-Batch-Skript: $updateBatchPath" -Level 'INFO'
+        Start-Process -FilePath $updateBatchPath -WindowStyle Normal
         
-        # Fenster schließen
+        # Kurz warten und dann Fenster schließen
+        Start-Sleep -Milliseconds 500
         $window.Close()
         
         return $true
@@ -500,12 +584,18 @@ del "%~f0" >nul 2>&1
     catch {
         Write-Log -Message "Fehler beim Update-Prozess: $($_.Exception.Message)" -Level 'ERROR'
         
-        # Aufräumen bei Fehler
-        if (Test-Path $tempUpdatePath) {
-            Remove-Item $tempUpdatePath -Force -ErrorAction SilentlyContinue
-        }
-        if (Test-Path $updateBatchPath) {
-            Remove-Item $updateBatchPath -Force -ErrorAction SilentlyContinue
+        # Aufräumen bei Fehler - alle temporären Dateien im AppData-Ordner
+        $filesToCleanup = @($tempUpdatePath, $updateBatchPath)
+        foreach ($file in $filesToCleanup) {
+            if (Test-Path $file) {
+                try {
+                    Remove-Item $file -Force -ErrorAction Stop
+                    Write-Log -Message "Temporäre Datei bereinigt: $file" -Level 'INFO'
+                }
+                catch {
+                    Write-Log -Message "Konnte temporäre Datei nicht bereinigen: $file - $($_.Exception.Message)" -Level 'WARN'
+                }
+            }
         }
         
         [System.Windows.MessageBox]::Show(
