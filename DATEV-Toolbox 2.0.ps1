@@ -24,6 +24,13 @@
 
 # DATEV-Toolbox 2.0
 
+# Version und Update-Konfiguration
+$script:AppVersion = "2.0.0"
+$script:AppName = "DATEV-Toolbox 2.0"
+$script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
+$script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
+$script:ScriptDownloadUrl = "https://github.com/$script:GitHubRepo/raw/main/DATEV-Toolbox 2.0.ps1"
+
 #region Initialisierung und GUI
 # Konsole verstecken (funktioniert nur wenn als .ps1 ausgeführt)
 Add-Type -Name Window -Namespace Console -MemberDefinition '
@@ -132,9 +139,9 @@ Add-Type -AssemblyName PresentationFramework
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="Einstellungen" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
                                 <Button Name="btnOpenFolder" Content="Einstellungen öffnen" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnCheckUpdate" Content="Nach Updates suchen" Height="25" Margin="0,3,0,3"/>
                                 <!-- Hier können zukünftig Einstellungen ergänzt werden -->
                             </StackPanel>
                         </GroupBox>
@@ -267,6 +274,340 @@ function Get-Settings {
     }
     catch {
         Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'        return @{}
+    }
+}
+#endregion
+
+#region Update-Check-Funktionen
+# Funktion zum Abrufen der aktuellen lokalen Version
+function Get-CurrentVersion {
+    return $script:AppVersion
+}
+
+# Funktion zum Vergleichen von Versionen (Semantic Versioning)
+function Compare-Version {
+    param(
+        [Parameter(Mandatory = $true)][string]$Version1,
+        [Parameter(Mandatory = $true)][string]$Version2
+    )
+    
+    try {
+        $v1Parts = $Version1 -split '\.' | ForEach-Object { [int]$_ }
+        $v2Parts = $Version2 -split '\.' | ForEach-Object { [int]$_ }
+        
+        # Sicherstellen dass beide Arrays die gleiche Länge haben
+        $maxLength = [Math]::Max($v1Parts.Length, $v2Parts.Length)
+        while ($v1Parts.Length -lt $maxLength) { $v1Parts += 0 }
+        while ($v2Parts.Length -lt $maxLength) { $v2Parts += 0 }
+        
+        for ($i = 0; $i -lt $maxLength; $i++) {
+            if ($v1Parts[$i] -lt $v2Parts[$i]) { return -1 }
+            if ($v1Parts[$i] -gt $v2Parts[$i]) { return 1 }
+        }
+        return 0
+    }
+    catch {
+        Write-Log -Message "Fehler beim Vergleichen der Versionen: $($_.Exception.Message)" -Level 'ERROR'
+        return 0
+    }
+}
+
+# Funktion zum Prüfen auf verfügbare Updates
+function Test-ForUpdates {
+    param(
+        [switch]$Silent
+    )
+    
+    try {
+        if (-not $Silent) {
+            Write-Log -Message "Prüfe auf verfügbare Updates..." -Level 'INFO'
+        }
+        
+        # TLS 1.2 für sichere Downloads erzwingen
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        # Version.json von GitHub laden
+        $versionInfo = Invoke-RestMethod -Uri $script:UpdateCheckUrl -TimeoutSec 10 -UseBasicParsing
+        
+        $currentVersion = Get-CurrentVersion
+        $remoteVersion = $versionInfo.version
+        
+        Write-Log -Message "Aktuelle Version: $currentVersion, Verfügbare Version: $remoteVersion" -Level 'INFO'
+        
+        $comparison = Compare-Version -Version1 $currentVersion -Version2 $remoteVersion
+        
+        if ($comparison -lt 0) {
+            # Update verfügbar
+            if (-not $Silent) {
+                Write-Log -Message "Update verfügbar: Version $remoteVersion" -Level 'INFO'
+            }
+            return @{
+                UpdateAvailable = $true
+                CurrentVersion = $currentVersion
+                NewVersion = $remoteVersion
+                VersionInfo = $versionInfo
+            }
+        }
+        else {
+            if (-not $Silent) {
+                Write-Log -Message "Sie verwenden bereits die neueste Version" -Level 'INFO'
+            }
+            return @{
+                UpdateAvailable = $false
+                CurrentVersion = $currentVersion
+                NewVersion = $remoteVersion
+                VersionInfo = $versionInfo
+            }
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Prüfen auf Updates: $($_.Exception.Message)" -Level 'ERROR'
+        return @{
+            UpdateAvailable = $false
+            Error = $_.Exception.Message
+        }
+    }
+}
+
+# Funktion zum Anzeigen des Update-Dialogs
+function Show-UpdateDialog {
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo
+    )
+    
+    try {
+        $changelog = if ($UpdateInfo.VersionInfo.changelog) { 
+            "`n`nÄnderungen:`n" + ($UpdateInfo.VersionInfo.changelog -join "`n• ")
+        } else { "" }
+        
+        $message = "Ein Update ist verfügbar!`n`n" +
+                  "Aktuelle Version: $($UpdateInfo.CurrentVersion)`n" +
+                  "Neue Version: $($UpdateInfo.NewVersion)`n" +
+                  "Erscheinungsdatum: $($UpdateInfo.VersionInfo.releaseDate)" +
+                  $changelog +
+                  "`n`nMöchten Sie jetzt aktualisieren?"
+        
+        $result = [System.Windows.MessageBox]::Show(
+            $message,
+            "Update verfügbar - $script:AppName",
+            [System.Windows.MessageBoxButton]::YesNo,
+            [System.Windows.MessageBoxImage]::Question
+        )
+        
+        return $result -eq [System.Windows.MessageBoxResult]::Yes
+    }
+    catch {
+        Write-Log -Message "Fehler beim Anzeigen des Update-Dialogs: $($_.Exception.Message)" -Level 'ERROR'
+        return $false
+    }
+}
+
+# Funktion zum Herunterladen und Anwenden eines Updates
+function Start-UpdateProcess {
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo
+    )
+    
+    try {
+        Write-Log -Message "Starte Update-Prozess für Version $($UpdateInfo.NewVersion)..." -Level 'INFO'
+        
+        # Pfade definieren
+        $currentScriptPath = $MyInvocation.ScriptName
+        if ([string]::IsNullOrEmpty($currentScriptPath)) {
+            $currentScriptPath = $PSCommandPath
+        }
+        
+        $backupPath = $currentScriptPath + ".backup"
+        $tempUpdatePath = $currentScriptPath + ".update"
+        $updateBatchPath = Join-Path $env:TEMP "DATEV-Toolbox-Update.bat"
+        
+        # TLS 1.2 für sichere Downloads erzwingen
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        # Neue Version herunterladen
+        Write-Log -Message "Lade neue Version herunter..." -Level 'INFO'
+        Invoke-WebRequest -Uri $UpdateInfo.VersionInfo.downloadUrl -OutFile $tempUpdatePath -UseBasicParsing -TimeoutSec 30
+        
+        # Integrität prüfen (einfache Größenprüfung)
+        $downloadedFile = Get-Item $tempUpdatePath
+        if ($downloadedFile.Length -lt 1000) {
+            throw "Heruntergeladene Datei ist zu klein und möglicherweise beschädigt"
+        }
+        
+        Write-Log -Message "Download erfolgreich. Erstelle Update-Batch-Skript..." -Level 'INFO'
+        
+        # Batch-Skript für verzögertes Update erstellen
+        $batchContent = @"
+@echo off
+echo Warte auf Beendigung der DATEV-Toolbox...
+timeout /t 2 /nobreak >nul
+
+echo Erstelle Backup der aktuellen Version...
+copy "$currentScriptPath" "$backupPath" >nul
+if errorlevel 1 (
+    echo Fehler beim Erstellen des Backups!
+    pause
+    exit /b 1
+)
+
+echo Installiere neue Version...
+copy "$tempUpdatePath" "$currentScriptPath" >nul
+if errorlevel 1 (
+    echo Fehler beim Installieren der neuen Version!
+    echo Stelle Backup wieder her...
+    copy "$backupPath" "$currentScriptPath" >nul
+    pause
+    exit /b 1
+)
+
+echo Bereinige temporäre Dateien...
+del "$tempUpdatePath" >nul 2>&1
+
+echo Update erfolgreich installiert!
+echo Starte DATEV-Toolbox neu...
+start "" pwsh.exe -File "$currentScriptPath"
+
+echo Bereinige Update-Skript...
+del "%~f0" >nul 2>&1
+"@
+        
+        Set-Content -Path $updateBatchPath -Value $batchContent -Encoding ASCII
+        
+        Write-Log -Message "Update wird angewendet. Anwendung wird neu gestartet..." -Level 'INFO'
+        
+        # Update-Einstellungen speichern
+        $settings = Get-Settings
+        if ($settings -is [PSCustomObject]) {
+            $settings = @{}
+            foreach ($property in $settings.PSObject.Properties) {
+                $settings[$property.Name] = $property.Value
+            }
+        }
+        $settings.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+        $settings.lastInstalledVersion = $UpdateInfo.NewVersion
+        Set-Settings -Settings $settings
+        
+        # Batch-Skript ausführen und Anwendung beenden
+        Start-Process -FilePath $updateBatchPath -WindowStyle Hidden
+        
+        # Fenster schließen
+        $window.Close()
+        
+        return $true
+    }
+    catch {
+        Write-Log -Message "Fehler beim Update-Prozess: $($_.Exception.Message)" -Level 'ERROR'
+        
+        # Aufräumen bei Fehler
+        if (Test-Path $tempUpdatePath) {
+            Remove-Item $tempUpdatePath -Force -ErrorAction SilentlyContinue
+        }
+        if (Test-Path $updateBatchPath) {
+            Remove-Item $updateBatchPath -Force -ErrorAction SilentlyContinue
+        }
+        
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Update-Prozess:`n$($_.Exception.Message)",
+            "Update fehlgeschlagen",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+        
+        return $false
+    }
+}
+
+# Funktion für automatischen Update-Check beim Start
+function Initialize-UpdateCheck {
+    try {
+        # Einstellungen laden
+        $settings = Get-Settings
+        $checkInterval = 24 # Stunden
+        
+        # Letzten Check-Zeitpunkt prüfen
+        $lastCheck = $null
+        if ($settings.lastUpdateCheck) {
+            try {
+                $lastCheck = [DateTime]::Parse($settings.lastUpdateCheck)
+            }
+            catch {
+                Write-Log -Message "Ungültiger lastUpdateCheck Wert, setze zurück" -Level 'WARN'
+            }
+        }
+        
+        $shouldCheck = $false
+        if ($null -eq $lastCheck) {
+            $shouldCheck = $true
+            Write-Log -Message "Erster Update-Check wird durchgeführt" -Level 'INFO'
+        }
+        elseif ($lastCheck.AddHours($checkInterval) -lt (Get-Date)) {
+            $shouldCheck = $true
+            Write-Log -Message "Update-Check-Intervall erreicht (alle $checkInterval Stunden)" -Level 'INFO'
+        }
+        
+        if ($shouldCheck) {            # Stillen Update-Check durchführen
+            $updateInfo = Test-ForUpdates -Silent
+            
+            if ($updateInfo.UpdateAvailable) {
+                Write-Log -Message "Update verfügbar: Version $($updateInfo.NewVersion)" -Level 'INFO'
+                
+                # Update-Dialog anzeigen
+                $userWantsUpdate = Show-UpdateDialog -UpdateInfo $updateInfo
+                
+                if ($userWantsUpdate) {
+                    Start-UpdateProcess -UpdateInfo $updateInfo
+                }
+                else {
+                    Write-Log -Message "Benutzer hat Update abgelehnt" -Level 'INFO'
+                }
+            }
+            
+            # Letzten Check-Zeitpunkt aktualisieren
+            if ($settings -is [PSCustomObject]) {
+                $settingsHash = @{
+                }
+                foreach ($property in $settings.PSObject.Properties) {
+                    $settingsHash[$property.Name] = $property.Value
+                }
+                $settings = $settingsHash
+            }
+            $settings.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+            Set-Settings -Settings $settings
+        }
+        else {
+            Write-Log -Message "Update-Check übersprungen (letzter Check: $($lastCheck.ToString('yyyy-MM-dd HH:mm')))" -Level 'INFO'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim automatischen Update-Check: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+# Funktion für manuellen Update-Check
+function Start-ManualUpdateCheck {
+    try {
+        Write-Log -Message "Manueller Update-Check gestartet..." -Level 'INFO'
+        
+        $updateInfo = Test-ForUpdates
+        
+        if ($updateInfo.UpdateAvailable) {
+            $userWantsUpdate = Show-UpdateDialog -UpdateInfo $updateInfo
+            
+            if ($userWantsUpdate) {
+                Start-UpdateProcess -UpdateInfo $updateInfo
+            }
+        }
+        else {
+            [System.Windows.MessageBox]::Show(
+                "Sie verwenden bereits die neueste Version ($($updateInfo.CurrentVersion)).",
+                "Kein Update verfügbar",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Information
+            )
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim manuellen Update-Check: $($_.Exception.Message)" -Level 'ERROR'
     }
 }
 #endregion
@@ -800,6 +1141,17 @@ else {
     Write-Log -Message "Button 'btnOpenFolder' konnte nicht gefunden werden" -Level 'WARN'
 }
 
+# Event-Handler für Update-Check-Button
+$btnCheckUpdate = $window.FindName("btnCheckUpdate")
+if ($null -ne $btnCheckUpdate) {
+    $btnCheckUpdate.Add_Click({
+            Start-ManualUpdateCheck
+        })
+}
+else {
+    Write-Log -Message "Button 'btnCheckUpdate' konnte nicht gefunden werden" -Level 'WARN'
+}
+
 # Event-Handler für Update-Termine-Button (TextBlock)
 if ($null -ne $btnUpdateDates) {
     $btnUpdateDates.Add_MouseLeftButtonDown({
@@ -883,6 +1235,9 @@ Initialize-DownloadsComboBox
 
 # Update-Termine beim Start laden (falls vorhanden)
 Initialize-UpdateDates
+
+# Automatischen Update-Check durchführen
+Initialize-UpdateCheck
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet" -Level 'INFO'
