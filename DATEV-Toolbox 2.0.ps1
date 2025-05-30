@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     DATEV-Toolbox 2.0 - Eine WPF-basierte PowerShell-Anwendung
 
@@ -25,6 +25,20 @@
 # DATEV-Toolbox 2.0
 
 #region Initialisierung und GUI
+# Konsole verstecken (funktioniert nur wenn als .ps1 ausgeführt)
+Add-Type -Name Window -Namespace Console -MemberDefinition '
+[DllImport("Kernel32.dll")]
+public static extern IntPtr GetConsoleWindow();
+[DllImport("user32.dll")]
+public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
+'
+
+# Konsole verstecken
+$consolePtr = [Console.Window]::GetConsoleWindow()
+if ($consolePtr -ne [System.IntPtr]::Zero) {
+    [Console.Window]::ShowWindow($consolePtr, 0) | Out-Null
+}
+
 # Benötigte .NET-Assembly für WPF-GUI laden
 Add-Type -AssemblyName PresentationFramework
 
@@ -36,50 +50,108 @@ Add-Type -AssemblyName PresentationFramework
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
-        </Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV Tools">
+        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV Tools">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Orientation="Vertical" Margin="10">                        <GroupBox Margin="5,5,5,5">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- Hier können zukünftige DATEV Tools hinzugefügt werden -->
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="DATEV Online">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- Hilfe und Support -->
+                        <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Anstehende Update-Termine" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
-                                    <Button Name="btnUpdateDates" Content="Aktualisieren" Height="20" Margin="10,0,0,0" Padding="5,0"/>
-                                </StackPanel>
+                                <TextBlock Text="Hilfe und Support" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
-                            <StackPanel Name="spUpdateDates" MinHeight="80">
-                                <TextBlock Text="Klicken Sie auf 'Aktualisieren', um die neuesten Update-Termine zu laden." FontStyle="Italic" Foreground="Gray"/>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnHilfeCenter" Content="DATEV Hilfe Center" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnServicekontakte" Content="Servicekontakte" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnMyUpdates" Content="DATEV myUpdates" Height="30" Margin="0,3,0,3"/>
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <!-- Cloud -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="Cloud" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnMyDATEV" Content="myDATEV Portal" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnDUO" Content="DATEV Unternehmen Online" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnLAO" Content="Logistikauftrag Online" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnLizenzverwaltung" Content="Lizenzverwaltung Online" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnRechteraum" Content="DATEV Rechteraum Online" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnRVO" Content="DATEV Rechteverwaltung Online" Height="30" Margin="0,3,0,3"/>
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <!-- Verwaltung und Technik -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="Verwaltung und Technik" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnSmartLogin" Content="SmartLogin Administration" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="30" Margin="0,3,0,3"/>
+                                <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="30" Margin="0,3,0,3"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
-            </TabItem><TabItem Header="Downloads">
+            </TabItem>
+            <TabItem Header="Downloads">
                 <Grid>
                     <GroupBox Margin="10">
                         <GroupBox.Header>
-                            <TextBlock Text="Direkt Downloads" FontWeight="Bold"/>
-                        </GroupBox.Header>
-                        <Grid>
+                            <TextBlock Text="Direkt Downloads" FontWeight="Bold" FontSize="12"/>
+                        </GroupBox.Header>                        <Grid Margin="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>                            </Grid.RowDefinitions>
-                            <ComboBox Name="cmbDirectDownloads" Grid.Row="0" Margin="10,10,10,10" Height="25"/>
-                            <Button Name="btnDownload" Grid.Row="1" Content="Download starten" Height="30" 
-                                    VerticalAlignment="Top" Margin="10,0,10,10" IsEnabled="False"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Button Name="btnUpdateDownloads" Grid.Row="0" Content="Direkt-Downloads aktualisieren" Height="20" 
+                                    Margin="0,0,0,10"/>
+                            <ComboBox Name="cmbDirectDownloads" Grid.Row="1" Margin="0,0,0,10" Height="25"/>
+                            <Button Name="btnDownload" Grid.Row="2" Content="Download starten" Height="30" 
+                                    VerticalAlignment="Top" Margin="0,0,0,0" IsEnabled="False"/>
                         </Grid>
                     </GroupBox>
                 </Grid>
+            </TabItem>            <TabItem Header="Einstellungen">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- Einstellungen -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="Einstellungen" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnOpenFolder" Content="Einstellungen öffnen" Height="30" Margin="0,3,0,3"/>
+                                <!-- Hier können zukünftig Einstellungen ergänzt werden -->
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <!-- Anstehende Update-Termine -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="Anstehende Update-Termine" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnUpdateDates" Content="Update-Termine aktualisieren" Height="20" Margin="0,3,0,3"/>
+                                <StackPanel Name="spUpdateDates" Orientation="Vertical" Margin="0,10,0,0">
+                                    <TextBlock Text="Klicken Sie auf 'Update-Termine aktualisieren'." 
+                                               FontStyle="Italic" Foreground="Gray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
-            <TabItem Header="Einstellungen">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Name="btnOpenFolder" Content="Einstellungen öffnen" Height="30"
-                            Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,10,10,0"/>
-                    <!-- Hier können zukünftig Einstellungen ergänzt werden -->
-                </Grid>
-            </TabItem>        </TabControl>
+        </TabControl>
         <TextBox Name="txtLog" Grid.Row="1" Margin="10,5,10,10" 
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                  IsReadOnly="True" TextWrapping="Wrap" FontSize="10"/>
@@ -103,6 +175,7 @@ $txtLog = $window.FindName("txtLog")
 # Referenzen auf DATEV Cloud Elemente holen
 $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
 $btnDownload = $window.FindName("btnDownload")
+$btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
 
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
@@ -195,21 +268,67 @@ function Get-Settings {
 # Funktion zum Laden der DATEV Downloads aus datev-downloads.json
 function Get-DATEVDownloads {
     try {
-        $downloadsFile = Join-Path $PSScriptRoot 'datev-downloads.json'
-        if (Test-Path $downloadsFile) {
-            $json = Get-Content -Path $downloadsFile -Raw -Encoding UTF8
+        # Nur im AppData-Ordner suchen
+        $appDataFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'datev-downloads.json'
+        
+        if (Test-Path $appDataFile) {
+            $json = Get-Content -Path $appDataFile -Raw -Encoding UTF8
             $downloadsData = $json | ConvertFrom-Json
-            Write-Log -Message "DATEV Downloads erfolgreich geladen" -Level 'INFO'
+            Write-Log -Message "DATEV Downloads erfolgreich aus AppData geladen" -Level 'INFO'
             return $downloadsData.downloads
         }
         else {
-            Write-Log -Message "Datei 'datev-downloads.json' nicht gefunden" -Level 'WARN'
+            Write-Log -Message "Keine datev-downloads.json im AppData-Ordner gefunden. Bitte erst aktualisieren." -Level 'WARN'
             return @()
         }
     }
     catch {
         Write-Log -Message "Fehler beim Laden der DATEV Downloads: $($_.Exception.Message)" -Level 'ERROR'
         return @()
+    }
+}
+
+# Funktion zum Aktualisieren der datev-downloads.json aus GitHub
+function Update-DATEVDownloads {
+    $downloadsUrl = "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/refs/heads/main/datev-downloads.json"
+    $localFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'datev-downloads.json'
+    
+    Write-Log -Message "Benutzeraktion: Direkt-Downloads aktualisieren geklickt. Lade JSON von $downloadsUrl" -Level 'INFO'
+    
+    try {
+        # Verzeichnis erstellen falls es nicht existiert
+        $downloadsDir = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+        if (-not (Test-Path $downloadsDir)) {
+            New-Item -Path $downloadsDir -ItemType Directory -Force | Out-Null
+            Write-Log -Message "Downloads-Verzeichnis erstellt: $downloadsDir" -Level 'INFO'
+        }
+        
+        # Button während Download deaktivieren
+        if ($null -ne $btnUpdateDownloads) {
+            $btnUpdateDownloads.IsEnabled = $false
+        }
+        
+        # TLS 1.2 für sichere Downloads erzwingen
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        # JSON-Datei herunterladen
+        Invoke-WebRequest -Uri $downloadsUrl -OutFile $localFile -UseBasicParsing -TimeoutSec 15
+        
+        Write-Log -Message "Downloads-JSON erfolgreich aktualisiert: $localFile" -Level 'INFO'
+        
+        # ComboBox neu initialisieren mit aktualisierten Daten
+        Initialize-DownloadsComboBox
+        
+        Write-Log -Message "Downloads-Liste erfolgreich aktualisiert" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Aktualisieren der Downloads-JSON: $($_.Exception.Message)" -Level 'ERROR'
+    }
+    finally {
+        # Button wieder aktivieren
+        if ($null -ne $btnUpdateDownloads) {
+            $btnUpdateDownloads.IsEnabled = $true
+        }
     }
 }
 
@@ -285,7 +404,7 @@ function Start-BackgroundDownload {
         
         # Download-Button während Download deaktivieren
         $btnDownload.IsEnabled = $false
-          Write-Log -Message "Download gestartet: $FileName" -Level 'INFO'
+        Write-Log -Message "Download gestartet: $FileName" -Level 'INFO'
         
         # TLS 1.2 für sichere Downloads erzwingen
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
@@ -534,6 +653,82 @@ function Update-UpdateDates {
 #endregion
 
 #region Fenster anzeigen
+# Funktion zum Öffnen von URLs im Standard-Browser
+function Open-Url {
+    param([string]$Url)
+    try {
+        Start-Process $Url
+        Write-Log -Message "URL geöffnet: $Url" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen der URL $Url`: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+# Event-Handler für DATEV Online Buttons
+# Hilfe und Support
+$btnHilfeCenter = $window.FindName("btnHilfeCenter")
+if ($null -ne $btnHilfeCenter) {
+    $btnHilfeCenter.Add_Click({ Open-Url -Url "https://apps.datev.de/help-center/" })
+}
+
+$btnServicekontakte = $window.FindName("btnServicekontakte")
+if ($null -ne $btnServicekontakte) {
+    $btnServicekontakte.Add_Click({ Open-Url -Url "https://apps.datev.de/servicekontakt-online/contacts" })
+}
+
+$btnMyUpdates = $window.FindName("btnMyUpdates")
+if ($null -ne $btnMyUpdates) {
+    $btnMyUpdates.Add_Click({ Open-Url -Url "https://apps.datev.de/myupdates/home" })
+}
+
+# Cloud
+$btnMyDATEV = $window.FindName("btnMyDATEV")
+if ($null -ne $btnMyDATEV) {
+    $btnMyDATEV.Add_Click({ Open-Url -Url "https://apps.datev.de/mydatev" })
+}
+
+$btnDUO = $window.FindName("btnDUO")
+if ($null -ne $btnDUO) {
+    $btnDUO.Add_Click({ Open-Url -Url "https://duo.datev.de/" })
+}
+
+$btnLAO = $window.FindName("btnLAO")
+if ($null -ne $btnLAO) {
+    $btnLAO.Add_Click({ Open-Url -Url "https://apps.datev.de/lao" })
+}
+
+$btnLizenzverwaltung = $window.FindName("btnLizenzverwaltung")
+if ($null -ne $btnLizenzverwaltung) {
+    $btnLizenzverwaltung.Add_Click({ Open-Url -Url "https://apps.datev.de/lizenzverwaltung" })
+}
+
+$btnRechteraum = $window.FindName("btnRechteraum")
+if ($null -ne $btnRechteraum) {
+    $btnRechteraum.Add_Click({ Open-Url -Url "https://apps.datev.de/rechteraum" })
+}
+
+$btnRVO = $window.FindName("btnRVO")
+if ($null -ne $btnRVO) {
+    $btnRVO.Add_Click({ Open-Url -Url "https://apps.datev.de/rvo-administration" })
+}
+
+# Verwaltung und Technik
+$btnSmartLogin = $window.FindName("btnSmartLogin")
+if ($null -ne $btnSmartLogin) {
+    $btnSmartLogin.Add_Click({ Open-Url -Url "https://go.datev.de/smartlogin-administration" })
+}
+
+$btnBestandsmanagement = $window.FindName("btnBestandsmanagement")
+if ($null -ne $btnBestandsmanagement) {
+    $btnBestandsmanagement.Add_Click({ Open-Url -Url "https://apps.datev.de/mydata/" })
+}
+
+$btnWeitereApps = $window.FindName("btnWeitereApps")
+if ($null -ne $btnWeitereApps) {
+    $btnWeitereApps.Add_Click({ Open-Url -Url "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/" })
+}
+
 # Referenz auf den Button zum Öffnen des Ordners holen (vor ShowDialog!)
 $btnOpenFolder = $window.FindName("btnOpenFolder")
 if ($null -ne $btnOpenFolder) {
@@ -558,8 +753,8 @@ else {
 # Event-Handler für Update-Termine-Button
 if ($null -ne $btnUpdateDates) {
     $btnUpdateDates.Add_Click({
-        Update-UpdateDates
-    })
+            Update-UpdateDates
+        })
 }
 else {
     Write-Log -Message "Button 'btnUpdateDates' konnte nicht gefunden werden" -Level 'WARN'
@@ -611,6 +806,16 @@ if ($null -ne $btnDownload) {
 }
 else {
     Write-Log -Message "Button 'btnDownload' konnte nicht gefunden werden" -Level 'WARN'
+}
+
+# Event-Handler für Update-Downloads-Button
+if ($null -ne $btnUpdateDownloads) {
+    $btnUpdateDownloads.Add_Click({
+            Update-DATEVDownloads
+        })
+}
+else {
+    Write-Log -Message "Button 'btnUpdateDownloads' konnte nicht gefunden werden" -Level 'WARN'
 }
 
 # Downloads-ComboBox initialisieren
