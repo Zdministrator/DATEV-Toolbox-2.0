@@ -1,8 +1,10 @@
 {
-  "version": "2.0.1",
+  "version": "2.0.2",
   "releaseDate": "2025-05-30",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
+    "Versionsnummer im Fenstertitel hinzugefügt",
+    "Verbesserte Benutzerfreundlichkeit durch sichtbare Version",
     "Automatischer Update-Check implementiert",
     "Manueller Update-Button im Einstellungen-Tab",
     "Verbesserte Versionsverwaltung mit Semantic Versioning",
