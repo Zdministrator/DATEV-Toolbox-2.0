@@ -52,7 +52,7 @@ Add-Type -AssemblyName PresentationFramework
 # XAML-Definition für das Hauptfenster mit Tabs und Log-Bereich
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        Title="DATEV-Toolbox 2.0" Height="550" Width="400">    <Grid>
+        Title="DATEV-Toolbox 2 - Version v$script:AppVersion" Height="550" Width="400">    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
