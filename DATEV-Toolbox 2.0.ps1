@@ -538,7 +538,16 @@ del "$tempUpdatePath" >nul 2>&1
 echo [5/5] Starte DATEV-Toolbox neu...
 echo.
 echo Update auf Version $($UpdateInfo.NewVersion) erfolgreich installiert!
-start "" pwsh.exe -File "$currentScriptPath"
+
+REM Versuche zuerst pwsh.exe (PowerShell 7+), dann powershell.exe (PowerShell 5.1)
+where pwsh.exe >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Starte mit PowerShell 7+ ^(pwsh.exe^)...
+    start "" pwsh.exe -File "$currentScriptPath"
+) else (
+    echo PowerShell 7+ nicht gefunden, verwende PowerShell 5.1 ^(powershell.exe^)...
+    start "" powershell.exe -File "$currentScriptPath"
+)
 
 echo.
 echo Bereinige Update-Skript in 5 Sekunden...
