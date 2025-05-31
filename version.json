@@ -1,16 +1,16 @@
 {
-  "version": "2.0.2",
-  "releaseDate": "2025-05-30",
+  "version": "2.0.3",
+  "releaseDate": "2025-05-31",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
+    "Verbesserte PowerShell-Kompatibilität im Update-Prozess",
+    "Automatische Erkennung von PowerShell 7+ und PowerShell 5.1",
+    "Robustere Update-Installation ohne pwsh.exe-Abhängigkeit",
     "Versionsnummer im Fenstertitel hinzugefügt",
     "Verbesserte Benutzerfreundlichkeit durch sichtbare Version",
     "Automatischer Update-Check implementiert",
     "Manueller Update-Button im Einstellungen-Tab",
-    "Verbesserte Versionsverwaltung mit Semantic Versioning",
-    "Automatisches Laden der Update-Termine beim Start",
-    "Verbesserte GUI mit Icons für Update-Funktionen",
-    "Download-Ordner-Zugriff über Ordner-Icon"
+    "Verbesserte Versionsverwaltung mit Semantic Versioning"
   ],
   "minimumRequiredVersion": "2.0.0",
   "updateRequired": false
