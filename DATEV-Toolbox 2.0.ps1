@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.0.3"
+$script:AppVersion = "2.0.5"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -57,10 +57,23 @@ Add-Type -AssemblyName PresentationFramework
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
             <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0"><TabItem Header="DATEV Tools">
+        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV Tools">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
-                        <!-- Hier können zukünftige DATEV Tools hinzugefügt werden -->
+                        <!-- Performance -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="System Tools" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnResourceMonitor" Content="Ressourcenmonitor" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnEventViewer" Content="Ereignisanzeige" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnServices" Content="Dienste" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnMsconfig" Content="Systemkonfiguration" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnDiskCleanup" Content="Datenträgerbereinigung" Height="25" Margin="0,3,0,3"/>
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -138,10 +151,10 @@ Add-Type -AssemblyName PresentationFramework
                         <!-- Einstellungen -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
-                                <TextBlock Text="Einstellungen" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="DATEV-Toolbox Einstellungen" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnOpenFolder" Content="Einstellungen öffnen" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnCheckUpdate" Content="Nach Updates suchen" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnOpenFolder" Content="Toolbox Ordner öffnen" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnCheckUpdate" Content="Nach Script Updates suchen" Height="25" Margin="0,3,0,3"/>
                                 <!-- Hier können zukünftig Einstellungen ergänzt werden -->
                             </StackPanel>
                         </GroupBox>
@@ -196,6 +209,14 @@ $btnOpenDownloadFolder = $window.FindName("btnOpenDownloadFolder")
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
 $btnUpdateDates = $window.FindName("btnUpdateDates")
+
+# Referenzen auf System Tools Buttons holen
+$btnTaskManager = $window.FindName("btnTaskManager")
+$btnResourceMonitor = $window.FindName("btnResourceMonitor")
+$btnEventViewer = $window.FindName("btnEventViewer")
+$btnServices = $window.FindName("btnServices")
+$btnMsconfig = $window.FindName("btnMsconfig")
+$btnDiskCleanup = $window.FindName("btnDiskCleanup")
 #endregion
 
 #region Logging-Funktion
@@ -233,6 +254,39 @@ function Write-Log {
     catch {
         # Fallback wenn Logging fehlschlägt
         Write-Host "LOGGING-FEHLER: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+#endregion
+
+#endregion
+
+#region System-Tools Funktionen
+# Funktion zum Starten von System-Tools
+function Start-SystemTool {
+    param(
+        [Parameter(Mandatory = $true)][string]$Command,
+        [string]$Arguments = "",
+        [string]$Description = $Command
+    )
+    
+    try {
+        Write-Log -Message "Starte $Description..." -Level 'INFO'
+        
+        if ([string]::IsNullOrEmpty($Arguments)) {
+            Start-Process -FilePath $Command
+        }
+        else {
+            Start-Process -FilePath $Command -ArgumentList $Arguments
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Starten von $Description`: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Starten von $Description`:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
     }
 }
 #endregion
@@ -1339,6 +1393,43 @@ Initialize-UpdateDates
 
 # Automatischen Update-Check durchführen
 Initialize-UpdateCheck
+
+# Event-Handler für Performance Tools Buttons
+if ($null -ne $btnTaskManager) {
+    $btnTaskManager.Add_Click({
+        Start-SystemTool -Command 'taskmgr.exe' -Description 'Task-Manager'
+    })
+}
+
+if ($null -ne $btnResourceMonitor) {
+    $btnResourceMonitor.Add_Click({
+        Start-SystemTool -Command 'resmon.exe' -Description 'Ressourcenmonitor'
+    })
+}
+
+if ($null -ne $btnEventViewer) {
+    $btnEventViewer.Add_Click({
+        Start-SystemTool -Command 'eventvwr.msc' -Description 'Ereignisanzeige'
+    })
+}
+
+if ($null -ne $btnServices) {
+    $btnServices.Add_Click({
+        Start-SystemTool -Command 'services.msc' -Description 'Dienste'
+    })
+}
+
+if ($null -ne $btnMsconfig) {
+    $btnMsconfig.Add_Click({
+        Start-SystemTool -Command 'msconfig.exe' -Description 'Systemkonfiguration'
+    })
+}
+
+if ($null -ne $btnDiskCleanup) {
+    $btnDiskCleanup.Add_Click({
+        Start-SystemTool -Command 'cleanmgr.exe' -Description 'Datenträgerbereinigung'
+    })
+}
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet" -Level 'INFO'

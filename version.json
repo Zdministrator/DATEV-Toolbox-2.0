@@ -1,16 +1,17 @@
 {
-  "version": "2.0.3",
+  "version": "2.0.5",
   "releaseDate": "2025-05-31",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Verbesserte PowerShell-Kompatibilität im Update-Prozess",
-    "Automatische Erkennung von PowerShell 7+ und PowerShell 5.1",
-    "Robustere Update-Installation ohne pwsh.exe-Abhängigkeit",
-    "Versionsnummer im Fenstertitel hinzugefügt",
-    "Verbesserte Benutzerfreundlichkeit durch sichtbare Version",
-    "Automatischer Update-Check implementiert",
-    "Manueller Update-Button im Einstellungen-Tab",
-    "Verbesserte Versionsverwaltung mit Semantic Versioning"
+    "Code-Bereinigung durchgeführt:",
+    "• DATEV Programme und Tools GroupBoxen entfernt (auf Benutzerwunsch)",
+    "• Nur Performance Tools GroupBox beibehalten",
+    "• Nicht mehr benötigte DATEV-Pfad-Definitionen entfernt",
+    "• Ungenutzte Button-Referenzen bereinigt",
+    "• Event-Handler für Programme und Tools entfernt",
+    "• DATEV-spezifische Funktionen entfernt",
+    "• Code-Struktur optimiert und vereinfacht",
+    "Performance Tools weiterhin verfügbar: Task-Manager, Ressourcenmonitor, Ereignisanzeige, Dienste, Systemkonfiguration, Datenträgerbereinigung"
   ],
   "minimumRequiredVersion": "2.0.0",
   "updateRequired": false
