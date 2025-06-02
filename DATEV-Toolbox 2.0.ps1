@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.0.5"
+$script:AppVersion = "2.0.6"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -57,17 +57,40 @@ Add-Type -AssemblyName PresentationFramework
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
             <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV Tools">
+        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
-                        <!-- Platzhalter für zukünftige DATEV Tools -->
+                        <!-- DATEV Programme -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV Programme" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <TextBlock Text="Hier können zukünftig DATEV-Programme hinzugefügt werden." 
-                                           FontStyle="Italic" Foreground="Gray" TextWrapping="Wrap"/>
+                                <Button Name="btnDATEVArbeitsplatz" Content="DATEV-Arbeitsplatz" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnInstallationsmanager" Content="Installationsmanager" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnServicetool" Content="Servicetool" Height="25" Margin="0,3,0,3"/>
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <!-- DATEV Tools -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="DATEV Tools" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnKonfigDBTools" Content="KonfigDB-Tools" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnEODBconfig" Content="EODBconfig" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnEOAufgabenplanung" Content="EO Aufgabenplanung" Height="25" Margin="0,3,0,3"/>
+                            </StackPanel>
+                        </GroupBox>
+                          <!-- Performance Tools -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="Performance Tools" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnLeistungsindex" Content="Leistungsindex ermitteln" Height="25" Margin="0,3,0,3"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -224,6 +247,20 @@ $btnOpenDownloadFolder = $window.FindName("btnOpenDownloadFolder")
 $spUpdateDates = $window.FindName("spUpdateDates")
 $btnUpdateDates = $window.FindName("btnUpdateDates")
 
+# Referenzen auf DATEV Programme Buttons holen
+$btnDATEVArbeitsplatz = $window.FindName("btnDATEVArbeitsplatz")
+$btnInstallationsmanager = $window.FindName("btnInstallationsmanager")
+$btnServicetool = $window.FindName("btnServicetool")
+
+# Referenzen auf DATEV Tools Buttons holen
+$btnKonfigDBTools = $window.FindName("btnKonfigDBTools")
+$btnEODBconfig = $window.FindName("btnEODBconfig")
+$btnEOAufgabenplanung = $window.FindName("btnEOAufgabenplanung")
+
+# Referenzen auf DATEV Performance Tools Buttons holen
+$btnNGENALL40 = $window.FindName("btnNGENALL40")
+$btnLeistungsindex = $window.FindName("btnLeistungsindex")
+
 # Referenzen auf System Tools Buttons holen
 $btnTaskManager = $window.FindName("btnTaskManager")
 $btnResourceMonitor = $window.FindName("btnResourceMonitor")
@@ -272,6 +309,174 @@ function Write-Log {
 }
 #endregion
 
+#endregion
+
+#region DATEV-Tools Funktionen
+# DATEV-Pfad-Definitionen
+$script:DATEVProgramPaths = @{
+    'DATEVArbeitsplatz' = @(
+        '%DATEVPP%\PROGRAMM\K0005000\Arbeitsplatz.exe'
+    )
+    'Installationsmanager' = @(
+        '%DATEVPP%\PROGRAMM\INSTALL\DvInesInstMan.exe'
+    )
+    'Servicetool' = @(
+        '%DATEVPP%\PROGRAMM\SRVTOOL\Srvtool.exe'
+    )
+    'KonfigDBTools' = @(
+        '%DATEVPP%\PROGRAMM\B0001502\cdbtool.exe'
+    )
+    'EODBconfig' = @(
+        '%DATEVPP%\PROGRAMM\EODB\EODBConfig.exe'
+    )
+    'EOAufgabenplanung' = @(
+        '%DATEVPP%\PROGRAMM\I0000085\EOControl.exe'
+    )
+    'NGENALL40' = @(
+        '%DATEVPP%\Programm\B0001508\ngenall40.cmd'
+    )
+    'Leistungsindex' = @(
+        '%DATEVPP%\PROGRAMM\RWAPPLIC\irw.exe'
+    )
+}
+
+# Funktion zum Finden und Starten von DATEV-Programmen
+function Start-DATEVProgram {
+    param(
+        [Parameter(Mandatory = $true)][string]$ProgramName,
+        [Parameter(Mandatory = $true)][array]$PossiblePaths,
+        [string]$Description = $ProgramName
+    )
+    
+    try {
+        Write-Log -Message "Suche nach $Description..." -Level 'INFO'
+        
+        $foundPath = $null
+        foreach ($path in $PossiblePaths) {
+            # %DATEVPP% durch tatsächlichen DATEV-Pfad ersetzen
+            $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
+            if ([string]::IsNullOrEmpty($env:DATEVPP)) {
+                # Fallback: Standard DATEV-Pfade durchsuchen
+                $standardPaths = @(
+                    'C:\DATEV',
+                    'D:\DATEV',
+                    'E:\DATEV',
+                    "${env:ProgramFiles(x86)}\DATEV",
+                    "${env:ProgramFiles}\DATEV"
+                )
+                
+                foreach ($basePath in $standardPaths) {
+                    $testPath = $path -replace '%DATEVPP%', $basePath
+                    if (Test-Path $testPath) {
+                        $foundPath = $testPath
+                        break
+                    }
+                }
+            }
+            else {
+                if (Test-Path $expandedPath) {
+                    $foundPath = $expandedPath
+                    break
+                }
+            }
+            
+            if ($foundPath) { break }
+        }
+        
+        if ($foundPath) {
+            Write-Log -Message "Starte $Description von: $foundPath" -Level 'INFO'
+            Start-Process -FilePath $foundPath
+        }
+        else {
+            Write-Log -Message "$Description wurde nicht gefunden. Überprüfen Sie die DATEV-Installation." -Level 'WARN'
+            [System.Windows.MessageBox]::Show(
+                "$Description wurde auf diesem System nicht gefunden.`n`nMögliche Ursachen:`n• DATEV nicht installiert`n• DATEVPP-Umgebungsvariable nicht gesetzt`n• Programm in anderem Pfad installiert`n• Fehlende Berechtigung",
+                "DATEV-Programm nicht gefunden",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Warning
+            )
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Starten von $Description`: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Starten von $Description`:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+# Spezielle Funktion für den Leistungsindex (startet das Programm 2x mit unterschiedlichen Parametern)
+function Start-Leistungsindex {
+    try {
+        Write-Log -Message "Suche nach Leistungsindex (irw.exe)..." -Level 'INFO'
+        
+        $foundPath = $null
+        $possiblePaths = $script:DATEVProgramPaths['Leistungsindex']
+        
+        foreach ($path in $possiblePaths) {
+            # %DATEVPP% durch tatsächlichen DATEV-Pfad ersetzen
+            $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
+            if ([string]::IsNullOrEmpty($env:DATEVPP)) {
+                # Fallback: Standard DATEV-Pfade durchsuchen
+                $standardPaths = @(
+                    'C:\DATEV',
+                    'D:\DATEV',
+                    'E:\DATEV',
+                    "${env:ProgramFiles(x86)}\DATEV",
+                    "${env:ProgramFiles}\DATEV"
+                )
+                
+                foreach ($basePath in $standardPaths) {
+                    $testPath = $path -replace '%DATEVPP%', $basePath
+                    if (Test-Path $testPath) {
+                        $foundPath = $testPath
+                        break
+                    }
+                }
+            }
+            else {
+                if (Test-Path $expandedPath) {
+                    $foundPath = $expandedPath
+                    break
+                }
+            }
+            
+            if ($foundPath) { break }
+        }
+        
+        if ($foundPath) {
+            Write-Log -Message "Starte Leistungsindex von: $foundPath" -Level 'INFO'
+            Write-Log -Message "Erster Durchlauf: -ap:PerfIndex -d:IRW20011 -c" -Level 'INFO'
+            Start-Process -FilePath $foundPath -ArgumentList "-ap:PerfIndex -d:IRW20011 -c" -Wait
+            
+            Write-Log -Message "Zweiter Durchlauf: -ap:PerfIndex -d:IRW20011" -Level 'INFO'
+            Start-Process -FilePath $foundPath -ArgumentList "-ap:PerfIndex -d:IRW20011" -Wait
+            
+            Write-Log -Message "Leistungsindex-Messungen abgeschlossen" -Level 'INFO'
+        }
+        else {
+            Write-Log -Message "Leistungsindex (irw.exe) wurde nicht gefunden. Überprüfen Sie die DATEV-Installation." -Level 'WARN'
+            [System.Windows.MessageBox]::Show(
+                "Leistungsindex (irw.exe) wurde auf diesem System nicht gefunden.`n`nMögliche Ursachen:`n• DATEV nicht installiert`n• DATEVPP-Umgebungsvariable nicht gesetzt`n• Programm in anderem Pfad installiert`n• Fehlende Berechtigung",
+                "DATEV-Programm nicht gefunden",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Warning
+            )
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Starten des Leistungsindex: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Starten des Leistungsindex:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
 #endregion
 
 #region System-Tools Funktionen
@@ -1408,7 +1613,58 @@ Initialize-UpdateDates
 # Automatischen Update-Check durchführen
 Initialize-UpdateCheck
 
-# Event-Handler für Performance Tools Buttons
+# Event-Handler für DATEV Programme Buttons
+if ($null -ne $btnDATEVArbeitsplatz) {
+    $btnDATEVArbeitsplatz.Add_Click({
+        Start-DATEVProgram -ProgramName 'DATEVArbeitsplatz' -PossiblePaths $script:DATEVProgramPaths['DATEVArbeitsplatz'] -Description 'DATEV-Arbeitsplatz'
+    })
+}
+
+if ($null -ne $btnInstallationsmanager) {
+    $btnInstallationsmanager.Add_Click({
+        Start-DATEVProgram -ProgramName 'Installationsmanager' -PossiblePaths $script:DATEVProgramPaths['Installationsmanager'] -Description 'Installationsmanager'
+    })
+}
+
+if ($null -ne $btnServicetool) {
+    $btnServicetool.Add_Click({
+        Start-DATEVProgram -ProgramName 'Servicetool' -PossiblePaths $script:DATEVProgramPaths['Servicetool'] -Description 'Servicetool'
+    })
+}
+
+# Event-Handler für DATEV Tools Buttons
+if ($null -ne $btnKonfigDBTools) {
+    $btnKonfigDBTools.Add_Click({
+        Start-DATEVProgram -ProgramName 'KonfigDBTools' -PossiblePaths $script:DATEVProgramPaths['KonfigDBTools'] -Description 'KonfigDB-Tools'
+    })
+}
+
+if ($null -ne $btnEODBconfig) {
+    $btnEODBconfig.Add_Click({
+        Start-DATEVProgram -ProgramName 'EODBconfig' -PossiblePaths $script:DATEVProgramPaths['EODBconfig'] -Description 'EODBconfig'
+    })
+}
+
+if ($null -ne $btnEOAufgabenplanung) {
+    $btnEOAufgabenplanung.Add_Click({
+        Start-DATEVProgram -ProgramName 'EOAufgabenplanung' -PossiblePaths $script:DATEVProgramPaths['EOAufgabenplanung'] -Description 'EO Aufgabenplanung'
+    })
+}
+
+# Event-Handler für DATEV Performance Tools Button
+if ($null -ne $btnNGENALL40) {
+    $btnNGENALL40.Add_Click({
+        Start-DATEVProgram -ProgramName 'NGENALL40' -PossiblePaths $script:DATEVProgramPaths['NGENALL40'] -Description 'NGENALL 4.0'
+    })
+}
+
+if ($null -ne $btnLeistungsindex) {
+    $btnLeistungsindex.Add_Click({
+        Start-Leistungsindex
+    })
+}
+
+# Event-Handler für System Tools Buttons
 if ($null -ne $btnTaskManager) {
     $btnTaskManager.Add_Click({
         Start-SystemTool -Command 'taskmgr.exe' -Description 'Task-Manager'

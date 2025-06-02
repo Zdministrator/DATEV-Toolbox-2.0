@@ -1,17 +1,17 @@
 {
-  "version": "2.0.5",
-  "releaseDate": "2025-05-31",
+  "version": "2.0.6",
+  "releaseDate": "2025-06-02",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Code-Bereinigung durchgeführt:",
-    "• DATEV Programme und Tools GroupBoxen entfernt (auf Benutzerwunsch)",
-    "• Nur Performance Tools GroupBox beibehalten",
-    "• Nicht mehr benötigte DATEV-Pfad-Definitionen entfernt",
-    "• Ungenutzte Button-Referenzen bereinigt",
-    "• Event-Handler für Programme und Tools entfernt",
-    "• DATEV-spezifische Funktionen entfernt",
-    "• Code-Struktur optimiert und vereinfacht",
-    "Performance Tools weiterhin verfügbar: Task-Manager, Ressourcenmonitor, Ereignisanzeige, Dienste, Systemkonfiguration, Datenträgerbereinigung"
+    "DATEV Tools vollständig implementiert:",
+    "• DATEV Programme GroupBox hinzugefügt: DATEV-Arbeitsplatz, Installationsmanager, Servicetool",
+    "• DATEV Tools GroupBox hinzugefügt: KonfigDB-Tools, EODBconfig, EO Aufgabenplanung",
+    "• Performance Tools erweitert: NGENALL 4.0, Leistungsindex",
+    "• Intelligente DATEV-Pfad-Suche implementiert (DATEVPP + Fallback-Pfade)",
+    "• Spezielle Leistungsindex-Funktion mit doppeltem Programmaufruf",
+    "• Robuste Fehlerbehandlung und benutzerfreundliche MessageBoxen",
+    "• Vollständiges Logging aller DATEV-Programmstarts",
+    "• 8 neue DATEV-Tools verfügbar über benutzerfreundliche Oberfläche"
   ],
   "minimumRequiredVersion": "2.0.0",
   "updateRequired": false
