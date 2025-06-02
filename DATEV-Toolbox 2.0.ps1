@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.0.6"
+$script:AppVersion = "2.0.7"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -830,26 +830,26 @@ del "%~f0" >nul 2>&1
           Set-Content -Path $updateBatchPath -Value $batchContent -Encoding ASCII
         
         Write-Log -Message "Update wird angewendet. Anwendung wird neu gestartet..." -Level 'INFO'
-        Write-Log -Message "Backup wird erstellt unter: $backupPath" -Level 'INFO'
-          # Update-Einstellungen speichern
-        $settings = Get-Settings
+        Write-Log -Message "Backup wird erstellt unter: $backupPath" -Level 'INFO'          # Update-Einstellungen speichern (PSObject sicher in Hashtable konvertieren)
+        $settingsHash = @{}
         if ($settings -is [PSCustomObject]) {
-            $settingsHash = @{}
             foreach ($property in $settings.PSObject.Properties) {
                 $settingsHash[$property.Name] = $property.Value
             }
-            $settings = $settingsHash
         }
-        $settings.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
-        $settings.lastInstalledVersion = $UpdateInfo.NewVersion
-        $settings.lastBackupPath = $backupPath
-        $settings.updateHistory = if ($settings.updateHistory) { $settings.updateHistory } else { @() }
-        $settings.updateHistory += @{
+        else {
+            $settingsHash = $settings
+        }
+        $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+        $settingsHash.lastInstalledVersion = $UpdateInfo.NewVersion
+        $settingsHash.lastBackupPath = $backupPath
+        $settingsHash.updateHistory = if ($settingsHash.updateHistory) { $settingsHash.updateHistory } else { @() }
+        $settingsHash.updateHistory += @{
             version = $UpdateInfo.NewVersion
             date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
             backupPath = $backupPath
         }
-        Set-Settings -Settings $settings
+        Set-Settings -Settings $settingsHash
         
         # Alte Backups bereinigen (behält nur die letzten 5)
         Clear-OldUpdateBackups
@@ -918,8 +918,7 @@ function Initialize-UpdateCheck {
             $shouldCheck = $true
             Write-Log -Message "Update-Check-Intervall erreicht (alle $checkInterval Stunden)" -Level 'INFO'
         }
-        
-        if ($shouldCheck) {            # Stillen Update-Check durchführen
+          if ($shouldCheck) {            # Stillen Update-Check durchführen
             $updateInfo = Test-ForUpdates -Silent
             
             if ($updateInfo.UpdateAvailable) {
@@ -936,17 +935,18 @@ function Initialize-UpdateCheck {
                 }
             }
             
-            # Letzten Check-Zeitpunkt aktualisieren
+            # Letzten Check-Zeitpunkt aktualisieren (PSObject in Hashtable konvertieren)
+            $settingsHash = @{}
             if ($settings -is [PSCustomObject]) {
-                $settingsHash = @{
-                }
                 foreach ($property in $settings.PSObject.Properties) {
                     $settingsHash[$property.Name] = $property.Value
                 }
-                $settings = $settingsHash
             }
-            $settings.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
-            Set-Settings -Settings $settings
+            else {
+                $settingsHash = $settings
+            }
+            $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+            Set-Settings -Settings $settingsHash
         }
         else {
             Write-Log -Message "Update-Check übersprungen (letzter Check: $($lastCheck.ToString('yyyy-MM-dd HH:mm')))" -Level 'INFO'

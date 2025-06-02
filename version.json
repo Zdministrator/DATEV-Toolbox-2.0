@@ -1,17 +1,15 @@
 {
-  "version": "2.0.6",
-  "releaseDate": "2025-06-02",
+  "version": "2.0.7",
+  "releaseDate": "2025-01-02",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "DATEV Tools vollständig implementiert:",
-    "• DATEV Programme GroupBox hinzugefügt: DATEV-Arbeitsplatz, Installationsmanager, Servicetool",
-    "• DATEV Tools GroupBox hinzugefügt: KonfigDB-Tools, EODBconfig, EO Aufgabenplanung",
-    "• Performance Tools erweitert: NGENALL 4.0, Leistungsindex",
-    "• Intelligente DATEV-Pfad-Suche implementiert (DATEVPP + Fallback-Pfade)",
-    "• Spezielle Leistungsindex-Funktion mit doppeltem Programmaufruf",
-    "• Robuste Fehlerbehandlung und benutzerfreundliche MessageBoxen",
-    "• Vollständiges Logging aller DATEV-Programmstarts",
-    "• 8 neue DATEV-Tools verfügbar über benutzerfreundliche Oberfläche"
+    "Kritischer Bugfix: Update-Prozess-Fehler behoben",
+    "• PSObject zu Hashtable Konvertierungsfehler (op_Addition) behoben",
+    "• Sichere Behandlung von ConvertFrom-Json Objekten implementiert",
+    "• Update-Einstellungen werden jetzt korrekt verarbeitet",
+    "• Robuste Update-Check-Mechanismus ohne Typen-Konflikte",
+    "• Vollständige Stabilität des automatischen Update-Systems",
+    "Alle 8 DATEV-Tools bleiben vollständig funktional"
   ],
   "minimumRequiredVersion": "2.0.0",
   "updateRequired": false
