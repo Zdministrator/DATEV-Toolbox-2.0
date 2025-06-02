@@ -52,7 +52,7 @@ Add-Type -AssemblyName PresentationFramework
 # XAML-Definition für das Hauptfenster mit Tabs und Log-Bereich
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        Title="DATEV-Toolbox 2 - Version v$script:AppVersion" Height="550" Width="400">    <Grid>
+        Title="DATEV-Toolbox 2 - Version v$script:AppVersion" Height="550" Width="420">    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
@@ -60,18 +60,14 @@ Add-Type -AssemblyName PresentationFramework
         </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV Tools">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
-                        <!-- Performance -->
+                        <!-- Platzhalter für zukünftige DATEV Tools -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
-                                <TextBlock Text="System Tools" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="DATEV Programme" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnResourceMonitor" Content="Ressourcenmonitor" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnEventViewer" Content="Ereignisanzeige" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnServices" Content="Dienste" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnMsconfig" Content="Systemkonfiguration" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnDiskCleanup" Content="Datenträgerbereinigung" Height="25" Margin="0,3,0,3"/>
+                                <TextBlock Text="Hier können zukünftig DATEV-Programme hinzugefügt werden." 
+                                           FontStyle="Italic" Foreground="Gray" TextWrapping="Wrap"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -143,8 +139,26 @@ Add-Type -AssemblyName PresentationFramework
                                            Cursor="Hand" Foreground="Black"/>
                             </Grid>
                         </StackPanel>
-                    </GroupBox>
-                </StackPanel>
+                    </GroupBox>                </StackPanel>
+            </TabItem>            <TabItem Header="System">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- System Tools -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="System Tools" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnResourceMonitor" Content="Ressourcenmonitor" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnEventViewer" Content="Ereignisanzeige" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnServices" Content="Dienste" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnMsconfig" Content="Systemkonfiguration" Height="25" Margin="0,3,0,3"/>
+                                <Button Name="btnDiskCleanup" Content="Datenträgerbereinigung" Height="25" Margin="0,3,0,3"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem><TabItem Header="Einstellungen">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
