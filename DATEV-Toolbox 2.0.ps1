@@ -160,10 +160,21 @@ Add-Type -AssemblyName PresentationFramework
                                 <TextBlock Name="btnOpenDownloadFolder" Grid.Column="1" Text="📁" FontSize="16" Margin="0,0,0,0" 
                                            ToolTip="Download-Ordner öffnen" VerticalAlignment="Center" 
                                            Cursor="Hand" Foreground="Black"/>
-                            </Grid>
+                            </Grid>                        </StackPanel>
+                    </GroupBox>
+                    
+                    <!-- DATEV Online Downloads -->
+                    <GroupBox Margin="0,0,0,10">
+                        <GroupBox.Header>
+                            <TextBlock Text="Downloads von datev.de" FontWeight="Bold" FontSize="12"/>
+                        </GroupBox.Header>
+                        <StackPanel Orientation="Vertical" Margin="10">
+                            <Button Name="btnDATEVDownloadbereich" Content="DATEV Downloadbereich" Height="25" Margin="0,3,0,3"/>
+                            <Button Name="btnDATEVSmartDocs" Content="DATEV Smart Docs" Height="25" Margin="0,3,0,3"/>
+                            <Button Name="btnDatentraegerPortal" Content="Datenträger Download Portal" Height="25" Margin="0,3,0,3"/>
                         </StackPanel>
                     </GroupBox>                </StackPanel>
-            </TabItem>            <TabItem Header="System">
+            </TabItem><TabItem Header="System">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- System Tools -->
@@ -242,6 +253,11 @@ $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
 $btnDownload = $window.FindName("btnDownload")
 $btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
 $btnOpenDownloadFolder = $window.FindName("btnOpenDownloadFolder")
+
+# Referenzen auf DATEV Online Downloads Buttons holen
+$btnDATEVDownloadbereich = $window.FindName("btnDATEVDownloadbereich")
+$btnDATEVSmartDocs = $window.FindName("btnDATEVSmartDocs")
+$btnDatentraegerPortal = $window.FindName("btnDatentraegerPortal")
 
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
@@ -1602,6 +1618,25 @@ if ($null -ne $btnOpenDownloadFolder) {
 }
 else {
     Write-Log -Message "TextBlock 'btnOpenDownloadFolder' konnte nicht gefunden werden" -Level 'WARN'
+}
+
+# Event-Handler für DATEV Online Downloads Buttons
+if ($null -ne $btnDATEVDownloadbereich) {
+    $btnDATEVDownloadbereich.Add_Click({
+        Open-Url -Url "https://www.datev.de/download/"
+    })
+}
+
+if ($null -ne $btnDATEVSmartDocs) {
+    $btnDATEVSmartDocs.Add_Click({
+        Open-Url -Url "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
+    })
+}
+
+if ($null -ne $btnDatentraegerPortal) {
+    $btnDatentraegerPortal.Add_Click({
+        Open-Url -Url "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
+    })
 }
 
 # Downloads-ComboBox initialisieren
