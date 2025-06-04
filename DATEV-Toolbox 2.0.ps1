@@ -31,6 +31,22 @@ $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
 $script:ScriptDownloadUrl = "https://github.com/$script:GitHubRepo/raw/main/DATEV-Toolbox 2.0.ps1"
 
+#region Administrator-Rechte-Prüfung
+# Setup für Administratorrechte
+$IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $IsAdmin) {
+    Add-Type -AssemblyName PresentationFramework
+    [System.Windows.MessageBox]::Show("Dieses Skript benötigt Administratorrechte. Es wird jetzt mit erhöhten Rechten neu gestartet.", "Administratorrechte erforderlich", 'OK', 'Warning')
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = 'powershell.exe'
+    $psi.Arguments = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    $psi.Verb = 'runas'
+    [System.Diagnostics.Process]::Start($psi) | Out-Null
+    exit
+}
+Write-Host "Script läuft mit Administratorrechten..." -ForegroundColor Green
+#endregion
+
 #region Initialisierung und GUI
 # Konsole verstecken (funktioniert nur wenn als .ps1 ausgeführt)
 Add-Type -Name Window -Namespace Console -MemberDefinition '

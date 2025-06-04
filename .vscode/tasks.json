@@ -15,7 +15,14 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": []
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": [],
+            "detail": "Startet die DATEV-Toolbox 2.0 Hauptanwendung"
         }
     ]
 }
