@@ -2,6 +2,12 @@
 
 # DATEV-Toolbox 2.0 - Copilot Instructions
 
+## 🌐 Kommunikation & Sprache
+- **Sprache**: Immer Deutsch verwenden in der Kommunikation mit dem Benutzer
+- **Code-Kommentare**: Deutsche Kommentare für bessere Verständlichkeit
+- **Dokumentation**: Alle Texte und Beschreibungen auf Deutsch
+- **Fehlermeldungen**: Benutzerfreundliche deutsche Fehlermeldungen bevorzugen
+
 ## 🎯 Projekt-Kontext
 Dies ist eine WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Tools.
 
