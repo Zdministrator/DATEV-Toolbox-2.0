@@ -68,23 +68,29 @@ Add-Type -AssemblyName PresentationFramework
 # XAML-Definition für das Hauptfenster mit Tabs und Log-Bereich
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        Title="DATEV-Toolbox 2 - Version v$script:AppVersion" Height="550" Width="420">    <Grid>
+        Title="DATEV-Toolbox 2 - Version v$script:AppVersion" 
+        Height="550" Width="420" 
+        MinHeight="500" MinWidth="400"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="120" MinHeight="100"/>
             <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>        <TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+        </Grid.RowDefinitions><TabControl Grid.Row="0" Margin="10,10,10,0">            <TabItem Header="DATEV">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- DATEV Programme -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV Programme" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnDATEVArbeitsplatz" Content="DATEV-Arbeitsplatz" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnInstallationsmanager" Content="Installationsmanager" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnServicetool" Content="Servicetool" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnDATEVArbeitsplatz" Content="DATEV-Arbeitsplatz" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Startet den DATEV-Arbeitsplatz mit maximiertem Fenster"/>
+                                <Button Name="btnInstallationsmanager" Content="Installationsmanager" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet den DATEV Installationsmanager für Software-Updates"/>
+                                <Button Name="btnServicetool" Content="Servicetool" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Startet das DATEV Servicetool für Systemdiagnose"/>
                             </StackPanel>
                         </GroupBox>
                         
@@ -92,38 +98,42 @@ Add-Type -AssemblyName PresentationFramework
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV Tools" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnKonfigDBTools" Content="KonfigDB-Tools" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnEODBconfig" Content="EODBconfig" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnEOAufgabenplanung" Content="EO Aufgabenplanung" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnKonfigDBTools" Content="KonfigDB-Tools" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet die DATEV Konfigurations-Datenbank Tools"/>
+                                <Button Name="btnEODBconfig" Content="EODBconfig" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Startet die DATEV Enterprise Objects Datenbank-Konfiguration"/>
+                                <Button Name="btnEOAufgabenplanung" Content="EO Aufgabenplanung" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet die DATEV Enterprise Objects Aufgabenplanung"/>
                             </StackPanel>
                         </GroupBox>
                           <!-- Performance Tools -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="Performance Tools" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnLeistungsindex" Content="Leistungsindex ermitteln" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Erzwingt die Neuerstellung der .NET Native Images für bessere Performance"/>
+                                <Button Name="btnLeistungsindex" Content="Leistungsindex ermitteln" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Führt eine Leistungsanalyse der DATEV-Installation durch (2 Durchläufe)"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
-            </TabItem>
-            <TabItem Header="DATEV Online">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+            </TabItem>            <TabItem Header="DATEV Online">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Hilfe und Support -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="Hilfe und Support" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnHilfeCenter" Content="DATEV Hilfe Center" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnServicekontakte" Content="Servicekontakte" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnMyUpdates" Content="DATEV myUpdates" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnHilfeCenter" Content="❓ DATEV Hilfe Center" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet das DATEV Hilfe Center im Browser"/>
+                                <Button Name="btnServicekontakte" Content="✉ Servicekontakte" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Zeigt DATEV Servicekontakte und Support-Informationen an"/>
+                                <Button Name="btnMyUpdates" Content="DATEV myUpdates" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet das DATEV myUpdates Portal für aktuelle Informationen"/>
                             </StackPanel>
                         </GroupBox>
                         
@@ -131,14 +141,19 @@ Add-Type -AssemblyName PresentationFramework
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="Cloud" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnMyDATEV" Content="myDATEV Portal" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnDUO" Content="DATEV Unternehmen Online" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnLAO" Content="Logistikauftrag Online" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnLizenzverwaltung" Content="Lizenzverwaltung Online" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnRechteraum" Content="DATEV Rechteraum Online" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnRVO" Content="DATEV Rechteverwaltung Online" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnMyDATEV" Content="myDATEV Portal" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet das zentrale myDATEV Portal"/>
+                                <Button Name="btnDUO" Content="DATEV Unternehmen Online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Startet DATEV Unternehmen Online (DUO) für Buchhaltung und mehr"/>
+                                <Button Name="btnLAO" Content="Logistikauftrag Online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet den Logistikauftrag Online Service"/>
+                                <Button Name="btnLizenzverwaltung" Content="Lizenzverwaltung Online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Verwaltet DATEV Lizenzen und Berechtigungen online"/>
+                                <Button Name="btnRechteraum" Content="DATEV Rechteraum Online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet den DATEV Rechteraum für Benutzerrechte-Verwaltung"/>
+                                <Button Name="btnRVO" Content="DATEV Rechteverwaltung Online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Startet die DATEV Rechteverwaltung Online"/>
                             </StackPanel>
                         </GroupBox>
                         
@@ -146,11 +161,13 @@ Add-Type -AssemblyName PresentationFramework
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="Verwaltung und Technik" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnSmartLogin" Content="SmartLogin Administration" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnSmartLogin" Content="SmartLogin Administration" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Verwaltet DATEV SmartLogin Einstellungen und Benutzer"/>
+                                <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet das myDATEV Bestandsmanagement für Kundenverwaltung"/>
+                                <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Zeigt weitere verfügbare DATEV Cloud-Anwendungen"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -170,9 +187,9 @@ Add-Type -AssemblyName PresentationFramework
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Button Name="btnDownload" Grid.Column="0" Content="Download starten" Height="25" 
-                                        VerticalAlignment="Top" Margin="0,0,8,0" IsEnabled="False"/>
+                                </Grid.ColumnDefinitions>                                <Button Name="btnDownload" Grid.Column="0" Content="Download starten" Height="25" 
+                                        VerticalAlignment="Top" Margin="0,0,8,0" IsEnabled="False" 
+                                        ToolTip="Lädt die ausgewählte DATEV-Software herunter"/>
                                 <TextBlock Name="btnOpenDownloadFolder" Grid.Column="1" Text="📁" FontSize="16" Margin="0,0,0,0" 
                                            ToolTip="Download-Ordner öffnen" VerticalAlignment="Center" 
                                            Cursor="Hand" Foreground="Black"/>
@@ -184,44 +201,51 @@ Add-Type -AssemblyName PresentationFramework
                         <GroupBox.Header>
                             <TextBlock Text="Downloads von datev.de" FontWeight="Bold" FontSize="12"/>
                         </GroupBox.Header>
-                        <StackPanel Orientation="Vertical" Margin="10">
-                            <Button Name="btnDATEVDownloadbereich" Content="DATEV Downloadbereich" Height="25" Margin="0,3,0,3"/>
-                            <Button Name="btnDATEVSmartDocs" Content="DATEV Smart Docs" Height="25" Margin="0,3,0,3"/>
-                            <Button Name="btnDatentraegerPortal" Content="Datenträger Download Portal" Height="25" Margin="0,3,0,3"/>
+                        <StackPanel Orientation="Vertical" Margin="10">                            <Button Name="btnDATEVDownloadbereich" Content="DATEV Downloadbereich" Height="25" Margin="0,3,0,3"
+                                    ToolTip="Öffnet den zentralen DATEV Downloadbereich für Updates und Tools"/>
+                            <Button Name="btnDATEVSmartDocs" Content="DATEV Smart Docs" Height="25" Margin="0,3,0,3"
+                                    ToolTip="Zugang zu DATEV Smart Docs für Dokumentation und Anleitungen"/>
+                            <Button Name="btnDatentraegerPortal" Content="Datenträger Download Portal" Height="25" Margin="0,3,0,3"
+                                    ToolTip="Portal für DVD/CD-ROM Downloads und Datenträger-Bestellungen"/>
                         </StackPanel>
                     </GroupBox>                </StackPanel>
-            </TabItem><TabItem Header="System">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+            </TabItem>            <TabItem Header="System">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- System Tools -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="System Tools" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnResourceMonitor" Content="Ressourcenmonitor" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnEventViewer" Content="Ereignisanzeige" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnServices" Content="Dienste" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnMsconfig" Content="Systemkonfiguration" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnDiskCleanup" Content="Datenträgerbereinigung" Height="25" Margin="0,3,0,3"/>
+                            <StackPanel Orientation="Vertical" Margin="10">                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Öffnet den Windows Task-Manager zur Prozessverwaltung"/>
+                                <Button Name="btnResourceMonitor" Content="Ressourcenmonitor" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Startet den Windows Ressourcenmonitor für detaillierte Systemanalyse"/>
+                                <Button Name="btnEventViewer" Content="Ereignisanzeige" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Öffnet die Windows Ereignisanzeige zur Fehlerdiagnose"/>
+                                <Button Name="btnServices" Content="Dienste" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Verwaltet Windows-Dienste (services.msc)"/>
+                                <Button Name="btnMsconfig" Content="Systemkonfiguration" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Öffnet die Windows Systemkonfiguration (msconfig.exe)"/>
+                                <Button Name="btnDiskCleanup" Content="Datenträgerbereinigung" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Startet die Windows Datenträgerbereinigung für mehr freien Speicher"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
-                </ScrollViewer>
-            </TabItem><TabItem Header="Einstellungen">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                </ScrollViewer>            </TabItem><TabItem Header="Einstellungen">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Einstellungen -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV-Toolbox Einstellungen" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnOpenFolder" Content="Toolbox Ordner öffnen" Height="25" Margin="0,3,0,3"/>
-                                <Button Name="btnCheckUpdate" Content="Nach Script Updates suchen" Height="25" Margin="0,3,0,3"/>
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">                                <Button Name="btnOpenFolder" Content="Toolbox Ordner öffnen" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Öffnet den AppData-Ordner der DATEV-Toolbox mit Einstellungen und Logs"/>
+                                <Button Name="btnCheckUpdate" Content="Nach Script Updates suchen" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Prüft GitHub auf verfügbare Updates für die DATEV-Toolbox"/>
                                 <!-- Hier können zukünftig Einstellungen ergänzt werden -->
-                            </StackPanel>
-                        </GroupBox>
+                            </StackPanel>                        </GroupBox>
+                        
                           <!-- Anstehende Update-Termine -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
@@ -300,6 +324,10 @@ $btnEventViewer = $window.FindName("btnEventViewer")
 $btnServices = $window.FindName("btnServices")
 $btnMsconfig = $window.FindName("btnMsconfig")
 $btnDiskCleanup = $window.FindName("btnDiskCleanup")
+
+# Referenzen auf Einstellungs-Buttons holen
+$btnOpenFolder = $window.FindName("btnOpenFolder")
+$btnCheckUpdate = $window.FindName("btnCheckUpdate")
 #endregion
 
 #region Logging-Funktion
@@ -542,50 +570,8 @@ function Start-SystemTool {
 }
 #endregion
 
-#region Einstellungen-Funktion
-# Funktion zum Speichern von Einstellungen in settings.json im AppData-Ordner
-function Set-Settings {
-    param(
-        [Parameter(Mandatory = $true)][hashtable]$Settings
-    )
-    
-    try {
-        $settingsDir = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
-        if (-not (Test-Path $settingsDir)) {
-            New-Item -Path $settingsDir -ItemType Directory -Force | Out-Null
-        }
-        $settingsFile = Join-Path $settingsDir 'settings.json'
-        $json = $Settings | ConvertTo-Json -Depth 5
-        Set-Content -Path $settingsFile -Value $json -Encoding UTF8
-        Write-Log -Message "Einstellungen erfolgreich gespeichert" -Level 'INFO'
-    }
-    catch {
-        Write-Log -Message "Fehler beim Speichern der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
-    }
-}
-
-# Funktion zum Laden von Einstellungen aus settings.json
-function Get-Settings {
-    try {
-        $settingsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'settings.json'
-        if (Test-Path $settingsFile) {
-            $json = Get-Content -Path $settingsFile -Raw -Encoding UTF8
-            $settings = $json | ConvertFrom-Json
-            Write-Log -Message "Einstellungen erfolgreich geladen" -Level 'INFO'
-            return $settings
-        }
-        else {
-            Write-Log -Message "Keine Einstellungsdatei gefunden, verwende Standardwerte" -Level 'INFO'
-            return @{}
-        }
-    }
-    catch {
-        Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'        return @{}
-    }
-}
-#endregion
-
 #region Update-Check-Funktionen
+# Funktion zum Bereinigen alter Update-Backups (behält nur die letzten 5)
 # Funktion zum Bereinigen alter Update-Backups (behält nur die letzten 5)
 function Clear-OldUpdateBackups {
     try {
@@ -1747,8 +1733,31 @@ if ($null -ne $btnMsconfig) {
 }
 
 if ($null -ne $btnDiskCleanup) {
-    $btnDiskCleanup.Add_Click({
-        Start-SystemTool -Command 'cleanmgr.exe' -Description 'Datenträgerbereinigung'
+    $btnDiskCleanup.Add_Click({        Start-SystemTool -Command 'cleanmgr.exe' -Description 'Datenträgerbereinigung'
+    })
+}
+
+# Event-Handler für Einstellungs-Buttons
+if ($null -ne $btnOpenFolder) {
+    $btnOpenFolder.Add_Click({
+        try {
+            $folderPath = Join-Path $env:APPDATA "DATEV-Toolbox 2.0"
+            if (-not (Test-Path $folderPath)) {
+                New-Item -Path $folderPath -ItemType Directory -Force | Out-Null
+            }
+            Start-Process "explorer.exe" -ArgumentList $folderPath
+            Write-Log -Message "Toolbox-Ordner geöffnet: $folderPath" -Level 'INFO'
+        }
+        catch {
+            Write-Log -Message "Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)" -Level 'ERROR'
+            [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)", "Fehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+        }
+    })
+}
+
+if ($null -ne $btnCheckUpdate) {
+    $btnCheckUpdate.Add_Click({
+        Check-ForUpdates
     })
 }
 
