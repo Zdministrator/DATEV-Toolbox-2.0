@@ -1,6 +1,6 @@
 # DATEV-Toolbox 2.0
 
-Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Online-Tools.
+Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Tools.
 
 ## 📋 Features
 
@@ -9,10 +9,12 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 - **DATEV Tools**: Zugriff auf KonfigDB-Tools, EODBconfig und EO Aufgabenplanung
 - **Performance Tools**: NGENALL 4.0 und Leistungsindex für Systemoptimierung
 - **System Tools**: Integrierte Windows-Systemtools (Task-Manager, Ressourcenmonitor, etc.)
+- **🆕 Aktionen-Bereich**: Gruppenrichtlinien-Update (gpupdate /force) mit asynchroner Ausführung
 - **Automatische Updates**: Selbst-aktualisierendes System mit GitHub-Integration
 - **DATEV Online Tools**: Schnellzugriff auf wichtige DATEV-Portale und -Services
-- **Direkt-Downloads**: Verwaltung und Download von DATEV-Software
+- **🆕 Erweiterte Downloads**: Verwaltung und Download von DATEV-Software mit Aktualisierungsdatum
 - **Update-Termine**: Anzeige anstehender DATEV-Updates
+- **🆕 Changelog-Viewer**: Anzeige der Update-Historie der letzten 3 Versionen
 - **Logging-System**: Umfassendes Protokollsystem mit verschiedenen Log-Leveln
 - **Einstellungsverwaltung**: Persistente Speicherung von Konfigurationen
 
@@ -77,18 +79,22 @@ Schnellzugriff auf wichtige DATEV-Online-Services:
 - **Verwaltung**: SmartLogin Administration, Bestandsmanagement
 
 ### 📥 Downloads
-- **Direkt-Downloads**: Verwaltung und Download von DATEV-Software
+- **🆕 Erweiterte Direkt-Downloads**: Verwaltung und Download von DATEV-Software
+- **Aktualisierungsdatum**: Downloads zeigen jetzt das Datum der letzten Aktualisierung
+- **Neueste Downloads**: Belegtransfer V. 5.47, DATEV Datenübernahme nach LODAS V. 4.24
 - **Automatische Updates**: Downloads werden von GitHub aktualisiert
 - **Download-Ordner**: Direkter Zugriff auf heruntergeladene Dateien
 
 ### ⚙️ System
-Integrierte Windows-Systemtools:
+Integrierte Windows- und System-Tools:
+- **🆕 Aktionen**: Gruppenrichtlinien-Update (gpupdate /force) mit asynchroner Ausführung
 - **System Tools**: Task-Manager, Ressourcenmonitor, Ereignisanzeige
 - **Verwaltung**: Dienste, Systemkonfiguration, Datenträgerbereinigung
 
 ### 🔧 Einstellungen
 - **Konfiguration**: Zugriff auf Einstellungsordner
 - **Update-Management**: Manuelle Update-Checks
+- **🆕 Changelog-Viewer**: Anzeige der Update-Historie der letzten 3 Versionen
 - **Update-Termine**: Anzeige anstehender DATEV-Updates
 
 ## 🔄 Update-System
@@ -116,7 +122,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Version
-Aktuelle Version: **2.0.7**
+Aktuelle Version: **2.0.9**
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -130,12 +136,39 @@ Aktuelle Version: **2.0.7**
 - Windows mit .NET Framework 4.5+
 - WPF-Unterstützung erforderlich
 - DATEV-Installation (für DATEV-Tools, optional)
+- Internetverbindung für Updates und Downloads
+
+### Neue Features in Version 2.0.9
+
+#### 🔧 Aktionen-Bereich
+- **Gruppenrichtlinien-Update**: Führt `gpupdate /force` asynchron aus
+- **Asynchrone Ausführung**: GUI bleibt während der Ausführung bedienbar
+- **PID-Tracking**: Detailliertes Logging mit Prozess-IDs
+- **Timeout-Schutz**: Automatischer Timeout nach 2 Minuten
+- **Robuste Fehlerbehandlung**: Runspace-basierte Prozessüberwachung
+
+#### 📥 Erweiterte Downloads
+- **Aktualisierungsdatum**: Download-Liste zeigt Stand der Daten an
+- **Deutsche Datumsformatierung**: Benutzerfreundliches Format (dd.MM.yyyy)
+- **Neue Downloads**: Belegtransfer V. 5.47, LODAS V. 4.24
+
+#### 📋 Changelog-Viewer
+- **Update-Historie**: Anzeige der letzten 3 Versionen
+- **GitHub-Integration**: Lädt aktuelle Changelog-Daten
+- **Deutsche Formatierung**: Übersichtliche Darstellung mit Emojis
+- **Offline-Sicherheit**: Fallback bei Netzwerkproblemen
+
+#### 🐛 Kritische Bugfixes
+- **Update-Prozess**: `Set-Settings` → `Save-Settings` Fehler behoben
+- **Settings-Management**: Globale Variable korrekt aktualisiert
+- **Update-Stabilität**: Vollständige Wiederherstellung des Update-Systems
 
 ### Changelog (Neueste Versionen)
-- **v2.0.7**: Kritischer Bugfix - Update-Prozess-Fehler behoben
+- **v2.0.9**: Kritischer Update-Bugfix + Changelog-Viewer + Aktionen-Bereich
+- **v2.0.8**: Gruppenrichtlinien-Update + erweiterte Downloads + Datumsanzeige
+- **v2.0.7**: PSObject zu Hashtable Konvertierungsfehler behoben
 - **v2.0.6**: DATEV Tools vollständig implementiert (8 neue Tools)
 - **v2.0.5**: System Tools hinzugefügt
-- **v2.0.4**: Performance-Optimierungen
 
 ## 📄 Lizenz
 
@@ -146,8 +179,11 @@ Dieses Projekt ist für den internen Gebrauch bei HEES GmbH entwickelt.
 **Hinweis**: Diese Anwendung verbindet sich automatisch mit GitHub für Updates und Download-Konfigurationen. Stellen Sie sicher, dass eine Internetverbindung verfügbar ist.
 
 ### 🎯 Besondere Features
+- **🆕 Asynchrone Gruppenrichtlinien-Updates**: Ohne GUI-Blockierung
+- **🆕 Changelog-Integration**: Vollständige Update-Historie verfügbar
+- **🆕 Erweiterte Download-Verwaltung**: Mit Aktualisierungsdatum
 - **Intelligente DATEV-Pfad-Suche**: Automatische Erkennung von DATEV-Installationen
 - **Robuste Fehlerbehandlung**: Benutzerfreundliche MessageBoxen bei Problemen
-- **Vollständiges Logging**: Alle Aktionen werden protokolliert
-- **Backup-System**: Automatische Backups vor Updates
-- **Rollback-Funktion**: Wiederherstellung bei fehlgeschlagenen Updates
+- **Vollständiges Logging**: Alle Aktionen werden mit PID-Tracking protokolliert
+- **Backup-System**: Automatische Backups vor Updates mit Rollback-Funktion
+- **Runspace-basierte Überwachung**: Moderne asynchrone Prozessbehandlung
