@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.0.7"
+$script:AppVersion = "2.0.8"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -64,6 +64,119 @@ if ($consolePtr -ne [System.IntPtr]::Zero) {
 
 # Benötigte .NET-Assembly für WPF-GUI laden
 Add-Type -AssemblyName PresentationFramework
+
+#region Settings Management
+# Global Settings Variable
+$script:Settings = $null
+
+function Initialize-Settings {
+    <#
+    .SYNOPSIS
+    Initialisiert die Benutzereinstellungen aus der settings.json Datei
+    #>
+    try {
+        $settingsPath = Join-Path $env:APPDATA "DATEV-Toolbox 2.0\settings.json"
+        
+        if (Test-Path $settingsPath) {
+            Write-Log -Message "Lade Einstellungen von: $settingsPath" -Level 'INFO'
+            $json = Get-Content $settingsPath -Raw | ConvertFrom-Json
+            
+            # PSObject zu Hashtable konvertieren (gemäß Instructions)
+            $script:Settings = @{
+            }
+            $json.PSObject.Properties | ForEach-Object {
+                $script:Settings[$_.Name] = $_.Value
+            }
+            Write-Log -Message "Einstellungen erfolgreich geladen" -Level 'INFO'
+        } else {
+            Write-Log -Message "Keine settings.json gefunden, verwende Standard-Einstellungen" -Level 'INFO'
+            $script:Settings = Get-DefaultSettings
+            Save-Settings
+        }
+    } catch {
+        Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
+        $script:Settings = Get-DefaultSettings
+    }
+}
+
+function Get-DefaultSettings {
+    <#
+    .SYNOPSIS
+    Liefert die Standard-Einstellungen zurück
+    #>
+    return @{
+        DownloadPath = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
+        AutoUpdate = $true
+        LogLevel = "INFO"
+        WindowPosition = @{
+            Left = 100
+            Top = 100
+        }
+        LastUpdateCheck = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
+    }
+}
+
+function Save-Settings {
+    <#
+    .SYNOPSIS
+    Speichert die aktuellen Einstellungen in die settings.json Datei
+    #>
+    try {
+        $settingsPath = Join-Path $env:APPDATA "DATEV-Toolbox 2.0\settings.json"
+        $settingsDir = Split-Path $settingsPath -Parent
+        
+        if (-not (Test-Path $settingsDir)) {
+            New-Item -ItemType Directory -Path $settingsDir -Force | Out-Null
+        }
+        
+        $script:Settings | ConvertTo-Json -Depth 3 | Set-Content $settingsPath -Encoding UTF8
+        Write-Log -Message "Einstellungen gespeichert: $settingsPath" -Level 'INFO'
+    } catch {
+        Write-Log -Message "Fehler beim Speichern der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Get-Setting {
+    <#
+    .SYNOPSIS
+    Liefert einen Einstellungswert zurück
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Key,
+        [object]$DefaultValue = $null
+    )
+    
+    if ($null -eq $script:Settings) {
+        Initialize-Settings
+    }
+    
+    if ($script:Settings.ContainsKey($Key)) {
+        return $script:Settings[$Key]
+    }
+    return $DefaultValue
+}
+
+function Set-Setting {
+    <#
+    .SYNOPSIS
+    Setzt einen Einstellungswert
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Key,
+        [Parameter(Mandatory = $true)]
+        [object]$Value
+    )
+    
+    if ($null -eq $script:Settings) {
+        Initialize-Settings
+    }
+    
+    $script:Settings[$Key] = $Value
+    Save-Settings
+}
+#endregion
 
 # XAML-Definition für das Hauptfenster mit Tabs und Log-Bereich
 [xml]$xaml = @"
@@ -212,6 +325,17 @@ Add-Type -AssemblyName PresentationFramework
             </TabItem>            <TabItem Header="System">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- Aktionen -->
+                        <GroupBox Margin="5,5,5,10">
+                            <GroupBox.Header>
+                                <TextBlock Text="Aktionen" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="10">
+                                <Button Name="btnGpupdate" Content="Gruppenrichtlinien aktualisieren" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Führt gpupdate /force aus um Gruppenrichtlinien sofort zu aktualisieren"/>
+                            </StackPanel>
+                        </GroupBox>
+                        
                         <!-- System Tools -->
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
@@ -316,6 +440,9 @@ $btnEOAufgabenplanung = $window.FindName("btnEOAufgabenplanung")
 # Referenzen auf DATEV Performance Tools Buttons holen
 $btnNGENALL40 = $window.FindName("btnNGENALL40")
 $btnLeistungsindex = $window.FindName("btnLeistungsindex")
+
+# Referenzen auf Aktionen Buttons holen
+$btnGpupdate = $window.FindName("btnGpupdate")
 
 # Referenzen auf System Tools Buttons holen
 $btnTaskManager = $window.FindName("btnTaskManager")
@@ -562,6 +689,172 @@ function Start-SystemTool {
         Write-Log -Message "Fehler beim Starten von $Description`: $($_.Exception.Message)" -Level 'ERROR'
         [System.Windows.MessageBox]::Show(
             "Fehler beim Starten von $Description`:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+# Funktion zum Ausführen von Gruppenrichtlinien-Update
+function Start-Gpupdate {
+    <#
+    .SYNOPSIS
+    Führt gpupdate /force aus, um Gruppenrichtlinien sofort zu aktualisieren (asynchron)
+    #>
+    try {
+        Write-Log -Message "Starte Gruppenrichtlinien-Update (gpupdate /force)..." -Level 'INFO'
+        
+        # gpupdate /force asynchron ausführen ohne GUI zu blockieren
+        $process = Start-Process -FilePath 'gpupdate.exe' -ArgumentList '/force' -PassThru -WindowStyle Hidden
+        
+        Write-Log -Message "Gruppenrichtlinien-Update läuft im Hintergrund (PID: $($process.Id))..." -Level 'INFO'
+        
+        # Runspace für asynchrone Prozess-Überwachung
+        $runspace = [runspacefactory]::CreateRunspace()
+        $runspace.Open()
+        $runspace.SessionStateProxy.SetVariable('ProcessId', $process.Id)
+        
+        $powershell = [powershell]::Create()
+        $powershell.Runspace = $runspace
+        
+        [void]$powershell.AddScript({
+            param($ProcessId)
+            try {
+                # Warten auf Prozess-Ende
+                $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
+                if ($process) {
+                    $process.WaitForExit()
+                    return @{
+                        Success = $true
+                        ExitCode = $process.ExitCode
+                        ProcessId = $ProcessId
+                    }
+                }
+                return @{
+                    Success = $false
+                    Error = "Prozess nicht gefunden"
+                    ProcessId = $ProcessId
+                }
+            }
+            catch {
+                return @{
+                    Success = $false
+                    Error = $_.Exception.Message
+                    ProcessId = $ProcessId
+                }
+            }
+        }).AddArgument($process.Id)
+        
+        # Asynchrone Ausführung starten
+        $asyncResult = $powershell.BeginInvoke()
+        
+        # Timer für periodische Überprüfung
+        $timer = New-Object System.Windows.Threading.DispatcherTimer
+        $timer.Interval = [TimeSpan]::FromMilliseconds(1000) # 1 Sekunde
+        
+        # Referenzen für Timer-Callback speichern
+        $timer.Tag = @{
+            PowerShell = $powershell
+            AsyncResult = $asyncResult
+            Runspace = $runspace
+            StartTime = Get-Date
+        }
+        
+        $timer.Add_Tick({
+            param($sender, $e)
+            
+            try {
+                $timerData = $sender.Tag
+                $asyncResult = $timerData.AsyncResult
+                $powershell = $timerData.PowerShell
+                $runspace = $timerData.Runspace
+                $startTime = $timerData.StartTime
+                
+                # Timeout nach 2 Minuten
+                if ((Get-Date) - $startTime -gt [TimeSpan]::FromMinutes(2)) {
+                    $sender.Stop()
+                    Write-Log -Message "Gruppenrichtlinien-Update Timeout nach 2 Minuten erreicht" -Level 'WARN'
+                    
+                    # Cleanup
+                    $powershell.Dispose()
+                    $runspace.Close()
+                    $runspace.Dispose()
+                    
+                    [System.Windows.MessageBox]::Show(
+                        "Das Gruppenrichtlinien-Update dauert ungewöhnlich lange.`nDer Prozess läuft möglicherweise noch im Hintergrund.",
+                        "Timeout",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Warning
+                    )
+                    return
+                }
+                
+                # Prüfen ob Ausführung abgeschlossen
+                if ($asyncResult.IsCompleted) {
+                    $sender.Stop()
+                    
+                    try {
+                        $result = $powershell.EndInvoke($asyncResult)
+                        
+                        if ($result.Success -and $result.ExitCode -eq 0) {
+                            Write-Log -Message "Gruppenrichtlinien erfolgreich aktualisiert (PID: $($result.ProcessId))" -Level 'INFO'
+                            [System.Windows.MessageBox]::Show(
+                                "Gruppenrichtlinien wurden erfolgreich aktualisiert.`n`nDie neuen Richtlinien sind jetzt aktiv.",
+                                "Gruppenrichtlinien aktualisiert",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Information
+                            )
+                        } 
+                        elseif ($result.Success) {
+                            Write-Log -Message "Gpupdate wurde mit Exit-Code $($result.ExitCode) beendet" -Level 'WARN'
+                            [System.Windows.MessageBox]::Show(
+                                "Gruppenrichtlinien-Update wurde mit Warnungen abgeschlossen.`nExit-Code: $($result.ExitCode)`n`nPrüfen Sie das Log für weitere Details.",
+                                "Gruppenrichtlinien-Update",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Warning
+                            )
+                        }
+                        else {
+                            Write-Log -Message "Fehler beim Gruppenrichtlinien-Update: $($result.Error)" -Level 'ERROR'
+                            [System.Windows.MessageBox]::Show(
+                                "Fehler beim Gruppenrichtlinien-Update:`n$($result.Error)",
+                                "Fehler",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Error
+                            )
+                        }
+                    }
+                    catch {
+                        Write-Log -Message "Fehler beim Abrufen des Runspace-Ergebnisses: $($_.Exception.Message)" -Level 'ERROR'
+                        [System.Windows.MessageBox]::Show(
+                            "Fehler beim Abrufen des Update-Ergebnisses:`n$($_.Exception.Message)",
+                            "Fehler",
+                            [System.Windows.MessageBoxButton]::OK,
+                            [System.Windows.MessageBoxImage]::Error
+                        )
+                    }
+                    finally {
+                        # Cleanup
+                        $powershell.Dispose()
+                        $runspace.Close()
+                        $runspace.Dispose()
+                    }
+                }
+            }
+            catch {
+                $sender.Stop()
+                Write-Log -Message "Fehler im Timer-Callback: $($_.Exception.Message)" -Level 'ERROR'
+            }
+        })
+        
+        $timer.Start()
+        
+    }
+    catch {
+        Write-Log -Message "Fehler beim Starten des Gruppenrichtlinien-Updates: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Starten des Gruppenrichtlinien-Updates:`n$($_.Exception.Message)",
             "Fehler",
             [System.Windows.MessageBoxButton]::OK,
             [System.Windows.MessageBoxImage]::Error
@@ -913,14 +1206,15 @@ del "%~f0" >nul 2>&1
 function Initialize-UpdateCheck {
     try {
         # Einstellungen laden
-        $settings = Get-Settings
+        if ($null -eq $script:Settings) {
+            Initialize-Settings
+        }
         $checkInterval = 24 # Stunden
-        
-        # Letzten Check-Zeitpunkt prüfen
+          # Letzten Check-Zeitpunkt prüfen
         $lastCheck = $null
-        if ($settings.lastUpdateCheck) {
+        if ($script:Settings.lastUpdateCheck) {
             try {
-                $lastCheck = [DateTime]::Parse($settings.lastUpdateCheck)
+                $lastCheck = [DateTime]::Parse($script:Settings.lastUpdateCheck)
             }
             catch {
                 Write-Log -Message "Ungültiger lastUpdateCheck Wert, setze zurück" -Level 'WARN'
@@ -950,21 +1244,9 @@ function Initialize-UpdateCheck {
                 }
                 else {
                     Write-Log -Message "Benutzer hat Update abgelehnt" -Level 'INFO'
-                }
-            }
-            
-            # Letzten Check-Zeitpunkt aktualisieren (PSObject in Hashtable konvertieren)
-            $settingsHash = @{}
-            if ($settings -is [PSCustomObject]) {
-                foreach ($property in $settings.PSObject.Properties) {
-                    $settingsHash[$property.Name] = $property.Value
-                }
-            }
-            else {
-                $settingsHash = $settings
-            }
-            $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
-            Set-Settings -Settings $settingsHash
+                }            }
+              # Letzten Check-Zeitpunkt aktualisieren
+            Set-Setting -Key "lastUpdateCheck" -Value (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         }
         else {
             Write-Log -Message "Update-Check übersprungen (letzter Check: $($lastCheck.ToString('yyyy-MM-dd HH:mm')))" -Level 'INFO'
@@ -1644,6 +1926,9 @@ if ($null -ne $btnDatentraegerPortal) {
 # Downloads-ComboBox initialisieren
 Initialize-DownloadsComboBox
 
+# Settings initialisieren
+Initialize-Settings
+
 # Update-Termine beim Start laden (falls vorhanden)
 Initialize-UpdateDates
 
@@ -1701,6 +1986,13 @@ if ($null -ne $btnLeistungsindex) {
     })
 }
 
+# Event-Handler für Aktionen Buttons
+if ($null -ne $btnGpupdate) {
+    $btnGpupdate.Add_Click({
+        Start-Gpupdate
+    })
+}
+
 # Event-Handler für System Tools Buttons
 if ($null -ne $btnTaskManager) {
     $btnTaskManager.Add_Click({
@@ -1751,14 +2043,7 @@ if ($null -ne $btnOpenFolder) {
         catch {
             Write-Log -Message "Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)" -Level 'ERROR'
             [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)", "Fehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
-        }
-    })
-}
-
-if ($null -ne $btnCheckUpdate) {
-    $btnCheckUpdate.Add_Click({
-        Check-ForUpdates
-    })
+        }    })
 }
 
 # Startup-Log schreiben
