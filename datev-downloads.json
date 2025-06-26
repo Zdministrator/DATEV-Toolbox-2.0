@@ -27,11 +27,6 @@
       "description": "Software-Manager Treibererweiterung Version 7.88"
     },
     {
-      "name": "Sicherheitspaket V. 7.88",
-      "url": "https://download.datev.de/download/srel/sicherheitspaket_sr_pak00565_7.88.exe",
-      "description": "DATEV Sicherheitspaket Version 7.88"
-    },
-    {
       "name": "DATEVnet Einzel-/Telearbeitsplatz",
       "url": "https://download.datev.de/download/datevnet/datevnet_einzel-telearbeitsplatz_compact-full.exe",
       "description": "DATEVnet Installation für Einzel- und Telearbeitsplätze"

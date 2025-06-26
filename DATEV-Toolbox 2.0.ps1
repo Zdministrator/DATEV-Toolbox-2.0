@@ -182,7 +182,7 @@ function Set-Setting {
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         Title="DATEV-Toolbox 2 - Version v$script:AppVersion" 
-        Height="550" Width="420" 
+        Height="700" Width="420" 
         MinHeight="500" MinWidth="400"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">    <Grid>
@@ -331,7 +331,7 @@ function Set-Setting {
                                 <TextBlock Text="Aktionen" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="10">
-                                <Button Name="btnGpupdate" Content="Gruppenrichtlinien aktualisieren" Height="25" Margin="0,3,0,3"
+                                <Button Name="btnGpupdate" Content="🔄 Gruppenrichtlinien aktualisieren" Height="25" Margin="0,3,0,3"
                                         ToolTip="Führt gpupdate /force aus um Gruppenrichtlinien sofort zu aktualisieren"/>
                             </StackPanel>
                         </GroupBox>
@@ -376,7 +376,7 @@ function Set-Setting {
                         <GroupBox Margin="5,5,5,10">
                             <GroupBox.Header>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Anstehende Update-Termine" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Anstehende DATEV Update-Termine" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
                                     <TextBlock Name="btnUpdateDates" Text="🔄" FontSize="14" Margin="8,0,0,0" 
                                                ToolTip="Update-Termine aktualisieren" VerticalAlignment="Center" 
                                                Cursor="Hand" Foreground="Black"/>
