@@ -1297,16 +1297,27 @@ function Get-DATEVDownloads {
             $json = Get-Content -Path $appDataFile -Raw -Encoding UTF8
             $downloadsData = $json | ConvertFrom-Json
             Write-Log -Message "DATEV Downloads erfolgreich aus AppData geladen" -Level 'INFO'
-            return $downloadsData.downloads
+            
+            # Rückgabe als Hashtable mit Downloads und lastUpdated
+            return @{
+                downloads = $downloadsData.downloads
+                lastUpdated = $downloadsData.lastUpdated
+            }
         }
         else {
             Write-Log -Message "Keine datev-downloads.json im AppData-Ordner gefunden. Bitte erst aktualisieren." -Level 'WARN'
-            return @()
+            return @{
+                downloads = @()
+                lastUpdated = $null
+            }
         }
     }
     catch {
         Write-Log -Message "Fehler beim Laden der DATEV Downloads: $($_.Exception.Message)" -Level 'ERROR'
-        return @()
+        return @{
+            downloads = @()
+            lastUpdated = $null
+        }
     }
 }
 
@@ -1357,12 +1368,28 @@ function Update-DATEVDownloads {
 # Funktion zum Befüllen der Dropdown-Liste
 function Initialize-DownloadsComboBox {
     try {
-        $downloads = Get-DATEVDownloads
+        $downloadsData = Get-DATEVDownloads
+        $downloads = $downloadsData.downloads
+        $lastUpdated = $downloadsData.lastUpdated
+        
         $cmbDirectDownloads.Items.Clear()
         
-        # Platzhalter-Element hinzufügen
+        # Platzhalter-Element mit Datum hinzufügen
         $placeholderItem = New-Object System.Windows.Controls.ComboBoxItem
-        $placeholderItem.Content = "Download auswählen..."
+        if ($lastUpdated) {
+            # Datum in deutsches Format konvertieren
+            try {
+                $dateObj = [DateTime]::ParseExact($lastUpdated, 'yyyy-MM-dd', $null)
+                $germanDate = $dateObj.ToString('dd.MM.yyyy')
+                $placeholderItem.Content = "Download auswählen... (Stand: $germanDate)"
+            }
+            catch {
+                $placeholderItem.Content = "Download auswählen... (Stand: $lastUpdated)"
+            }
+        }
+        else {
+            $placeholderItem.Content = "Download auswählen..."
+        }
         $placeholderItem.IsEnabled = $false
         $placeholderItem.Foreground = "Gray"
         $cmbDirectDownloads.Items.Add($placeholderItem) | Out-Null
