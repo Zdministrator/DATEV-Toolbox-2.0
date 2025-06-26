@@ -1160,7 +1160,10 @@ del "%~f0" >nul 2>&1
             date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
             backupPath = $backupPath
         }
-        Set-Settings -Settings $settingsHash
+        
+        # Einstellungen in globale Variable übertragen und speichern
+        $script:Settings = $settingsHash
+        Save-Settings
         
         # Alte Backups bereinigen (behält nur die letzten 5)
         Clear-OldUpdateBackups
