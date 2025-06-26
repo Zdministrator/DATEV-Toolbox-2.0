@@ -1,15 +1,44 @@
 {
-  "version": "2.0.8",
+  "version": "2.0.9",
   "releaseDate": "2025-06-26",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Neuer Aktionen-Bereich im System-Tab hinzugefügt",
-    "• Gruppenrichtlinien-Update Button (gpupdate /force) implementiert",
-    "• Asynchrone Ausführung verhindert GUI-Blockierung",
-    "• Robuste Runspace-basierte Prozessüberwachung",
-    "• Timeout-Schutz und detailliertes Logging mit PID-Tracking",
-    "• Benutzerfreundliche deutsche Rückmeldungen und Fehlermeldungen",
-    "Alle bestehenden DATEV-Tools bleiben vollständig funktional"
+    "Kritischer Bugfix: Update-Prozess-Fehler behoben",
+    "• Fehlerhaften 'Set-Settings' Aufruf durch korrekten 'Save-Settings' Aufruf ersetzt",
+    "• Globale Settings-Variable wird jetzt korrekt vor dem Speichern aktualisiert",
+    "• Update-Verlauf und Backup-Informationen werden ordnungsgemäß gespeichert",
+    "• Vollständige Stabilität des automatischen Update-Systems wiederhergestellt",
+    "Neue Features: Aktionen-Bereich mit Gruppenrichtlinien-Update",
+    "Download-Updates: Belegtransfer V. 5.47 und LODAS V. 4.24 hinzugefügt"
+  ],
+  "previousVersions": [
+    {
+      "version": "2.0.8",
+      "releaseDate": "2025-06-26",
+      "changelog": [
+        "Neuer Aktionen-Bereich im System-Tab hinzugefügt",
+        "• Gruppenrichtlinien-Update Button (gpupdate /force) implementiert",
+        "• Asynchrone Ausführung verhindert GUI-Blockierung",
+        "• Robuste Runspace-basierte Prozessüberwachung",
+        "• Timeout-Schutz und detailliertes Logging mit PID-Tracking",
+        "• Benutzerfreundliche deutsche Rückmeldungen und Fehlermeldungen",
+        "• Download-Liste zeigt jetzt Aktualisierungsdatum an",
+        "Alle bestehenden DATEV-Tools bleiben vollständig funktional"
+      ]
+    },
+    {
+      "version": "2.0.7",
+      "releaseDate": "2025-01-02",
+      "changelog": [
+        "Kritischer Bugfix: Update-Prozess-Fehler behoben",
+        "• PSObject zu Hashtable Konvertierungsfehler (op_Addition) behoben",
+        "• Sichere Behandlung von ConvertFrom-Json Objekten implementiert",
+        "• Update-Einstellungen werden jetzt korrekt verarbeitet",
+        "• Robuste Update-Check-Mechanismus ohne Typen-Konflikte",
+        "• Vollständige Stabilität des automatischen Update-Systems",
+        "Alle 8 DATEV-Tools bleiben vollständig funktional"
+      ]
+    }
   ],
   "minimumRequiredVersion": "2.0.0",
   "updateRequired": false
