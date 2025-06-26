@@ -367,6 +367,8 @@ function Set-Setting {
                                         ToolTip="Öffnet den AppData-Ordner der DATEV-Toolbox mit Einstellungen und Logs"/>
                                 <Button Name="btnCheckUpdate" Content="Nach Script Updates suchen" Height="25" Margin="0,3,0,3"
                                         ToolTip="Prüft GitHub auf verfügbare Updates für die DATEV-Toolbox"/>
+                                <Button Name="btnShowChangelog" Content="Changelog anzeigen" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Zeigt das Changelog der aktuellen Version und der letzten Updates an"/>
                                 <!-- Hier können zukünftig Einstellungen ergänzt werden -->
                             </StackPanel>                        </GroupBox>
                         
@@ -455,6 +457,7 @@ $btnDiskCleanup = $window.FindName("btnDiskCleanup")
 # Referenzen auf Einstellungs-Buttons holen
 $btnOpenFolder = $window.FindName("btnOpenFolder")
 $btnCheckUpdate = $window.FindName("btnCheckUpdate")
+$btnShowChangelog = $window.FindName("btnShowChangelog")
 #endregion
 
 #region Logging-Funktion
@@ -855,6 +858,76 @@ function Start-Gpupdate {
         Write-Log -Message "Fehler beim Starten des Gruppenrichtlinien-Updates: $($_.Exception.Message)" -Level 'ERROR'
         [System.Windows.MessageBox]::Show(
             "Fehler beim Starten des Gruppenrichtlinien-Updates:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+# Funktion zum Anzeigen des Changelogs
+function Show-ChangelogDialog {
+    <#
+    .SYNOPSIS
+    Zeigt das Changelog der aktuellen Version und der letzten Updates an
+    #>
+    try {
+        Write-Log -Message "Lade Changelog von GitHub..." -Level 'INFO'
+        
+        # Version-Daten von GitHub laden
+        $versionUrl = "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/version.json"
+        
+        # TLS 1.2 erzwingen für sichere Downloads
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        $webClient = New-Object System.Net.WebClient
+        $webClient.Encoding = [System.Text.Encoding]::UTF8
+        
+        $versionJson = $webClient.DownloadString($versionUrl)
+        $versionData = $versionJson | ConvertFrom-Json
+        
+        # Changelog-Text zusammenstellen
+        $changelogText = "DATEV-Toolbox 2.0 - Changelog`n"
+        $changelogText += "=" * 50 + "`n`n"
+        
+        # Aktuelle Version
+        $changelogText += "📦 Version $($versionData.version) ($(Get-Date $versionData.releaseDate -Format 'dd.MM.yyyy'))`n"
+        $changelogText += "-" * 30 + "`n"
+        foreach ($change in $versionData.changelog) {
+            $changelogText += "• $change`n"
+        }
+        $changelogText += "`n"
+        
+        # Vorherige Versionen
+        if ($versionData.previousVersions) {
+            foreach ($prevVersion in $versionData.previousVersions) {
+                $changelogText += "📦 Version $($prevVersion.version) ($(Get-Date $prevVersion.releaseDate -Format 'dd.MM.yyyy'))`n"
+                $changelogText += "-" * 30 + "`n"
+                foreach ($change in $prevVersion.changelog) {
+                    $changelogText += "• $change`n"
+                }
+                $changelogText += "`n"
+            }
+        }
+        
+        # Changelog in MessageBox anzeigen
+        [System.Windows.MessageBox]::Show(
+            $changelogText,
+            "DATEV-Toolbox 2.0 - Changelog",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Information
+        )
+        
+        Write-Log -Message "Changelog erfolgreich angezeigt" -Level 'INFO'
+        
+        # WebClient ordnungsgemäß entsorgen
+        $webClient.Dispose()
+        
+    }
+    catch {
+        Write-Log -Message "Fehler beim Laden des Changelogs: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Laden des Changelogs von GitHub:`n$($_.Exception.Message)`n`nPrüfen Sie Ihre Internetverbindung.",
             "Fehler",
             [System.Windows.MessageBoxButton]::OK,
             [System.Windows.MessageBoxImage]::Error
@@ -2074,6 +2147,18 @@ if ($null -ne $btnOpenFolder) {
             Write-Log -Message "Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)" -Level 'ERROR'
             [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)", "Fehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
         }    })
+}
+
+if ($null -ne $btnCheckUpdate) {
+    $btnCheckUpdate.Add_Click({
+        Start-UpdateCheck
+    })
+}
+
+if ($null -ne $btnShowChangelog) {
+    $btnShowChangelog.Add_Click({
+        Show-ChangelogDialog
+    })
 }
 
 # Startup-Log schreiben
