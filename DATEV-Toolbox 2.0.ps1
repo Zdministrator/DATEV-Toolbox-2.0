@@ -25,11 +25,83 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.0.9"
+$script:AppVersion = "2.1.0"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
 $script:ScriptDownloadUrl = "https://github.com/$script:GitHubRepo/raw/main/DATEV-Toolbox 2.0.ps1"
+
+#region Zentrale Konfiguration
+# Alle URLs, Pfade und Konfigurationswerte zentral verwaltet
+$script:Config = @{
+    URLs = @{
+        GitHub = @{
+            Repository = "https://github.com/$script:GitHubRepo"
+            VersionCheck = $script:UpdateCheckUrl
+            ScriptDownload = $script:ScriptDownloadUrl
+            DownloadsConfig = "https://github.com/$script:GitHubRepo/raw/refs/heads/main/datev-downloads.json"
+        }
+        DATEV = @{
+            # Online-Services
+            HelpCenter = "https://apps.datev.de/help-center/"
+            ServiceKontakte = "https://apps.datev.de/servicekontakt-online/contacts"
+            MyUpdates = "https://apps.datev.de/myupdates/home"
+            MyDATEV = "https://apps.datev.de/mydatev"
+            DUO = "https://duo.datev.de/"
+            LAO = "https://apps.datev.de/lao"
+            Lizenzverwaltung = "https://apps.datev.de/lizenzverwaltung"
+            Rechteraum = "https://apps.datev.de/rechteraum"
+            RVO = "https://apps.datev.de/rvo-administration"
+            SmartLogin = "https://go.datev.de/smartlogin-administration"
+            Bestandsmanagement = "https://apps.datev.de/mydata/"
+            WeitereApps = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
+            
+            # Download-Bereiche
+            Downloadbereich = "https://www.datev.de/download/"
+            SmartDocs = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
+            DatentraegerPortal = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
+            
+            # Update-Termine
+            Jahresplanung = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
+        }
+    }
+    
+    Timeouts = @{
+        UpdateCheck = 10
+        DownloadJSON = 15
+        FileDownload = 30
+        ICSDownload = 15
+        UpdateInterval = 24  # Stunden
+        GpupdateTimeout = 2  # Minuten
+    }
+    
+    Paths = @{
+        AppData = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+        Downloads = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
+        Updates = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Updates'
+        SettingsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'settings.json'
+        ErrorLog = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Error-Log.txt'
+        DownloadsJSON = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'datev-downloads.json'
+        ICSFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
+    }
+    
+    Limits = @{
+        MaxBackups = 5
+        MinFileSize = 1000  # Bytes für Download-Validierung
+        MaxUpdateRetries = 3
+    }
+    
+    SystemTools = @{
+        TaskManager = @{ Command = 'taskmgr.exe'; Description = 'Task-Manager' }
+        ResourceMonitor = @{ Command = 'resmon.exe'; Description = 'Ressourcenmonitor' }
+        EventViewer = @{ Command = 'eventvwr.msc'; Description = 'Ereignisanzeige' }
+        Services = @{ Command = 'services.msc'; Description = 'Dienste' }
+        MSConfig = @{ Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
+        DiskCleanup = @{ Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
+        Gpupdate = @{ Command = 'gpupdate.exe'; Arguments = '/force'; Description = 'Gruppenrichtlinien-Update' }
+    }
+}
+#endregion
 
 #region Administrator-Rechte-Prüfung
 # Setup für Administratorrechte
@@ -75,7 +147,7 @@ function Initialize-Settings {
     Initialisiert die Benutzereinstellungen aus der settings.json Datei
     #>
     try {
-        $settingsPath = Join-Path $env:APPDATA "DATEV-Toolbox 2.0\settings.json"
+        $settingsPath = $script:Config.Paths.SettingsFile
         
         if (Test-Path $settingsPath) {
             Write-Log -Message "Lade Einstellungen von: $settingsPath" -Level 'INFO'
@@ -122,7 +194,7 @@ function Save-Settings {
     Speichert die aktuellen Einstellungen in die settings.json Datei
     #>
     try {
-        $settingsPath = Join-Path $env:APPDATA "DATEV-Toolbox 2.0\settings.json"
+        $settingsPath = $script:Config.Paths.SettingsFile
         $settingsDir = Split-Path $settingsPath -Parent
         
         if (-not (Test-Path $settingsDir)) {
@@ -484,11 +556,11 @@ function Write-Log {
         
         # Warnungen und Fehler zusätzlich in Error-Log.txt speichern
         if ($Level -eq 'WARN' -or $Level -eq 'ERROR') {
-            $logDir = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+            $logFile = $script:Config.Paths.ErrorLog
+            $logDir = Split-Path $logFile -Parent
             if (-not (Test-Path $logDir)) {
                 New-Item -Path $logDir -ItemType Directory -Force | Out-Null
             }
-            $logFile = Join-Path $logDir 'Error-Log.txt'
             Add-Content -Path $logFile -Value $logEntry -Encoding UTF8
         }
     }
@@ -765,19 +837,19 @@ function Start-Gpupdate {
         }
         
         $timer.Add_Tick({
-            param($sender, $e)
+            param($timerSender, $timerEventArgs)
             
             try {
-                $timerData = $sender.Tag
+                $timerData = $timerSender.Tag
                 $asyncResult = $timerData.AsyncResult
                 $powershell = $timerData.PowerShell
                 $runspace = $timerData.Runspace
                 $startTime = $timerData.StartTime
                 
-                # Timeout nach 2 Minuten
-                if ((Get-Date) - $startTime -gt [TimeSpan]::FromMinutes(2)) {
-                    $sender.Stop()
-                    Write-Log -Message "Gruppenrichtlinien-Update Timeout nach 2 Minuten erreicht" -Level 'WARN'
+                # Timeout nach Konfigurations-Wert
+                if ((Get-Date) - $startTime -gt [TimeSpan]::FromMinutes($script:Config.Timeouts.GpupdateTimeout)) {
+                    $timerSender.Stop()
+                    Write-Log -Message "Gruppenrichtlinien-Update Timeout nach $($script:Config.Timeouts.GpupdateTimeout) Minuten erreicht" -Level 'WARN'
                     
                     # Cleanup
                     $powershell.Dispose()
@@ -795,7 +867,7 @@ function Start-Gpupdate {
                 
                 # Prüfen ob Ausführung abgeschlossen
                 if ($asyncResult.IsCompleted) {
-                    $sender.Stop()
+                    $timerSender.Stop()
                     
                     try {
                         $result = $powershell.EndInvoke($asyncResult)
@@ -846,7 +918,7 @@ function Start-Gpupdate {
                 }
             }
             catch {
-                $sender.Stop()
+                $timerSender.Stop()
                 Write-Log -Message "Fehler im Timer-Callback: $($_.Exception.Message)" -Level 'ERROR'
             }
         })
@@ -875,7 +947,7 @@ function Show-ChangelogDialog {
         Write-Log -Message "Lade Changelog von GitHub..." -Level 'INFO'
         
         # Version-Daten von GitHub laden
-        $versionUrl = "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/version.json"
+        $versionUrl = $script:Config.URLs.GitHub.VersionCheck
         
         # TLS 1.2 erzwingen für sichere Downloads
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
@@ -941,7 +1013,7 @@ function Show-ChangelogDialog {
 # Funktion zum Bereinigen alter Update-Backups (behält nur die letzten 5)
 function Clear-OldUpdateBackups {
     try {
-        $updateDir = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Updates'
+        $updateDir = $script:Config.Paths.Updates
         if (-not (Test-Path $updateDir)) {
             return
         }
@@ -949,9 +1021,9 @@ function Clear-OldUpdateBackups {
         # Alle Backup-Dateien finden und nach Datum sortieren
         $backupFiles = Get-ChildItem -Path $updateDir -Filter "*.backup" | Sort-Object CreationTime -Descending
         
-        # Nur die letzten 5 behalten, den Rest löschen
-        if ($backupFiles.Count -gt 5) {
-            $filesToDelete = $backupFiles | Select-Object -Skip 5
+        # Nur die konfigurierten Anzahl behalten, den Rest löschen
+        if ($backupFiles.Count -gt $script:Config.Limits.MaxBackups) {
+            $filesToDelete = $backupFiles | Select-Object -Skip $script:Config.Limits.MaxBackups
             foreach ($file in $filesToDelete) {
                 try {
                     Remove-Item $file.FullName -Force
@@ -1016,7 +1088,7 @@ function Test-ForUpdates {
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         
         # Version.json von GitHub laden
-        $versionInfo = Invoke-RestMethod -Uri $script:UpdateCheckUrl -TimeoutSec 10 -UseBasicParsing
+        $versionInfo = Invoke-RestMethod -Uri $script:UpdateCheckUrl -TimeoutSec $script:Config.Timeouts.UpdateCheck -UseBasicParsing
         
         $currentVersion = Get-CurrentVersion
         $remoteVersion = $versionInfo.version
@@ -1100,9 +1172,8 @@ function Start-UpdateProcess {
     try {
         Write-Log -Message "Starte Update-Prozess für Version $($UpdateInfo.NewVersion)..." -Level 'INFO'
         
-        # AppData-Verzeichnis für Updates erstellen
-        $appDataDir = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
-        $updateDir = Join-Path $appDataDir 'Updates'
+        # Update-Verzeichnis erstellen
+        $updateDir = $script:Config.Paths.Updates
         if (-not (Test-Path $updateDir)) {
             New-Item -Path $updateDir -ItemType Directory -Force | Out-Null
             Write-Log -Message "Update-Verzeichnis erstellt: $updateDir" -Level 'INFO'
@@ -1130,11 +1201,11 @@ function Start-UpdateProcess {
         
         # Neue Version herunterladen
         Write-Log -Message "Lade neue Version herunter nach: $tempUpdatePath" -Level 'INFO'
-        Invoke-WebRequest -Uri $UpdateInfo.VersionInfo.downloadUrl -OutFile $tempUpdatePath -UseBasicParsing -TimeoutSec 30
+        Invoke-WebRequest -Uri $UpdateInfo.VersionInfo.downloadUrl -OutFile $tempUpdatePath -UseBasicParsing -TimeoutSec $script:Config.Timeouts.FileDownload
         
         # Erweiterte Integrität prüfen
         $downloadedFile = Get-Item $tempUpdatePath
-        if ($downloadedFile.Length -lt 1000) {
+        if ($downloadedFile.Length -lt $script:Config.Limits.MinFileSize) {
             throw "Heruntergeladene Datei ist zu klein ($($downloadedFile.Length) Bytes) und möglicherweise beschädigt"
         }
         
@@ -1216,13 +1287,13 @@ del "%~f0" >nul 2>&1
         Write-Log -Message "Update wird angewendet. Anwendung wird neu gestartet..." -Level 'INFO'
         Write-Log -Message "Backup wird erstellt unter: $backupPath" -Level 'INFO'          # Update-Einstellungen speichern (PSObject sicher in Hashtable konvertieren)
         $settingsHash = @{}
-        if ($settings -is [PSCustomObject]) {
-            foreach ($property in $settings.PSObject.Properties) {
+        if ($script:Settings -is [PSCustomObject]) {
+            foreach ($property in $script:Settings.PSObject.Properties) {
                 $settingsHash[$property.Name] = $property.Value
             }
         }
         else {
-            $settingsHash = $settings
+            $settingsHash = $script:Settings
         }
         $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         $settingsHash.lastInstalledVersion = $UpdateInfo.NewVersion
@@ -1285,7 +1356,7 @@ function Initialize-UpdateCheck {
         if ($null -eq $script:Settings) {
             Initialize-Settings
         }
-        $checkInterval = 24 # Stunden
+        $checkInterval = $script:Config.Timeouts.UpdateInterval # Stunden
           # Letzten Check-Zeitpunkt prüfen
         $lastCheck = $null
         if ($script:Settings.lastUpdateCheck) {
@@ -1367,7 +1438,7 @@ function Start-ManualUpdateCheck {
 function Get-DATEVDownloads {
     try {
         # Nur im AppData-Ordner suchen
-        $appDataFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'datev-downloads.json'
+        $appDataFile = $script:Config.Paths.DownloadsJSON
         
         if (Test-Path $appDataFile) {
             $json = Get-Content -Path $appDataFile -Raw -Encoding UTF8
@@ -1399,14 +1470,14 @@ function Get-DATEVDownloads {
 
 # Funktion zum Aktualisieren der datev-downloads.json aus GitHub
 function Update-DATEVDownloads {
-    $downloadsUrl = "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/refs/heads/main/datev-downloads.json"
-    $localFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'datev-downloads.json'
+    $downloadsUrl = $script:Config.URLs.GitHub.DownloadsConfig
+    $localFile = $script:Config.Paths.DownloadsJSON
     
     Write-Log -Message "Benutzeraktion: Direkt-Downloads aktualisieren geklickt. Lade JSON von $downloadsUrl" -Level 'INFO'
     
     try {
         # Verzeichnis erstellen falls es nicht existiert
-        $downloadsDir = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+        $downloadsDir = $script:Config.Paths.AppData
         if (-not (Test-Path $downloadsDir)) {
             New-Item -Path $downloadsDir -ItemType Directory -Force | Out-Null
             Write-Log -Message "Downloads-Verzeichnis erstellt: $downloadsDir" -Level 'INFO'
@@ -1421,7 +1492,7 @@ function Update-DATEVDownloads {
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         
         # JSON-Datei herunterladen
-        Invoke-WebRequest -Uri $downloadsUrl -OutFile $localFile -UseBasicParsing -TimeoutSec 15
+        Invoke-WebRequest -Uri $downloadsUrl -OutFile $localFile -UseBasicParsing -TimeoutSec $script:Config.Timeouts.DownloadJSON
         
         Write-Log -Message "Downloads-JSON erfolgreich aktualisiert: $localFile" -Level 'INFO'
         
@@ -1444,6 +1515,12 @@ function Update-DATEVDownloads {
 # Funktion zum Befüllen der Dropdown-Liste
 function Initialize-DownloadsComboBox {
     try {
+        # Prüfen ob ComboBox verfügbar ist
+        if ($null -eq $cmbDirectDownloads) {
+            Write-Log -Message "ComboBox 'cmbDirectDownloads' nicht verfügbar, überspringe Initialisierung" -Level 'WARN'
+            return
+        }
+        
         $downloadsData = Get-DATEVDownloads
         $downloads = $downloadsData.downloads
         $lastUpdated = $downloadsData.lastUpdated
@@ -1501,7 +1578,7 @@ function Start-BackgroundDownload {
     
     try {
         # Download-Ordner erstellen
-        $downloadFolder = Join-Path ([Environment]::GetFolderPath("UserProfile")) "Downloads\DATEV-Toolbox"
+        $downloadFolder = $script:Config.Paths.Downloads
         if (-not (Test-Path $downloadFolder)) {
             New-Item -Path $downloadFolder -ItemType Directory -Force | Out-Null
             Write-Log -Message "Download-Ordner erstellt: $downloadFolder" -Level 'INFO'
@@ -1539,15 +1616,15 @@ function Start-BackgroundDownload {
         
         # Event-Handler für Download-Completion
         $webClient.add_DownloadFileCompleted({
-                param($s, $e)
+                param($webClientSender, $downloadEventArgs)
                 # Dateiname aus UserState oder aus der lokalen Variable extrahieren
-                $currentFileName = if ($e.UserState) { $e.UserState } else { $FileName }
+                $currentFileName = if ($downloadEventArgs.UserState) { $downloadEventArgs.UserState } else { $FileName }
             
-                if ($null -eq $e.Error -and -not $e.Cancelled) {
+                if ($null -eq $downloadEventArgs.Error -and -not $downloadEventArgs.Cancelled) {
                     Write-Log -Message "Download erfolgreich abgeschlossen: $currentFileName" -Level 'INFO'
                 }
                 else {
-                    Write-Log -Message "Download fehlgeschlagen: $($e.Error.Message)" -Level 'ERROR'
+                    Write-Log -Message "Download fehlgeschlagen: $($downloadEventArgs.Error.Message)" -Level 'ERROR'
                 }
             
                 # UI zurücksetzen
@@ -1555,8 +1632,8 @@ function Start-BackgroundDownload {
             
                 # WebClient sicher entsorgen
                 try {
-                    if ($null -ne $s -and $s -is [System.Net.WebClient]) {
-                        $s.Dispose()
+                    if ($null -ne $webClientSender -and $webClientSender -is [System.Net.WebClient]) {
+                        $webClientSender.Dispose()
                     }
                 }
                 catch {
@@ -1579,7 +1656,7 @@ function Start-BackgroundDownload {
 # Funktion zum Öffnen des Download-Ordners im Explorer
 function Open-DownloadFolder {
     try {
-        $downloadFolder = Join-Path ([Environment]::GetFolderPath("UserProfile")) "Downloads\DATEV-Toolbox"
+        $downloadFolder = $script:Config.Paths.Downloads
         
         # Ordner erstellen falls er nicht existiert
         if (-not (Test-Path $downloadFolder)) {
@@ -1601,7 +1678,7 @@ function Open-DownloadFolder {
 # Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei
 function Show-NextUpdateDates {
     Write-Log -Message "Lese Update-Termine aus ICS-Datei..." -Level 'INFO'
-    $icsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
+    $icsFile = $script:Config.Paths.ICSFile
     
     if ($null -eq $spUpdateDates) {
         Write-Log -Message "Update-Termine Container nicht gefunden" -Level 'WARN'
@@ -1754,7 +1831,7 @@ function Show-NextUpdateDates {
 
 # Funktion zum automatischen Laden der Update-Termine beim Start (falls .ics-Datei vorhanden)
 function Initialize-UpdateDates {
-    $icsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
+    $icsFile = $script:Config.Paths.ICSFile
     
     if (Test-Path $icsFile) {
         Write-Log -Message "Vorhandene ICS-Datei gefunden. Lade Update-Termine automatisch..." -Level 'INFO'
@@ -1775,8 +1852,8 @@ function Initialize-UpdateDates {
 
 # Funktion zum Laden der ICS-Datei von DATEV
 function Update-UpdateDates {
-    $icsUrl = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
-    $icsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
+    $icsUrl = $script:Config.URLs.DATEV.Jahresplanung
+    $icsFile = $script:Config.Paths.ICSFile
     
     if ($null -eq $spUpdateDates) {
         Write-Log -Message "Update-Termine Container nicht gefunden" -Level 'WARN'
@@ -1796,7 +1873,7 @@ function Update-UpdateDates {
         # TLS 1.2 für sichere Downloads erzwingen
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         
-        Invoke-WebRequest -Uri $icsUrl -OutFile $icsFile -UseBasicParsing -TimeoutSec 15
+        Invoke-WebRequest -Uri $icsUrl -OutFile $icsFile -UseBasicParsing -TimeoutSec $script:Config.Timeouts.ICSDownload
         
         $spUpdateDates.Children.Clear()
         $tb = New-Object System.Windows.Controls.TextBlock
@@ -1837,64 +1914,64 @@ function Open-Url {
 # Hilfe und Support
 $btnHilfeCenter = $window.FindName("btnHilfeCenter")
 if ($null -ne $btnHilfeCenter) {
-    $btnHilfeCenter.Add_Click({ Open-Url -Url "https://apps.datev.de/help-center/" })
+    $btnHilfeCenter.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.HelpCenter })
 }
 
 $btnServicekontakte = $window.FindName("btnServicekontakte")
 if ($null -ne $btnServicekontakte) {
-    $btnServicekontakte.Add_Click({ Open-Url -Url "https://apps.datev.de/servicekontakt-online/contacts" })
+    $btnServicekontakte.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.ServiceKontakte })
 }
 
 $btnMyUpdates = $window.FindName("btnMyUpdates")
 if ($null -ne $btnMyUpdates) {
-    $btnMyUpdates.Add_Click({ Open-Url -Url "https://apps.datev.de/myupdates/home" })
+    $btnMyUpdates.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.MyUpdates })
 }
 
 # Cloud
 $btnMyDATEV = $window.FindName("btnMyDATEV")
 if ($null -ne $btnMyDATEV) {
-    $btnMyDATEV.Add_Click({ Open-Url -Url "https://apps.datev.de/mydatev" })
+    $btnMyDATEV.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.MyDATEV })
 }
 
 $btnDUO = $window.FindName("btnDUO")
 if ($null -ne $btnDUO) {
-    $btnDUO.Add_Click({ Open-Url -Url "https://duo.datev.de/" })
+    $btnDUO.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.DUO })
 }
 
 $btnLAO = $window.FindName("btnLAO")
 if ($null -ne $btnLAO) {
-    $btnLAO.Add_Click({ Open-Url -Url "https://apps.datev.de/lao" })
+    $btnLAO.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.LAO })
 }
 
 $btnLizenzverwaltung = $window.FindName("btnLizenzverwaltung")
 if ($null -ne $btnLizenzverwaltung) {
-    $btnLizenzverwaltung.Add_Click({ Open-Url -Url "https://apps.datev.de/lizenzverwaltung" })
+    $btnLizenzverwaltung.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.Lizenzverwaltung })
 }
 
 $btnRechteraum = $window.FindName("btnRechteraum")
 if ($null -ne $btnRechteraum) {
-    $btnRechteraum.Add_Click({ Open-Url -Url "https://apps.datev.de/rechteraum" })
+    $btnRechteraum.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.Rechteraum })
 }
 
 $btnRVO = $window.FindName("btnRVO")
 if ($null -ne $btnRVO) {
-    $btnRVO.Add_Click({ Open-Url -Url "https://apps.datev.de/rvo-administration" })
+    $btnRVO.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.RVO })
 }
 
 # Verwaltung und Technik
 $btnSmartLogin = $window.FindName("btnSmartLogin")
 if ($null -ne $btnSmartLogin) {
-    $btnSmartLogin.Add_Click({ Open-Url -Url "https://go.datev.de/smartlogin-administration" })
+    $btnSmartLogin.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.SmartLogin })
 }
 
 $btnBestandsmanagement = $window.FindName("btnBestandsmanagement")
 if ($null -ne $btnBestandsmanagement) {
-    $btnBestandsmanagement.Add_Click({ Open-Url -Url "https://apps.datev.de/mydata/" })
+    $btnBestandsmanagement.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.Bestandsmanagement })
 }
 
 $btnWeitereApps = $window.FindName("btnWeitereApps")
 if ($null -ne $btnWeitereApps) {
-    $btnWeitereApps.Add_Click({ Open-Url -Url "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/" })
+    $btnWeitereApps.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.WeitereApps })
 }
 
 # Referenz auf den Button zum Öffnen des Ordners holen (vor ShowDialog!)
@@ -1902,7 +1979,7 @@ $btnOpenFolder = $window.FindName("btnOpenFolder")
 if ($null -ne $btnOpenFolder) {
     $btnOpenFolder.Add_Click({
             try {
-                $folder = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+                $folder = $script:Config.Paths.AppData
                 if (-not (Test-Path $folder)) {
                     New-Item -Path $folder -ItemType Directory -Force | Out-Null
                 }
@@ -2010,24 +2087,30 @@ else {
 # Event-Handler für DATEV Online Downloads Buttons
 if ($null -ne $btnDATEVDownloadbereich) {
     $btnDATEVDownloadbereich.Add_Click({
-        Open-Url -Url "https://www.datev.de/download/"
+        Open-Url -Url $script:Config.URLs.DATEV.Downloadbereich
     })
 }
 
 if ($null -ne $btnDATEVSmartDocs) {
     $btnDATEVSmartDocs.Add_Click({
-        Open-Url -Url "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
+        Open-Url -Url $script:Config.URLs.DATEV.SmartDocs
     })
 }
 
 if ($null -ne $btnDatentraegerPortal) {
     $btnDatentraegerPortal.Add_Click({
-        Open-Url -Url "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
+        Open-Url -Url $script:Config.URLs.DATEV.DatentraegerPortal
     })
 }
 
-# Downloads-ComboBox initialisieren
-Initialize-DownloadsComboBox
+# Downloads-ComboBox initialisieren (nur wenn JSON-Datei vorhanden ist)
+$downloadsJsonPath = $script:Config.Paths.DownloadsJSON
+if (Test-Path $downloadsJsonPath) {
+    Initialize-DownloadsComboBox
+    Write-Log -Message "Downloads-ComboBox mit vorhandenen Daten initialisiert" -Level 'INFO'
+} else {
+    Write-Log -Message "Keine Downloads-JSON gefunden, ComboBox bleibt leer bis zum ersten Update" -Level 'INFO'
+}
 
 # Settings initialisieren
 Initialize-Settings
@@ -2151,7 +2234,7 @@ if ($null -ne $btnOpenFolder) {
 
 if ($null -ne $btnCheckUpdate) {
     $btnCheckUpdate.Add_Click({
-        Start-UpdateCheck
+        Start-ManualUpdateCheck
     })
 }
 

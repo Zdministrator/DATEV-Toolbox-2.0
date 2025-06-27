@@ -4,6 +4,7 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 
 ## 📋 Features
 
+- **🆕 Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
 - **WPF-GUI**: Moderne tab-basierte Benutzeroberfläche
 - **DATEV Programme**: Direkter Start von DATEV-Arbeitsplatz, Installationsmanager und Servicetool
 - **DATEV Tools**: Zugriff auf KonfigDB-Tools, EODBconfig und EO Aufgabenplanung
@@ -122,7 +123,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Version
-Aktuelle Version: **2.0.9**
+Aktuelle Version: **2.1.0**
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -138,27 +139,53 @@ Aktuelle Version: **2.0.9**
 - DATEV-Installation (für DATEV-Tools, optional)
 - Internetverbindung für Updates und Downloads
 
-### Neue Features in Version 2.0.9
+### Neue Features in Version 2.1.0
 
-#### 🔧 Aktionen-Bereich
+#### 🎯 Zentrale Konfiguration (Major Update)
+- **Zentrale URLs**: Alle GitHub und DATEV URLs in `$script:Config` zentralisiert
+- **Zentrale Pfade**: Alle AppData, Downloads und System-Pfade konfigurierbar
+- **Konfigurierbare Timeouts**: Update-Check (10s), Downloads (15s/30s), ICS (15s)
+- **Konfigurierbare Limits**: Max Backups (5), Min Dateigröße (1000 Bytes)
+- **System-Tools-Definition**: Zentrale Definition aller Windows-Tools
+- **Wartbarkeit**: Alle URLs, Pfade und Magic Numbers an einem Ort
+- **Consistency**: Einheitliche Zugriffsmuster auf Konfigurationswerte
+
+#### 🔧 Code-Qualität und Robustheit
+- **Eliminierung von Magic Numbers**: Keine hartkodierten Werte mehr im Code
+- **URL-Zentralisierung**: 21+ URLs durch zentrale Konfiguration ersetzt
+- **Pfad-Zentralisierung**: Alle AppData-Pfade systematisch zentralisiert
+- **Timeout-Management**: Konfigurierbare Zeitüberschreitungen für alle Netzwerk-Operationen
+- **Bessere Lesbarkeit**: Selbstdokumentierender Code durch sprechende Konfigurationsnamen
+
+#### 🐛 Syntaxfehler-Bereinigung
+- **Automatische Variablen**: Probleme mit `$sender` und `$s` behoben
+- **Parameter-Umbenennung**: `$timerSender`, `$webClientSender` für bessere Kompatibilität
+- **Code-Formatierung**: Einrückungen und Zeilenumbrüche korrigiert
+- **Variable-Cleanup**: Ungenutzte Variablen entfernt
+
+### Changelog (Neueste Versionen)
+- **v2.1.0**: 🎯 Zentrale Konfiguration + Code-Qualität + Wartbarkeit (Major Update)
+- **v2.0.9**: Kritischer Update-Bugfix + Changelog-Viewer + Aktionen-Bereich
+
+#### 🔧 Aktionen-Bereich (v2.0.9)
 - **Gruppenrichtlinien-Update**: Führt `gpupdate /force` asynchron aus
 - **Asynchrone Ausführung**: GUI bleibt während der Ausführung bedienbar
 - **PID-Tracking**: Detailliertes Logging mit Prozess-IDs
 - **Timeout-Schutz**: Automatischer Timeout nach 2 Minuten
 - **Robuste Fehlerbehandlung**: Runspace-basierte Prozessüberwachung
 
-#### 📥 Erweiterte Downloads
+#### 📥 Erweiterte Downloads (v2.0.9)
 - **Aktualisierungsdatum**: Download-Liste zeigt Stand der Daten an
 - **Deutsche Datumsformatierung**: Benutzerfreundliches Format (dd.MM.yyyy)
 - **Neue Downloads**: Belegtransfer V. 5.47, LODAS V. 4.24
 
-#### 📋 Changelog-Viewer
+#### 📋 Changelog-Viewer (v2.0.9)
 - **Update-Historie**: Anzeige der letzten 3 Versionen
 - **GitHub-Integration**: Lädt aktuelle Changelog-Daten
 - **Deutsche Formatierung**: Übersichtliche Darstellung mit Emojis
 - **Offline-Sicherheit**: Fallback bei Netzwerkproblemen
 
-#### 🐛 Kritische Bugfixes
+#### 🐛 Kritische Bugfixes (v2.0.9)
 - **Update-Prozess**: `Set-Settings` → `Save-Settings` Fehler behoben
 - **Settings-Management**: Globale Variable korrekt aktualisiert
 - **Update-Stabilität**: Vollständige Wiederherstellung des Update-Systems
@@ -179,6 +206,7 @@ Dieses Projekt ist für den internen Gebrauch bei HEES GmbH entwickelt.
 **Hinweis**: Diese Anwendung verbindet sich automatisch mit GitHub für Updates und Download-Konfigurationen. Stellen Sie sicher, dass eine Internetverbindung verfügbar ist.
 
 ### 🎯 Besondere Features
+- **🆕 Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen an einem Ort (v2.1.0)
 - **🆕 Asynchrone Gruppenrichtlinien-Updates**: Ohne GUI-Blockierung
 - **🆕 Changelog-Integration**: Vollständige Update-Historie verfügbar
 - **🆕 Erweiterte Download-Verwaltung**: Mit Aktualisierungsdatum
