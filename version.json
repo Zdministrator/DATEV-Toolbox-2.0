@@ -1,17 +1,31 @@
 {
-  "version": "2.0.9",
-  "releaseDate": "2025-06-26",
+  "version": "2.1.0",
+  "releaseDate": "2025-06-30",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Kritischer Bugfix: Update-Prozess-Fehler behoben",
-    "• Fehlerhaften 'Set-Settings' Aufruf durch korrekten 'Save-Settings' Aufruf ersetzt",
-    "• Globale Settings-Variable wird jetzt korrekt vor dem Speichern aktualisiert",
-    "• Update-Verlauf und Backup-Informationen werden ordnungsgemäß gespeichert",
-    "• Vollständige Stabilität des automatischen Update-Systems wiederhergestellt",
-    "Neue Features: Aktionen-Bereich mit Gruppenrichtlinien-Update",
-    "Download-Updates: Belegtransfer V. 5.47 und LODAS V. 4.24 hinzugefügt"
+    "Major Code-Refactoring: Zentrale Konfiguration implementiert",
+    "• Alle URLs, Pfade, Timeouts und System-Tools in zentrale $script:Config ausgelagert",
+    "• Hardcoded Werte durch konfigurierbare Parameter ersetzt",
+    "• Verbesserte Wartbarkeit und einfachere Anpassungen",
+    "• Strukturierte Code-Organisation mit erweiterten Regionen",
+    "• Konsistente Verwendung von Konfigurationswerten im gesamten Script",
+    "• Fundament für zukünftige Erweiterungen und Verbesserungen gelegt",
+    "Alle bestehenden DATEV-Tools und Features bleiben vollständig funktional"
   ],
   "previousVersions": [
+    {
+      "version": "2.0.9",
+      "releaseDate": "2025-06-26",
+      "changelog": [
+        "Kritischer Bugfix: Update-Prozess-Fehler behoben",
+        "• Fehlerhaften 'Set-Settings' Aufruf durch korrekten 'Save-Settings' Aufruf ersetzt",
+        "• Globale Settings-Variable wird jetzt korrekt vor dem Speichern aktualisiert",
+        "• Update-Verlauf und Backup-Informationen werden ordnungsgemäß gespeichert",
+        "• Vollständige Stabilität des automatischen Update-Systems wiederhergestellt",
+        "Neue Features: Aktionen-Bereich mit Gruppenrichtlinien-Update",
+        "Download-Updates: Belegtransfer V. 5.47 und LODAS V. 4.24 hinzugefügt"
+      ]
+    },
     {
       "version": "2.0.8",
       "releaseDate": "2025-06-26",
