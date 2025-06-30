@@ -100,11 +100,58 @@ $script:Config = @{
         DiskCleanup = @{ Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
         Gpupdate = @{ Command = 'gpupdate.exe'; Arguments = '/force'; Description = 'Gruppenrichtlinien-Update' }
     }
+    
+    # Button-zu-Aktion-Mapping für vereinfachte Event-Handler-Registrierung
+    ButtonMappings = @{
+        # DATEV Online Services - Hilfe und Support
+        'btnHilfeCenter' = @{ Type = 'URL'; URL = 'URLs.DATEV.HelpCenter' }
+        'btnServicekontakte' = @{ Type = 'URL'; URL = 'URLs.DATEV.ServiceKontakte' }
+        'btnMyUpdates' = @{ Type = 'URL'; URL = 'URLs.DATEV.MyUpdates' }
+        
+        # DATEV Online Services - Cloud
+        'btnMyDATEV' = @{ Type = 'URL'; URL = 'URLs.DATEV.MyDATEV' }
+        'btnDUO' = @{ Type = 'URL'; URL = 'URLs.DATEV.DUO' }
+        'btnLAO' = @{ Type = 'URL'; URL = 'URLs.DATEV.LAO' }
+        'btnLizenzverwaltung' = @{ Type = 'URL'; URL = 'URLs.DATEV.Lizenzverwaltung' }
+        'btnRechteraum' = @{ Type = 'URL'; URL = 'URLs.DATEV.Rechteraum' }
+        'btnRVO' = @{ Type = 'URL'; URL = 'URLs.DATEV.RVO' }
+        'btnSmartLogin' = @{ Type = 'URL'; URL = 'URLs.DATEV.SmartLogin' }
+        'btnBestandsmanagement' = @{ Type = 'URL'; URL = 'URLs.DATEV.Bestandsmanagement' }
+        'btnWeitereApps' = @{ Type = 'URL'; URL = 'URLs.DATEV.WeitereApps' }
+        
+        # DATEV Online Downloads
+        'btnDATEVDownloadbereich' = @{ Type = 'URL'; URL = 'URLs.DATEV.Downloadbereich' }
+        'btnDATEVSmartDocs' = @{ Type = 'URL'; URL = 'URLs.DATEV.SmartDocs' }
+        'btnDatentraegerPortal' = @{ Type = 'URL'; URL = 'URLs.DATEV.DatentraegerPortal' }
+        
+        # DATEV Programme
+        'btnDATEVArbeitsplatz' = @{ Type = 'DATEV'; Program = 'DATEVArbeitsplatz' }
+        'btnInstallationsmanager' = @{ Type = 'DATEV'; Program = 'Installationsmanager' }
+        'btnServicetool' = @{ Type = 'DATEV'; Program = 'Servicetool' }
+        'btnKonfigDBTools' = @{ Type = 'DATEV'; Program = 'KonfigDBTools' }
+        'btnEODBconfig' = @{ Type = 'DATEV'; Program = 'EODBconfig' }
+        'btnEOAufgabenplanung' = @{ Type = 'DATEV'; Program = 'EOAufgabenplanung' }
+        'btnNGENALL40' = @{ Type = 'DATEV'; Program = 'NGENALL40' }
+        
+        # System Tools
+        'btnTaskManager' = @{ Type = 'SystemTool'; Tool = 'TaskManager' }
+        'btnResourceMonitor' = @{ Type = 'SystemTool'; Tool = 'ResourceMonitor' }
+        'btnEventViewer' = @{ Type = 'SystemTool'; Tool = 'EventViewer' }
+        'btnServices' = @{ Type = 'SystemTool'; Tool = 'Services' }
+        'btnMsconfig' = @{ Type = 'SystemTool'; Tool = 'MSConfig' }
+        'btnDiskCleanup' = @{ Type = 'SystemTool'; Tool = 'DiskCleanup' }
+        
+        # Spezielle Funktionen
+        'btnLeistungsindex' = @{ Type = 'Function'; Function = 'Start-Leistungsindex' }
+        'btnGpupdate' = @{ Type = 'Function'; Function = 'Start-Gpupdate' }
+        'btnCheckUpdate' = @{ Type = 'Function'; Function = 'Start-ManualUpdateCheck' }
+        'btnShowChangelog' = @{ Type = 'Function'; Function = 'Show-ChangelogDialog' }
+    }
 }
 #endregion
 
-#region Administrator-Rechte-Prüfung
-# Setup für Administratorrechte
+#region Anwendungs-Initialisierung
+# Administrator-Rechte-Prüfung und grundlegende Initialisierung
 $IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $IsAdmin) {
     Add-Type -AssemblyName PresentationFramework
@@ -117,9 +164,7 @@ if (-not $IsAdmin) {
     exit
 }
 Write-Host "Script läuft mit Administratorrechten..." -ForegroundColor Green
-#endregion
 
-#region Initialisierung und GUI
 # Konsole verstecken (funktioniert nur wenn als .ps1 ausgeführt)
 Add-Type -Name Window -Namespace Console -MemberDefinition '
 [DllImport("Kernel32.dll")]
@@ -136,9 +181,10 @@ if ($consolePtr -ne [System.IntPtr]::Zero) {
 
 # Benötigte .NET-Assembly für WPF-GUI laden
 Add-Type -AssemblyName PresentationFramework
+#endregion
 
-#region Settings Management
-# Global Settings Variable
+#region Einstellungs-Management
+# Benutzereinstellungen verwalten (Laden, Speichern, Zugriff)
 $script:Settings = $null
 
 function Initialize-Settings {
@@ -532,9 +578,15 @@ $btnCheckUpdate = $window.FindName("btnCheckUpdate")
 $btnShowChangelog = $window.FindName("btnShowChangelog")
 #endregion
 
-#region Logging-Funktion
-# Funktion zum Schreiben von Log-Einträgen in das Log-Feld
+#endregion
+
+#region Hilfsfunktionen und Utilities
+# Logging-System
 function Write-Log {
+    <#
+    .SYNOPSIS
+    Zentrale Logging-Funktion für die Anwendung
+    #>
     param(
         [Parameter(Mandatory = $true)][string]$Message,
         [ValidateSet('INFO', 'WARN', 'ERROR')][string]$Level = 'INFO'
@@ -569,11 +621,34 @@ function Write-Log {
         Write-Host "LOGGING-FEHLER: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
+
+# URL-Öffnungs-Funktion
+function Open-Url {
+    <#
+    .SYNOPSIS
+    Öffnet eine URL im Standard-Browser mit Fehlerbehandlung
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$Url
+    )
+    
+    try {
+        Write-Log -Message "Öffne URL: $Url" -Level 'INFO'
+        Start-Process $Url
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen der URL '$Url': $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Öffnen der URL:`n$Url`n`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
 #endregion
 
-#endregion
-
-#region DATEV-Tools Funktionen
+#region DATEV-Programme und -Tools
 # DATEV-Pfad-Definitionen
 $script:DATEVProgramPaths = @{
     'DATEVArbeitsplatz' = @(
@@ -742,8 +817,12 @@ function Start-Leistungsindex {
 #endregion
 
 #region System-Tools Funktionen
-# Funktion zum Starten von System-Tools
+# Windows System-Tools starten
 function Start-SystemTool {
+    <#
+    .SYNOPSIS
+    Startet ein Windows System-Tool mit Fehlerbehandlung
+    #>
     param(
         [Parameter(Mandatory = $true)][string]$Command,
         [string]$Arguments = "",
@@ -1008,8 +1087,8 @@ function Show-ChangelogDialog {
 }
 #endregion
 
-#region Update-Check-Funktionen
-# Funktion zum Bereinigen alter Update-Backups (behält nur die letzten 5)
+#region Update- und Versionsverwaltung
+# Update-Check und -Management Funktionen
 # Funktion zum Bereinigen alter Update-Backups (behält nur die letzten 5)
 function Clear-OldUpdateBackups {
     try {
@@ -1433,7 +1512,8 @@ function Start-ManualUpdateCheck {
 }
 #endregion
 
-#region DATEV Downloads-Funktion
+#region Download- und Datei-Management
+# DATEV Downloads und Dateimanagement
 # Funktion zum Laden der DATEV Downloads aus datev-downloads.json
 function Get-DATEVDownloads {
     try {
@@ -1652,7 +1732,7 @@ function Start-BackgroundDownload {
 }
 #endregion
 
-#region Download-Ordner-Funktionen
+# Ordner-Management Funktionen
 # Funktion zum Öffnen des Download-Ordners im Explorer
 function Open-DownloadFolder {
     try {
@@ -1674,7 +1754,7 @@ function Open-DownloadFolder {
 }
 #endregion
 
-#region Update-Termine-Funktionen
+# Update-Termine Funktionen
 # Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei
 function Show-NextUpdateDates {
     Write-Log -Message "Lese Update-Termine aus ICS-Datei..." -Level 'INFO'
@@ -1897,7 +1977,8 @@ function Update-UpdateDates {
 }
 #endregion
 
-#region Fenster anzeigen
+#region GUI-Setup und Event-Handler-Registrierung
+# Initialisierung der Benutzeroberfläche und Event-Handler
 # Funktion zum Öffnen von URLs im Standard-Browser
 function Open-Url {
     param([string]$Url)
