@@ -32,6 +32,34 @@ $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version
 $script:ScriptDownloadUrl = "https://github.com/$script:GitHubRepo/raw/main/DATEV-Toolbox 2.0.ps1"
 
 #region Zentrale Konfiguration
+# DATEV-Pfad-Definitionen (müssen vor ButtonMappings definiert werden)
+$script:DATEVProgramPaths = @{
+    'DATEVArbeitsplatz' = @(
+        '%DATEVPP%\PROGRAMM\K0005000\Arbeitsplatz.exe'
+    )
+    'Installationsmanager' = @(
+        '%DATEVPP%\PROGRAMM\INSTALL\DvInesInstMan.exe'
+    )
+    'Servicetool' = @(
+        '%DATEVPP%\PROGRAMM\SRVTOOL\Srvtool.exe'
+    )
+    'KonfigDBTools' = @(
+        '%DATEVPP%\PROGRAMM\B0001502\cdbtool.exe'
+    )
+    'EODBconfig' = @(
+        '%DATEVPP%\PROGRAMM\EODB\EODBConfig.exe'
+    )
+    'EOAufgabenplanung' = @(
+        '%DATEVPP%\PROGRAMM\I0000085\EOControl.exe'
+    )
+    'NGENALL40' = @(
+        '%DATEVPP%\Programm\B0001508\ngenall40.cmd'
+    )
+    'Leistungsindex' = @(
+        '%DATEVPP%\PROGRAMM\RWAPPLIC\irw.exe'
+    )
+}
+
 # Alle URLs, Pfade und Konfigurationswerte zentral verwaltet
 $script:Config = @{
     URLs = @{
@@ -103,49 +131,58 @@ $script:Config = @{
     
     # Button-zu-Aktion-Mapping für vereinfachte Event-Handler-Registrierung
     ButtonMappings = @{
-        # DATEV Online Services - Hilfe und Support
-        'btnHilfeCenter' = @{ Type = 'URL'; URL = 'URLs.DATEV.HelpCenter' }
-        'btnServicekontakte' = @{ Type = 'URL'; URL = 'URLs.DATEV.ServiceKontakte' }
-        'btnMyUpdates' = @{ Type = 'URL'; URL = 'URLs.DATEV.MyUpdates' }
+        # DATEV Online Services - Hilfe und Support (URL-Handler)
+        'btnHilfeCenter' = @{ Type = 'URL'; UrlKey = 'HelpCenter' }
+        'btnServicekontakte' = @{ Type = 'URL'; UrlKey = 'ServiceKontakte' }
+        'btnMyUpdates' = @{ Type = 'URL'; UrlKey = 'MyUpdates' }
         
-        # DATEV Online Services - Cloud
-        'btnMyDATEV' = @{ Type = 'URL'; URL = 'URLs.DATEV.MyDATEV' }
-        'btnDUO' = @{ Type = 'URL'; URL = 'URLs.DATEV.DUO' }
-        'btnLAO' = @{ Type = 'URL'; URL = 'URLs.DATEV.LAO' }
-        'btnLizenzverwaltung' = @{ Type = 'URL'; URL = 'URLs.DATEV.Lizenzverwaltung' }
-        'btnRechteraum' = @{ Type = 'URL'; URL = 'URLs.DATEV.Rechteraum' }
-        'btnRVO' = @{ Type = 'URL'; URL = 'URLs.DATEV.RVO' }
-        'btnSmartLogin' = @{ Type = 'URL'; URL = 'URLs.DATEV.SmartLogin' }
-        'btnBestandsmanagement' = @{ Type = 'URL'; URL = 'URLs.DATEV.Bestandsmanagement' }
-        'btnWeitereApps' = @{ Type = 'URL'; URL = 'URLs.DATEV.WeitereApps' }
+        # DATEV Online Services - Cloud (URL-Handler)
+        'btnMyDATEV' = @{ Type = 'URL'; UrlKey = 'MyDATEV' }
+        'btnDUO' = @{ Type = 'URL'; UrlKey = 'DUO' }
+        'btnLAO' = @{ Type = 'URL'; UrlKey = 'LAO' }
+        'btnLizenzverwaltung' = @{ Type = 'URL'; UrlKey = 'Lizenzverwaltung' }
+        'btnRechteraum' = @{ Type = 'URL'; UrlKey = 'Rechteraum' }
+        'btnRVO' = @{ Type = 'URL'; UrlKey = 'RVO' }
+        'btnSmartLogin' = @{ Type = 'URL'; UrlKey = 'SmartLogin' }
+        'btnBestandsmanagement' = @{ Type = 'URL'; UrlKey = 'Bestandsmanagement' }
+        'btnWeitereApps' = @{ Type = 'URL'; UrlKey = 'WeitereApps' }
         
-        # DATEV Online Downloads
-        'btnDATEVDownloadbereich' = @{ Type = 'URL'; URL = 'URLs.DATEV.Downloadbereich' }
-        'btnDATEVSmartDocs' = @{ Type = 'URL'; URL = 'URLs.DATEV.SmartDocs' }
-        'btnDatentraegerPortal' = @{ Type = 'URL'; URL = 'URLs.DATEV.DatentraegerPortal' }
+        # DATEV Online Downloads (URL-Handler)
+        'btnDATEVDownloadbereich' = @{ Type = 'URL'; UrlKey = 'Downloadbereich' }
+        'btnDATEVSmartDocs' = @{ Type = 'URL'; UrlKey = 'SmartDocs' }
+        'btnDatentraegerPortal' = @{ Type = 'URL'; UrlKey = 'DatentraegerPortal' }
         
-        # DATEV Programme
-        'btnDATEVArbeitsplatz' = @{ Type = 'DATEV'; Program = 'DATEVArbeitsplatz' }
-        'btnInstallationsmanager' = @{ Type = 'DATEV'; Program = 'Installationsmanager' }
-        'btnServicetool' = @{ Type = 'DATEV'; Program = 'Servicetool' }
-        'btnKonfigDBTools' = @{ Type = 'DATEV'; Program = 'KonfigDBTools' }
-        'btnEODBconfig' = @{ Type = 'DATEV'; Program = 'EODBconfig' }
-        'btnEOAufgabenplanung' = @{ Type = 'DATEV'; Program = 'EOAufgabenplanung' }
-        'btnNGENALL40' = @{ Type = 'DATEV'; Program = 'NGENALL40' }
+        # DATEV Programme (DATEV-Handler)
+        'btnDATEVArbeitsplatz' = @{ Type = 'DATEV'; ProgramName = 'DATEVArbeitsplatz'; Description = 'DATEV-Arbeitsplatz' }
+        'btnInstallationsmanager' = @{ Type = 'DATEV'; ProgramName = 'Installationsmanager'; Description = 'Installationsmanager' }
+        'btnServicetool' = @{ Type = 'DATEV'; ProgramName = 'Servicetool'; Description = 'Servicetool' }
+        'btnKonfigDBTools' = @{ Type = 'DATEV'; ProgramName = 'KonfigDBTools'; Description = 'KonfigDB-Tools' }
+        'btnEODBconfig' = @{ Type = 'DATEV'; ProgramName = 'EODBconfig'; Description = 'EODBconfig' }
+        'btnEOAufgabenplanung' = @{ Type = 'DATEV'; ProgramName = 'EOAufgabenplanung'; Description = 'EO Aufgabenplanung' }
+        'btnNGENALL40' = @{ Type = 'DATEV'; ProgramName = 'NGENALL40'; Description = 'NGENALL 4.0' }
         
-        # System Tools
-        'btnTaskManager' = @{ Type = 'SystemTool'; Tool = 'TaskManager' }
-        'btnResourceMonitor' = @{ Type = 'SystemTool'; Tool = 'ResourceMonitor' }
-        'btnEventViewer' = @{ Type = 'SystemTool'; Tool = 'EventViewer' }
-        'btnServices' = @{ Type = 'SystemTool'; Tool = 'Services' }
-        'btnMsconfig' = @{ Type = 'SystemTool'; Tool = 'MSConfig' }
-        'btnDiskCleanup' = @{ Type = 'SystemTool'; Tool = 'DiskCleanup' }
+        # System Tools (SystemTool-Handler)
+        'btnTaskManager' = @{ Type = 'SystemTool'; Command = 'taskmgr.exe'; Description = 'Task-Manager' }
+        'btnResourceMonitor' = @{ Type = 'SystemTool'; Command = 'resmon.exe'; Description = 'Ressourcenmonitor' }
+        'btnEventViewer' = @{ Type = 'SystemTool'; Command = 'eventvwr.msc'; Description = 'Ereignisanzeige' }
+        'btnServices' = @{ Type = 'SystemTool'; Command = 'services.msc'; Description = 'Dienste' }
+        'btnMsconfig' = @{ Type = 'SystemTool'; Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
+        'btnDiskCleanup' = @{ Type = 'SystemTool'; Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
         
-        # Spezielle Funktionen
-        'btnLeistungsindex' = @{ Type = 'Function'; Function = 'Start-Leistungsindex' }
-        'btnGpupdate' = @{ Type = 'Function'; Function = 'Start-Gpupdate' }
-        'btnCheckUpdate' = @{ Type = 'Function'; Function = 'Start-ManualUpdateCheck' }
-        'btnShowChangelog' = @{ Type = 'Function'; Function = 'Show-ChangelogDialog' }
+        # Funktions-Handler (Function-Handler)
+        'btnLeistungsindex' = @{ Type = 'Function'; FunctionName = 'Start-Leistungsindex' }
+        'btnGpupdate' = @{ Type = 'Function'; FunctionName = 'Start-Gpupdate' }
+        
+        # TextBlock-Handler (verwenden MouseLeftButtonDown statt Add_Click)
+        'btnUpdateDownloads' = @{ Type = 'TextBlock'; FunctionName = 'Update-DATEVDownloads' }
+        'btnOpenDownloadFolder' = @{ Type = 'TextBlock'; FunctionName = 'Open-DownloadFolder' }
+        'btnUpdateDates' = @{ Type = 'TextBlock'; FunctionName = 'Update-UpdateDates' }
+        
+        # Einstellungs-Handler (jetzt auch zentral verwaltet)
+        'btnCheckUpdate' = @{ Type = 'Function'; FunctionName = 'Start-UpdateCheck' }
+        'btnDownload' = @{ Type = 'Function'; FunctionName = 'Start-DirectDownload' }
+        'btnOpenFolder' = @{ Type = 'Function'; FunctionName = 'Open-AppDataFolder' }
+        'btnShowChangelog' = @{ Type = 'Function'; FunctionName = 'Show-ChangelogDialog' }
     }
 }
 #endregion
@@ -296,6 +333,7 @@ function Set-Setting {
 }
 #endregion
 
+#region XAML-Definition und GUI-Setup
 # XAML-Definition für das Hauptfenster mit Tabs und Log-Bereich
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -536,48 +574,15 @@ $txtLog = $window.FindName("txtLog")
 $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
 $btnDownload = $window.FindName("btnDownload")
 $btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
-$btnOpenDownloadFolder = $window.FindName("btnOpenDownloadFolder")
-
-# Referenzen auf DATEV Online Downloads Buttons holen
-$btnDATEVDownloadbereich = $window.FindName("btnDATEVDownloadbereich")
-$btnDATEVSmartDocs = $window.FindName("btnDATEVSmartDocs")
-$btnDatentraegerPortal = $window.FindName("btnDatentraegerPortal")
 
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
 $btnUpdateDates = $window.FindName("btnUpdateDates")
 
-# Referenzen auf DATEV Programme Buttons holen
-$btnDATEVArbeitsplatz = $window.FindName("btnDATEVArbeitsplatz")
-$btnInstallationsmanager = $window.FindName("btnInstallationsmanager")
-$btnServicetool = $window.FindName("btnServicetool")
-
-# Referenzen auf DATEV Tools Buttons holen
-$btnKonfigDBTools = $window.FindName("btnKonfigDBTools")
-$btnEODBconfig = $window.FindName("btnEODBconfig")
-$btnEOAufgabenplanung = $window.FindName("btnEOAufgabenplanung")
-
-# Referenzen auf DATEV Performance Tools Buttons holen
-$btnNGENALL40 = $window.FindName("btnNGENALL40")
-$btnLeistungsindex = $window.FindName("btnLeistungsindex")
-
-# Referenzen auf Aktionen Buttons holen
-$btnGpupdate = $window.FindName("btnGpupdate")
-
-# Referenzen auf System Tools Buttons holen
-$btnTaskManager = $window.FindName("btnTaskManager")
-$btnResourceMonitor = $window.FindName("btnResourceMonitor")
-$btnEventViewer = $window.FindName("btnEventViewer")
-$btnServices = $window.FindName("btnServices")
-$btnMsconfig = $window.FindName("btnMsconfig")
-$btnDiskCleanup = $window.FindName("btnDiskCleanup")
-
 # Referenzen auf Einstellungs-Buttons holen
 $btnOpenFolder = $window.FindName("btnOpenFolder")
 $btnCheckUpdate = $window.FindName("btnCheckUpdate")
 $btnShowChangelog = $window.FindName("btnShowChangelog")
-#endregion
-
 #endregion
 
 #region Hilfsfunktionen und Utilities
@@ -646,37 +651,256 @@ function Open-Url {
         )
     }
 }
+
+# Hilfsfunktionen für Event-Handler (PowerShell 5.1-kompatibel ohne Closures)
+function Register-UrlHandler {
+    param($Button, $Url)
+    $Button.Tag = $Url
+    $Button.Add_Click({
+        $url = $this.Tag
+        Write-Log -Message "URL-Button '$($this.Name)' geklickt - öffne: $url" -Level 'INFO'
+        Open-Url -Url $url
+    })
+}
+
+function Register-DATEVHandler {
+    param($Button, $ProgramName, $PossiblePaths, $Description)
+    $Button.Tag = @{
+        ProgramName = $ProgramName
+        PossiblePaths = $PossiblePaths
+        Description = $Description
+    }
+    $Button.Add_Click({
+        $config = $this.Tag
+        Write-Log -Message "DATEV-Button '$($this.Name)' geklickt - starte: $($config.ProgramName)" -Level 'INFO'
+        Start-DATEVProgram -ProgramName $config.ProgramName -PossiblePaths $config.PossiblePaths -Description $config.Description
+    })
+}
+
+function Register-SystemToolHandler {
+    param($Button, $Command, $Description)
+    $Button.Tag = @{
+        Command = $Command
+        Description = $Description
+    }
+    $Button.Add_Click({
+        $config = $this.Tag
+        Write-Log -Message "SystemTool-Button '$($this.Name)' geklickt - starte: $($config.Command)" -Level 'INFO'
+        Start-SystemTool -Command $config.Command -Description $config.Description
+    })
+}
+
+function Register-FunctionHandler {
+    param($Button, $FunctionName)
+    $Button.Tag = $FunctionName
+    $Button.Add_Click({
+        $functionName = $this.Tag
+        Write-Log -Message "Function-Button '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
+        & $functionName
+    })
+}
+
+function Register-TextBlockHandler {
+    param($TextBlock, $FunctionName)
+    $TextBlock.Tag = $FunctionName
+    $TextBlock.Add_MouseLeftButtonDown({
+        $functionName = $this.Tag
+        Write-Log -Message "TextBlock '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
+        & $functionName
+    })
+}
+
+# Zentrale Button-Handler-Registrierung
+function Register-ButtonHandlers {
+    <#
+    .SYNOPSIS
+    Registriert Event-Handler für alle Buttons basierend auf der zentralen Konfiguration
+    .DESCRIPTION
+    PowerShell 5.1-kompatible zentrale Event-Handler-Registrierung ohne GetNewClosure()
+    #>
+    param(
+        [Parameter(Mandatory = $true)][System.Windows.Window]$Window
+    )
+    
+    Write-Log -Message "Registriere zentrale Button-Handler..." -Level 'INFO'
+    
+    # Debug: Zeige alle konfigurierten Buttons
+    Write-Log -Message "Anzahl konfigurierte Buttons: $($script:Config.ButtonMappings.Keys.Count)" -Level 'INFO'
+    Write-Log -Message "Konfigurierte Buttons: $($script:Config.ButtonMappings.Keys -join ', ')" -Level 'INFO'
+    
+    try {
+        foreach ($buttonName in $script:Config.ButtonMappings.Keys) {
+            $buttonConfig = $script:Config.ButtonMappings[$buttonName]
+            $buttonElement = $Window.FindName($buttonName)
+            
+            if ($null -eq $buttonElement) {
+                Write-Log -Message "Button '$buttonName' nicht gefunden im GUI - überspringe (Typ: $($buttonConfig.Type))" -Level 'WARN'
+                continue
+            } else {
+                Write-Log -Message "Button '$buttonName' gefunden: $($buttonElement.GetType().Name)" -Level 'INFO'
+            }
+            
+            # Handler-Typ bestimmen und entsprechenden Event-Handler registrieren (OHNE GetNewClosure)
+            switch ($buttonConfig.Type) {
+                'URL' {
+                    if ($buttonConfig.ContainsKey('UrlKey')) {
+                        $urlKey = $buttonConfig.UrlKey
+                        $url = $script:Config.URLs.DATEV[$urlKey]
+                        if ($null -ne $url) {
+                            # Direkte Registrierung ohne Closure
+                            Register-UrlHandler -Button $buttonElement -Url $url
+                            Write-Log -Message "URL-Handler für '$buttonName' registriert (URL: $url)" -Level 'INFO'
+                        } else {
+                            Write-Log -Message "URL für '$urlKey' nicht gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
+                        }
+                    }
+                }
+                
+                'DATEV' {
+                    if ($buttonConfig.ContainsKey('ProgramName')) {
+                        $programName = $buttonConfig.ProgramName
+                        $description = $buttonConfig.Description
+                        $possiblePaths = $script:DATEVProgramPaths[$programName]
+                        
+                        Write-Log -Message "Debug: Button '$buttonName', Programm '$programName', Pfade: $($possiblePaths -join ', ')" -Level 'INFO'
+                        
+                        if ($null -ne $possiblePaths -and $possiblePaths.Count -gt 0) {
+                            # Direkte Registrierung ohne Closure
+                            Register-DATEVHandler -Button $buttonElement -ProgramName $programName -PossiblePaths $possiblePaths -Description $description
+                            Write-Log -Message "DATEV-Handler für '$buttonName' registriert" -Level 'INFO'
+                        } else {
+                            Write-Log -Message "Keine DATEV-Pfade für '$programName' gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
+                        }
+                    }
+                }
+                
+                'SystemTool' {
+                    if ($buttonConfig.ContainsKey('Command')) {
+                        $command = $buttonConfig.Command
+                        $description = $buttonConfig.Description
+                        # Direkte Registrierung ohne Closure
+                        Register-SystemToolHandler -Button $buttonElement -Command $command -Description $description
+                        Write-Log -Message "SystemTool-Handler für '$buttonName' registriert" -Level 'INFO'
+                    }
+                }
+                
+                'Function' {
+                    if ($buttonConfig.ContainsKey('FunctionName')) {
+                        $functionName = $buttonConfig.FunctionName
+                        # Direkte Registrierung ohne Closure
+                        Register-FunctionHandler -Button $buttonElement -FunctionName $functionName
+                        Write-Log -Message "Function-Handler für '$buttonName' registriert" -Level 'INFO'
+                    }
+                }
+                
+                'TextBlock' {
+                    # TextBlock-Elemente verwenden MouseLeftButtonDown statt Add_Click
+                    if ($buttonConfig.ContainsKey('FunctionName')) {
+                        $functionName = $buttonConfig.FunctionName
+                        # Direkte Registrierung ohne Closure
+                        Register-TextBlockHandler -TextBlock $buttonElement -FunctionName $functionName
+                        Write-Log -Message "TextBlock-Handler für '$buttonName' registriert" -Level 'INFO'
+                    }
+                }
+                
+                default {
+                    Write-Log -Message "Unbekannter Handler-Typ '$($buttonConfig.Type)' für Button '$buttonName'" -Level 'WARN'
+                }
+            }
+        }
+        
+        Write-Log -Message "Button-Handler-Registrierung abgeschlossen" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler bei der Button-Handler-Registrierung: $($_.Exception.Message)" -Level 'ERROR'
+        throw
+    }
+}
+
+# Funktions-Handler für zentrale Button-Registrierung
+function Start-UpdateCheck {
+    <#
+    .SYNOPSIS
+    Führt eine manuelle Update-Prüfung durch
+    #>
+    Start-ManualUpdateCheck
+}
+
+function Start-DirectDownload {
+    <#
+    .SYNOPSIS
+    Startet einen direkten Download basierend auf der ComboBox-Auswahl
+    #>
+    try {
+        if ($null -ne $cmbDirectDownloads.SelectedItem -and 
+            $cmbDirectDownloads.SelectedIndex -gt 0 -and 
+            $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
+            
+            $selectedItem = $cmbDirectDownloads.SelectedItem
+            $downloadInfo = $selectedItem.Tag
+            
+            # Dateiname aus URL extrahieren
+            $uri = [System.Uri]$downloadInfo.url
+            $fileName = Split-Path $uri.LocalPath -Leaf
+            if ([string]::IsNullOrEmpty($fileName)) {
+                $fileName = "download_$(Get-Date -Format 'yyyyMMdd_HHmmss').exe"
+            }
+            
+            Write-Log -Message "Starte Download: $($downloadInfo.Name)" -Level 'INFO'
+            Start-BackgroundDownload -Url $downloadInfo.url -FileName $fileName
+        }
+        else {
+            Write-Log -Message "Kein Download ausgewählt oder ungültige Auswahl" -Level 'WARN'
+            [System.Windows.MessageBox]::Show(
+                "Bitte wählen Sie zuerst einen Download aus der Liste aus.",
+                "Kein Download ausgewählt",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Information
+            )
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Starten des Downloads: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Starten des Downloads:`n$($_.Exception.Message)",
+            "Download-Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+function Open-AppDataFolder {
+    <#
+    .SYNOPSIS
+    Öffnet den AppData-Ordner der DATEV-Toolbox
+    #>
+    try {
+        $appDataPath = $script:Config.Paths.AppData
+        
+        # Ordner erstellen falls er nicht existiert
+        if (-not (Test-Path $appDataPath)) {
+            New-Item -ItemType Directory -Path $appDataPath -Force | Out-Null
+            Write-Log -Message "AppData-Ordner erstellt: $appDataPath" -Level 'INFO'
+        }
+        
+        Write-Log -Message "Öffne AppData-Ordner: $appDataPath" -Level 'INFO'
+        Start-Process -FilePath 'explorer.exe' -ArgumentList $appDataPath
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen des AppData-Ordners: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Öffnen des AppData-Ordners:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
 #endregion
 
 #region DATEV-Programme und -Tools
-# DATEV-Pfad-Definitionen
-$script:DATEVProgramPaths = @{
-    'DATEVArbeitsplatz' = @(
-        '%DATEVPP%\PROGRAMM\K0005000\Arbeitsplatz.exe'
-    )
-    'Installationsmanager' = @(
-        '%DATEVPP%\PROGRAMM\INSTALL\DvInesInstMan.exe'
-    )
-    'Servicetool' = @(
-        '%DATEVPP%\PROGRAMM\SRVTOOL\Srvtool.exe'
-    )
-    'KonfigDBTools' = @(
-        '%DATEVPP%\PROGRAMM\B0001502\cdbtool.exe'
-    )
-    'EODBconfig' = @(
-        '%DATEVPP%\PROGRAMM\EODB\EODBConfig.exe'
-    )
-    'EOAufgabenplanung' = @(
-        '%DATEVPP%\PROGRAMM\I0000085\EOControl.exe'
-    )
-    'NGENALL40' = @(
-        '%DATEVPP%\Programm\B0001508\ngenall40.cmd'
-    )
-    'Leistungsindex' = @(
-        '%DATEVPP%\PROGRAMM\RWAPPLIC\irw.exe'
-    )
-}
-
 # Funktion zum Finden und Starten von DATEV-Programmen
 function Start-DATEVProgram {
     param(
@@ -1243,63 +1467,70 @@ function Show-UpdateDialog {
 }
 
 # Funktion zum Herunterladen und Anwenden eines Updates
-function Start-UpdateProcess {
+# Update-Prozess-Hilfsfunktionen
+function New-UpdatePaths {
+    <#
+    .SYNOPSIS
+    Erstellt die benötigten Pfade für den Update-Prozess
+    #>
     param(
-        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo
+        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo,
+        [Parameter(Mandatory = $true)][string]$CurrentScriptPath
     )
     
+    $updateDir = $script:Config.Paths.Updates
+    if (-not (Test-Path $updateDir)) {
+        New-Item -Path $updateDir -ItemType Directory -Force | Out-Null
+        Write-Log -Message "Update-Verzeichnis erstellt: $updateDir" -Level 'INFO'
+    }
+    
+    $timestamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
+    return @{
+        UpdateDir = $updateDir
+        BackupPath = Join-Path $updateDir "DATEV-Toolbox-$timestamp.backup"
+        TempUpdatePath = Join-Path $updateDir "DATEV-Toolbox-$($UpdateInfo.NewVersion).download"
+        UpdateBatchPath = Join-Path $updateDir "Update-$timestamp.bat"
+        Timestamp = $timestamp
+    }
+}
+
+function Test-DownloadedFile {
+    <#
+    .SYNOPSIS
+    Prüft die Integrität und Syntax der heruntergeladenen Update-Datei
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$FilePath
+    )
+    
+    $downloadedFile = Get-Item $FilePath
+    if ($downloadedFile.Length -lt $script:Config.Limits.MinFileSize) {
+        throw "Heruntergeladene Datei ist zu klein ($($downloadedFile.Length) Bytes) und möglicherweise beschädigt"
+    }
+    
+    # PowerShell-Syntax-Check der heruntergeladenen Datei
     try {
-        Write-Log -Message "Starte Update-Prozess für Version $($UpdateInfo.NewVersion)..." -Level 'INFO'
-        
-        # Update-Verzeichnis erstellen
-        $updateDir = $script:Config.Paths.Updates
-        if (-not (Test-Path $updateDir)) {
-            New-Item -Path $updateDir -ItemType Directory -Force | Out-Null
-            Write-Log -Message "Update-Verzeichnis erstellt: $updateDir" -Level 'INFO'
-        }
-        
-        # Aktuellen Skript-Pfad ermitteln
-        $currentScriptPath = $MyInvocation.ScriptName
-        if ([string]::IsNullOrEmpty($currentScriptPath)) {
-            $currentScriptPath = $PSCommandPath
-        }
-        
-        if ([string]::IsNullOrEmpty($currentScriptPath)) {
-            throw "Kann den aktuellen Skript-Pfad nicht ermitteln"
-        }
-        
-        # Pfade im AppData-Ordner definieren
-        $timestamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
-        $backupPath = Join-Path $updateDir "DATEV-Toolbox-$timestamp.backup"
-        $tempUpdatePath = Join-Path $updateDir "DATEV-Toolbox-$($UpdateInfo.NewVersion).download"
-        $updateBatchPath = Join-Path $updateDir "Update-$timestamp.bat"
-        
-        Write-Log -Message "Update-Pfade: Backup=$backupPath, Download=$tempUpdatePath, Batch=$updateBatchPath" -Level 'INFO'
-          # TLS 1.2 für sichere Downloads erzwingen
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-        
-        # Neue Version herunterladen
-        Write-Log -Message "Lade neue Version herunter nach: $tempUpdatePath" -Level 'INFO'
-        Invoke-WebRequest -Uri $UpdateInfo.VersionInfo.downloadUrl -OutFile $tempUpdatePath -UseBasicParsing -TimeoutSec $script:Config.Timeouts.FileDownload
-        
-        # Erweiterte Integrität prüfen
-        $downloadedFile = Get-Item $tempUpdatePath
-        if ($downloadedFile.Length -lt $script:Config.Limits.MinFileSize) {
-            throw "Heruntergeladene Datei ist zu klein ($($downloadedFile.Length) Bytes) und möglicherweise beschädigt"
-        }
-        
-        # PowerShell-Syntax-Check der heruntergeladenen Datei
-        try {
-            $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $tempUpdatePath -Raw), [ref]$null)
-            Write-Log -Message "PowerShell-Syntax-Prüfung der heruntergeladenen Datei erfolgreich" -Level 'INFO'
-        }
-        catch {
-            throw "Heruntergeladene Datei hat ungültige PowerShell-Syntax: $($_.Exception.Message)"
-        }
-        
-        Write-Log -Message "Download erfolgreich ($($downloadedFile.Length) Bytes). Erstelle Backup und Update-Skript..." -Level 'INFO'
-          # Batch-Skript für verzögertes Update erstellen
-        $batchContent = @"
+        $null = [System.Management.Automation.PSParser]::Tokenize((Get-Content $FilePath -Raw), [ref]$null)
+        Write-Log -Message "PowerShell-Syntax-Prüfung der heruntergeladenen Datei erfolgreich" -Level 'INFO'
+        return $true
+    }
+    catch {
+        throw "Heruntergeladene Datei hat ungültige PowerShell-Syntax: $($_.Exception.Message)"
+    }
+}
+
+function New-UpdateBatchScript {
+    <#
+    .SYNOPSIS
+    Erstellt das Batch-Skript für die verzögerte Update-Installation
+    #>
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo,
+        [Parameter(Mandatory = $true)][hashtable]$Paths,
+        [Parameter(Mandatory = $true)][string]$CurrentScriptPath
+    )
+    
+    $batchContent = @"
 @echo off
 echo ===============================================
 echo DATEV-Toolbox 2.0 Update-Installation
@@ -1311,25 +1542,25 @@ echo [1/5] Warte auf Beendigung der DATEV-Toolbox...
 timeout /t 3 /nobreak >nul
 
 echo [2/5] Erstelle Backup der aktuellen Version...
-copy "$currentScriptPath" "$backupPath" >nul
+copy "$CurrentScriptPath" "$($Paths.BackupPath)" >nul
 if errorlevel 1 (
     echo FEHLER: Backup konnte nicht erstellt werden!
-    echo Aktuelle Datei: $currentScriptPath
-    echo Backup-Ziel: $backupPath
+    echo Aktuelle Datei: $CurrentScriptPath
+    echo Backup-Ziel: $($Paths.BackupPath)
     pause
     exit /b 1
 )
-echo Backup erfolgreich erstellt: $backupPath
+echo Backup erfolgreich erstellt: $($Paths.BackupPath)
 
 echo [3/5] Installiere neue Version...
-copy "$tempUpdatePath" "$currentScriptPath" >nul
+copy "$($Paths.TempUpdatePath)" "$CurrentScriptPath" >nul
 if errorlevel 1 (
     echo FEHLER: Installation der neuen Version fehlgeschlagen!
     echo Stelle Backup wieder her...
-    copy "$backupPath" "$currentScriptPath" >nul
+    copy "$($Paths.BackupPath)" "$CurrentScriptPath" >nul
     if errorlevel 1 (
         echo KRITISCHER FEHLER: Rollback fehlgeschlagen!
-        echo Backup manuell wiederherstellen: $backupPath
+        echo Backup manuell wiederherstellen: $($Paths.BackupPath)
         pause
         exit /b 2
     )
@@ -1340,7 +1571,7 @@ if errorlevel 1 (
 echo Installation erfolgreich.
 
 echo [4/5] Bereinige temporäre Dateien...
-del "$tempUpdatePath" >nul 2>&1
+del "$($Paths.TempUpdatePath)" >nul 2>&1
 
 echo [5/5] Starte DATEV-Toolbox neu...
 echo.
@@ -1350,10 +1581,10 @@ REM Versuche zuerst pwsh.exe (PowerShell 7+), dann powershell.exe (PowerShell 5.
 where pwsh.exe >nul 2>&1
 if %errorlevel% equ 0 (
     echo Starte mit PowerShell 7+ ^(pwsh.exe^)...
-    start "" pwsh.exe -File "$currentScriptPath"
+    start "" pwsh.exe -File "$CurrentScriptPath"
 ) else (
     echo PowerShell 7+ nicht gefunden, verwende PowerShell 5.1 ^(powershell.exe^)...
-    start "" powershell.exe -File "$currentScriptPath"
+    start "" powershell.exe -File "$CurrentScriptPath"
 )
 
 echo.
@@ -1361,38 +1592,123 @@ echo Bereinige Update-Skript in 5 Sekunden...
 timeout /t 5 /nobreak >nul
 del "%~f0" >nul 2>&1
 "@
-          Set-Content -Path $updateBatchPath -Value $batchContent -Encoding ASCII
-        
-        Write-Log -Message "Update wird angewendet. Anwendung wird neu gestartet..." -Level 'INFO'
-        Write-Log -Message "Backup wird erstellt unter: $backupPath" -Level 'INFO'          # Update-Einstellungen speichern (PSObject sicher in Hashtable konvertieren)
-        $settingsHash = @{}
-        if ($script:Settings -is [PSCustomObject]) {
-            foreach ($property in $script:Settings.PSObject.Properties) {
-                $settingsHash[$property.Name] = $property.Value
+    
+    Set-Content -Path $Paths.UpdateBatchPath -Value $batchContent -Encoding ASCII
+    Write-Log -Message "Update-Batch-Skript erstellt: $($Paths.UpdateBatchPath)" -Level 'INFO'
+}
+
+function Update-SettingsForUpdate {
+    <#
+    .SYNOPSIS
+    Aktualisiert die Einstellungen mit Update-Informationen
+    #>
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo,
+        [Parameter(Mandatory = $true)][string]$BackupPath
+    )
+    
+    # Update-Einstellungen speichern (PSObject sicher in Hashtable konvertieren)
+    $settingsHash = @{}
+    if ($script:Settings -is [PSCustomObject]) {
+        foreach ($property in $script:Settings.PSObject.Properties) {
+            $settingsHash[$property.Name] = $property.Value
+        }
+    } else {
+        $settingsHash = $script:Settings
+    }
+    
+    $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+    $settingsHash.lastInstalledVersion = $UpdateInfo.NewVersion
+    $settingsHash.lastBackupPath = $BackupPath
+    $settingsHash.updateHistory = if ($settingsHash.updateHistory) { $settingsHash.updateHistory } else { @() }
+    $settingsHash.updateHistory += @{
+        version = $UpdateInfo.NewVersion
+        date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+        backupPath = $BackupPath
+    }
+    
+    # Einstellungen in globale Variable übertragen und speichern
+    $script:Settings = $settingsHash
+    Save-Settings
+    Write-Log -Message "Update-Einstellungen gespeichert" -Level 'INFO'
+}
+
+function Remove-UpdateTemporaryFiles {
+    <#
+    .SYNOPSIS
+    Bereinigt temporäre Update-Dateien bei Fehlern
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string[]]$FilePaths
+    )
+    
+    foreach ($file in $FilePaths) {
+        if (Test-Path $file) {
+            try {
+                Remove-Item $file -Force -ErrorAction Stop
+                Write-Log -Message "Temporäre Datei bereinigt: $file" -Level 'INFO'
+            }
+            catch {
+                Write-Log -Message "Konnte temporäre Datei nicht bereinigen: $file - $($_.Exception.Message)" -Level 'WARN'
             }
         }
-        else {
-            $settingsHash = $script:Settings
+    }
+}
+
+function Start-UpdateProcess {
+    <#
+    .SYNOPSIS
+    Führt den Update-Prozess für die DATEV-Toolbox durch
+    .DESCRIPTION
+    Modularisierte und optimierte Version des Update-Prozesses
+    #>
+    param(
+        [Parameter(Mandatory = $true)][hashtable]$UpdateInfo
+    )
+    
+    try {
+        Write-Log -Message "Starte Update-Prozess für Version $($UpdateInfo.NewVersion)..." -Level 'INFO'
+        
+        # Aktuellen Script-Pfad ermitteln
+        $currentScriptPath = $MyInvocation.ScriptName
+        if ([string]::IsNullOrEmpty($currentScriptPath)) {
+            $currentScriptPath = $PSCommandPath
         }
-        $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
-        $settingsHash.lastInstalledVersion = $UpdateInfo.NewVersion
-        $settingsHash.lastBackupPath = $backupPath
-        $settingsHash.updateHistory = if ($settingsHash.updateHistory) { $settingsHash.updateHistory } else { @() }
-        $settingsHash.updateHistory += @{
-            version = $UpdateInfo.NewVersion
-            date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
-            backupPath = $backupPath
+        if ([string]::IsNullOrEmpty($currentScriptPath)) {
+            throw "Kann den aktuellen Skript-Pfad nicht ermitteln"
         }
         
-        # Einstellungen in globale Variable übertragen und speichern
-        $script:Settings = $settingsHash
-        Save-Settings
+        # Update-Pfade erstellen
+        $paths = New-UpdatePaths -UpdateInfo $UpdateInfo -CurrentScriptPath $currentScriptPath
+        Write-Log -Message "Update-Pfade erstellt: Backup=$($paths.BackupPath), Download=$($paths.TempUpdatePath)" -Level 'INFO'
         
-        # Alte Backups bereinigen (behält nur die letzten 5)
+        # TLS 1.2 für sichere Downloads erzwingen
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        # Neue Version herunterladen
+        Write-Log -Message "Lade neue Version herunter nach: $($paths.TempUpdatePath)" -Level 'INFO'
+        Invoke-WebRequest -Uri $UpdateInfo.VersionInfo.downloadUrl -OutFile $paths.TempUpdatePath -UseBasicParsing -TimeoutSec $script:Config.Timeouts.FileDownload
+        
+        # Heruntergeladene Datei validieren
+        Test-DownloadedFile -FilePath $paths.TempUpdatePath
+        $downloadedFile = Get-Item $paths.TempUpdatePath
+        Write-Log -Message "Download erfolgreich ($($downloadedFile.Length) Bytes). Erstelle Update-Skript..." -Level 'INFO'
+        
+        # Update-Batch-Skript erstellen
+        New-UpdateBatchScript -UpdateInfo $UpdateInfo -Paths $paths -CurrentScriptPath $currentScriptPath
+        
+        # Einstellungen für Update vorbereiten
+        Update-SettingsForUpdate -UpdateInfo $UpdateInfo -BackupPath $paths.BackupPath
+        
+        # Alte Backups bereinigen
         Clear-OldUpdateBackups
-          # Batch-Skript ausführen und Anwendung beenden
-        Write-Log -Message "Starte Update-Batch-Skript: $updateBatchPath" -Level 'INFO'
-        Start-Process -FilePath $updateBatchPath -WindowStyle Normal
+        
+        # Update-Prozess starten
+        Write-Log -Message "Update wird angewendet. Anwendung wird neu gestartet..." -Level 'INFO'
+        Write-Log -Message "Backup wird erstellt unter: $($paths.BackupPath)" -Level 'INFO'
+        Write-Log -Message "Starte Update-Batch-Skript: $($paths.UpdateBatchPath)" -Level 'INFO'
+        
+        Start-Process -FilePath $paths.UpdateBatchPath -WindowStyle Normal
         
         # Kurz warten und dann Fenster schließen
         Start-Sleep -Milliseconds 500
@@ -1403,18 +1719,9 @@ del "%~f0" >nul 2>&1
     catch {
         Write-Log -Message "Fehler beim Update-Prozess: $($_.Exception.Message)" -Level 'ERROR'
         
-        # Aufräumen bei Fehler - alle temporären Dateien im AppData-Ordner
-        $filesToCleanup = @($tempUpdatePath, $updateBatchPath)
-        foreach ($file in $filesToCleanup) {
-            if (Test-Path $file) {
-                try {
-                    Remove-Item $file -Force -ErrorAction Stop
-                    Write-Log -Message "Temporäre Datei bereinigt: $file" -Level 'INFO'
-                }
-                catch {
-                    Write-Log -Message "Konnte temporäre Datei nicht bereinigen: $file - $($_.Exception.Message)" -Level 'WARN'
-                }
-            }
+        # Temporäre Dateien bereinigen
+        if ($paths) {
+            Remove-UpdateTemporaryFiles -FilePaths @($paths.TempUpdatePath, $paths.UpdateBatchPath)
         }
         
         [System.Windows.MessageBox]::Show(
@@ -1754,7 +2061,130 @@ function Open-DownloadFolder {
 }
 #endregion
 
-# Update-Termine Funktionen
+#region Update-Termine und Kalenderfunktionen
+# Update-Termine Hilfsfunktionen
+function ConvertFrom-ICSDate {
+    <#
+    .SYNOPSIS
+    Konvertiert ICS-Datumsformat in DateTime-Objekt
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$ICSDate
+    )
+    
+    try {
+        if ($ICSDate.Length -eq 8) { 
+            return [datetime]::ParseExact($ICSDate, 'yyyyMMdd', $null) 
+        }
+        elseif ($ICSDate.Length -ge 15) { 
+            return [datetime]::ParseExact($ICSDate.Substring(0, 8), 'yyyyMMdd', $null) 
+        }
+        return $null
+    }
+    catch {
+        return $null
+    }
+}
+
+function ConvertFrom-ICSContent {
+    <#
+    .SYNOPSIS
+    Parst ICS-Dateiinhalt und extrahiert VEVENT-Einträge
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$ICSContent
+    )
+    
+    $lines = $ICSContent -split "`n"
+    $events = @()
+    $currentEvent = @{}
+    $lastKey = $null
+    
+    foreach ($lineRaw in $lines) {
+        $line = $lineRaw.TrimEnd("`r", "`n")
+        
+        if ($line -eq "BEGIN:VEVENT") { 
+            $currentEvent = @{}
+            $lastKey = $null 
+        }
+        elseif ($line -eq "END:VEVENT") {
+            if ($currentEvent.DTSTART -and $currentEvent.SUMMARY) {
+                $events += [PSCustomObject]@{
+                    DTSTART     = $currentEvent.DTSTART
+                    SUMMARY     = $currentEvent.SUMMARY
+                    DESCRIPTION = $currentEvent.DESCRIPTION
+                }
+            }
+            $currentEvent = @{}
+            $lastKey = $null
+        }
+        elseif ($line -match "^([A-Z]+).*:(.*)$") {
+            $key = $matches[1]
+            $val = $matches[2]
+            $lastKey = $key
+            if ($key -eq "DTSTART") { $currentEvent.DTSTART = $val }
+            elseif ($key -eq "SUMMARY") { $currentEvent.SUMMARY = $val }
+            elseif ($key -eq "DESCRIPTION") { $currentEvent.DESCRIPTION = $val }
+        }
+        elseif ($line -match "^[ \t](.*)$" -and $lastKey) {
+            # Fortgesetzte Zeile (folded line)
+            $continued = $matches[1]
+            if ($lastKey -eq "DESCRIPTION") {
+                $currentEvent.DESCRIPTION += [Environment]::NewLine + $continued
+            }
+            elseif ($lastKey -eq "SUMMARY") {
+                $currentEvent.SUMMARY += $continued
+            }
+        }
+    }
+    
+    return $events
+}
+
+function Get-UpcomingEvents {
+    <#
+    .SYNOPSIS
+    Filtert Events nach anstehenden Terminen
+    #>
+    param(
+        [Parameter(Mandatory = $true)][array]$Events,
+        [Parameter(Mandatory = $false)][int]$MaxCount = 3
+    )
+    
+    $now = Get-Date
+    $upcoming = $Events | Where-Object {
+        $parsedDate = ConvertFrom-ICSDate -ICSDate $_.DTSTART
+        $parsedDate -and $parsedDate -ge $now.Date
+    } | Sort-Object {
+        ConvertFrom-ICSDate -ICSDate $_.DTSTART
+    } | Select-Object -First $MaxCount
+    
+    return $upcoming
+}
+
+function Add-EventToUI {
+    <#
+    .SYNOPSIS
+    Fügt ein Event zur UI hinzu
+    #>
+    param(
+        [Parameter(Mandatory = $true)][PSCustomObject]$Event,
+        [Parameter(Mandatory = $true)][System.Windows.Controls.StackPanel]$Container
+    )
+    
+    $parsedDate = ConvertFrom-ICSDate -ICSDate $Event.DTSTART
+    if ($parsedDate) {
+        $tb = New-Object System.Windows.Controls.TextBlock
+        $tb.Text = "{0:dd.MM.yyyy} - {1}" -f $parsedDate, $Event.SUMMARY
+        if ($Event.DESCRIPTION) { 
+            $tb.ToolTip = $Event.DESCRIPTION 
+        }
+        $tb.FontSize = 12
+        $tb.Margin = '2'
+        $Container.Children.Add($tb) | Out-Null
+    }
+}
+
 # Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei
 function Show-NextUpdateDates {
     Write-Log -Message "Lese Update-Termine aus ICS-Datei..." -Level 'INFO'
@@ -1979,123 +2409,12 @@ function Update-UpdateDates {
 
 #region GUI-Setup und Event-Handler-Registrierung
 # Initialisierung der Benutzeroberfläche und Event-Handler
-# Funktion zum Öffnen von URLs im Standard-Browser
-function Open-Url {
-    param([string]$Url)
-    try {
-        Start-Process $Url
-        Write-Log -Message "URL geöffnet: $Url" -Level 'INFO'
-    }
-    catch {
-        Write-Log -Message "Fehler beim Öffnen der URL $Url`: $($_.Exception.Message)" -Level 'ERROR'
-    }
-}
+# Doppelte Open-Url Funktion entfernen (bereits in Hilfsfunktionen definiert)
 
-# Event-Handler für DATEV Online Buttons
-# Hilfe und Support
-$btnHilfeCenter = $window.FindName("btnHilfeCenter")
-if ($null -ne $btnHilfeCenter) {
-    $btnHilfeCenter.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.HelpCenter })
-}
-
-$btnServicekontakte = $window.FindName("btnServicekontakte")
-if ($null -ne $btnServicekontakte) {
-    $btnServicekontakte.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.ServiceKontakte })
-}
-
-$btnMyUpdates = $window.FindName("btnMyUpdates")
-if ($null -ne $btnMyUpdates) {
-    $btnMyUpdates.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.MyUpdates })
-}
-
-# Cloud
-$btnMyDATEV = $window.FindName("btnMyDATEV")
-if ($null -ne $btnMyDATEV) {
-    $btnMyDATEV.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.MyDATEV })
-}
-
-$btnDUO = $window.FindName("btnDUO")
-if ($null -ne $btnDUO) {
-    $btnDUO.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.DUO })
-}
-
-$btnLAO = $window.FindName("btnLAO")
-if ($null -ne $btnLAO) {
-    $btnLAO.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.LAO })
-}
-
-$btnLizenzverwaltung = $window.FindName("btnLizenzverwaltung")
-if ($null -ne $btnLizenzverwaltung) {
-    $btnLizenzverwaltung.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.Lizenzverwaltung })
-}
-
-$btnRechteraum = $window.FindName("btnRechteraum")
-if ($null -ne $btnRechteraum) {
-    $btnRechteraum.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.Rechteraum })
-}
-
-$btnRVO = $window.FindName("btnRVO")
-if ($null -ne $btnRVO) {
-    $btnRVO.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.RVO })
-}
-
-# Verwaltung und Technik
-$btnSmartLogin = $window.FindName("btnSmartLogin")
-if ($null -ne $btnSmartLogin) {
-    $btnSmartLogin.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.SmartLogin })
-}
-
-$btnBestandsmanagement = $window.FindName("btnBestandsmanagement")
-if ($null -ne $btnBestandsmanagement) {
-    $btnBestandsmanagement.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.Bestandsmanagement })
-}
-
-$btnWeitereApps = $window.FindName("btnWeitereApps")
-if ($null -ne $btnWeitereApps) {
-    $btnWeitereApps.Add_Click({ Open-Url -Url $script:Config.URLs.DATEV.WeitereApps })
-}
-
-# Referenz auf den Button zum Öffnen des Ordners holen (vor ShowDialog!)
-$btnOpenFolder = $window.FindName("btnOpenFolder")
-if ($null -ne $btnOpenFolder) {
-    $btnOpenFolder.Add_Click({
-            try {
-                $folder = $script:Config.Paths.AppData
-                if (-not (Test-Path $folder)) {
-                    New-Item -Path $folder -ItemType Directory -Force | Out-Null
-                }
-                Start-Process explorer.exe $folder
-                Write-Log -Message "Ordner im Explorer geöffnet: $folder" -Level 'INFO'
-            }
-            catch {
-                Write-Log -Message "Fehler beim Öffnen des Ordners: $($_.Exception.Message)" -Level 'ERROR'
-            }
-        })
-}
-else {
-    Write-Log -Message "Button 'btnOpenFolder' konnte nicht gefunden werden" -Level 'WARN'
-}
-
-# Event-Handler für Update-Check-Button
-$btnCheckUpdate = $window.FindName("btnCheckUpdate")
-if ($null -ne $btnCheckUpdate) {
-    $btnCheckUpdate.Add_Click({
-            Start-ManualUpdateCheck
-        })
-}
-else {
-    Write-Log -Message "Button 'btnCheckUpdate' konnte nicht gefunden werden" -Level 'WARN'
-}
-
-# Event-Handler für Update-Termine-Button (TextBlock)
-if ($null -ne $btnUpdateDates) {
-    $btnUpdateDates.Add_MouseLeftButtonDown({
-            Update-UpdateDates
-        })
-}
-else {
-    Write-Log -Message "TextBlock 'btnUpdateDates' konnte nicht gefunden werden" -Level 'WARN'
-}
+# Zentrale Handler-Registrierung ausführen
+Write-Log -Message "Starte zentrale Button-Handler-Registrierung..." -Level 'INFO'
+Register-ButtonHandlers -Window $window
+Write-Log -Message "Zentrale Button-Handler-Registrierung abgeschlossen" -Level 'INFO'
 
 # Event-Handler für DATEV Downloads ComboBox
 if ($null -ne $cmbDirectDownloads) {
@@ -2116,74 +2435,6 @@ else {
     Write-Log -Message "ComboBox 'cmbDirectDownloads' konnte nicht gefunden werden" -Level 'WARN'
 }
 
-# Event-Handler für Download-Button
-if ($null -ne $btnDownload) {
-    $btnDownload.Add_Click({
-            try {
-                if ($null -ne $cmbDirectDownloads.SelectedItem -and 
-                    $cmbDirectDownloads.SelectedIndex -gt 0 -and 
-                    $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
-                    $selectedItem = $cmbDirectDownloads.SelectedItem
-                    $downloadInfo = $selectedItem.Tag
-                
-                    # Dateiname aus URL extrahieren
-                    $uri = [System.Uri]$downloadInfo.url
-                    $fileName = Split-Path $uri.LocalPath -Leaf
-                    if ([string]::IsNullOrEmpty($fileName)) {
-                        $fileName = "download_$(Get-Date -Format 'yyyyMMdd_HHmmss').exe"
-                    }
-                
-                    Start-BackgroundDownload -Url $downloadInfo.url -FileName $fileName
-                }
-            }
-            catch {
-                Write-Log -Message "Fehler beim Starten des Downloads: $($_.Exception.Message)" -Level 'ERROR'
-            }
-        })
-}
-else {
-    Write-Log -Message "Button 'btnDownload' konnte nicht gefunden werden" -Level 'WARN'
-}
-
-# Event-Handler für Update-Downloads-Button (TextBlock)
-if ($null -ne $btnUpdateDownloads) {
-    $btnUpdateDownloads.Add_MouseLeftButtonDown({
-            Update-DATEVDownloads
-        })
-}
-else {
-    Write-Log -Message "TextBlock 'btnUpdateDownloads' konnte nicht gefunden werden" -Level 'WARN'
-}
-
-# Event-Handler für Download-Ordner-Icon (TextBlock)
-if ($null -ne $btnOpenDownloadFolder) {
-    $btnOpenDownloadFolder.Add_MouseLeftButtonDown({
-            Open-DownloadFolder
-        })
-}
-else {
-    Write-Log -Message "TextBlock 'btnOpenDownloadFolder' konnte nicht gefunden werden" -Level 'WARN'
-}
-
-# Event-Handler für DATEV Online Downloads Buttons
-if ($null -ne $btnDATEVDownloadbereich) {
-    $btnDATEVDownloadbereich.Add_Click({
-        Open-Url -Url $script:Config.URLs.DATEV.Downloadbereich
-    })
-}
-
-if ($null -ne $btnDATEVSmartDocs) {
-    $btnDATEVSmartDocs.Add_Click({
-        Open-Url -Url $script:Config.URLs.DATEV.SmartDocs
-    })
-}
-
-if ($null -ne $btnDatentraegerPortal) {
-    $btnDatentraegerPortal.Add_Click({
-        Open-Url -Url $script:Config.URLs.DATEV.DatentraegerPortal
-    })
-}
-
 # Downloads-ComboBox initialisieren (nur wenn JSON-Datei vorhanden ist)
 $downloadsJsonPath = $script:Config.Paths.DownloadsJSON
 if (Test-Path $downloadsJsonPath) {
@@ -2201,106 +2452,6 @@ Initialize-UpdateDates
 
 # Automatischen Update-Check durchführen
 Initialize-UpdateCheck
-
-# Event-Handler für DATEV Programme Buttons
-if ($null -ne $btnDATEVArbeitsplatz) {
-    $btnDATEVArbeitsplatz.Add_Click({
-        Start-DATEVProgram -ProgramName 'DATEVArbeitsplatz' -PossiblePaths $script:DATEVProgramPaths['DATEVArbeitsplatz'] -Description 'DATEV-Arbeitsplatz'
-    })
-}
-
-if ($null -ne $btnInstallationsmanager) {
-    $btnInstallationsmanager.Add_Click({
-        Start-DATEVProgram -ProgramName 'Installationsmanager' -PossiblePaths $script:DATEVProgramPaths['Installationsmanager'] -Description 'Installationsmanager'
-    })
-}
-
-if ($null -ne $btnServicetool) {
-    $btnServicetool.Add_Click({
-        Start-DATEVProgram -ProgramName 'Servicetool' -PossiblePaths $script:DATEVProgramPaths['Servicetool'] -Description 'Servicetool'
-    })
-}
-
-# Event-Handler für DATEV Tools Buttons
-if ($null -ne $btnKonfigDBTools) {
-    $btnKonfigDBTools.Add_Click({
-        Start-DATEVProgram -ProgramName 'KonfigDBTools' -PossiblePaths $script:DATEVProgramPaths['KonfigDBTools'] -Description 'KonfigDB-Tools'
-    })
-}
-
-if ($null -ne $btnEODBconfig) {
-    $btnEODBconfig.Add_Click({
-        Start-DATEVProgram -ProgramName 'EODBconfig' -PossiblePaths $script:DATEVProgramPaths['EODBconfig'] -Description 'EODBconfig'
-    })
-}
-
-if ($null -ne $btnEOAufgabenplanung) {
-    $btnEOAufgabenplanung.Add_Click({
-        Start-DATEVProgram -ProgramName 'EOAufgabenplanung' -PossiblePaths $script:DATEVProgramPaths['EOAufgabenplanung'] -Description 'EO Aufgabenplanung'
-    })
-}
-
-# Event-Handler für DATEV Performance Tools Button
-if ($null -ne $btnNGENALL40) {
-    $btnNGENALL40.Add_Click({
-        Start-DATEVProgram -ProgramName 'NGENALL40' -PossiblePaths $script:DATEVProgramPaths['NGENALL40'] -Description 'NGENALL 4.0'
-    })
-}
-
-if ($null -ne $btnLeistungsindex) {
-    $btnLeistungsindex.Add_Click({
-        Start-Leistungsindex
-    })
-}
-
-# Event-Handler für Aktionen Buttons
-if ($null -ne $btnGpupdate) {
-    $btnGpupdate.Add_Click({
-        Start-Gpupdate
-    })
-}
-
-# Event-Handler für System Tools Buttons
-if ($null -ne $btnTaskManager) {
-    $btnTaskManager.Add_Click({
-        Start-SystemTool -Command 'taskmgr.exe' -Description 'Task-Manager'
-    })
-}
-
-if ($null -ne $btnResourceMonitor) {
-    $btnResourceMonitor.Add_Click({
-        Start-SystemTool -Command 'resmon.exe' -Description 'Ressourcenmonitor'
-    })
-}
-
-if ($null -ne $btnEventViewer) {
-    $btnEventViewer.Add_Click({
-        Start-SystemTool -Command 'eventvwr.msc' -Description 'Ereignisanzeige'
-    })
-}
-
-if ($null -ne $btnServices) {
-    $btnServices.Add_Click({
-        Start-SystemTool -Command 'services.msc' -Description 'Dienste'
-    })
-}
-
-if ($null -ne $btnMsconfig) {
-    $btnMsconfig.Add_Click({
-        Start-SystemTool -Command 'msconfig.exe' -Description 'Systemkonfiguration'
-    })
-}
-
-if ($null -ne $btnDiskCleanup) {
-    $btnDiskCleanup.Add_Click({        Start-SystemTool -Command 'cleanmgr.exe' -Description 'Datenträgerbereinigung'
-    })
-}
-
-if ($null -ne $btnShowChangelog) {
-    $btnShowChangelog.Add_Click({
-        Show-ChangelogDialog
-    })
-}
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet" -Level 'INFO'
