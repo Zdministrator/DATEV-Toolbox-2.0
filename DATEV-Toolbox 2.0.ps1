@@ -2215,29 +2215,6 @@ if ($null -ne $btnDiskCleanup) {
     })
 }
 
-# Event-Handler für Einstellungs-Buttons
-if ($null -ne $btnOpenFolder) {
-    $btnOpenFolder.Add_Click({
-        try {
-            $folderPath = Join-Path $env:APPDATA "DATEV-Toolbox 2.0"
-            if (-not (Test-Path $folderPath)) {
-                New-Item -Path $folderPath -ItemType Directory -Force | Out-Null
-            }
-            Start-Process "explorer.exe" -ArgumentList $folderPath
-            Write-Log -Message "Toolbox-Ordner geöffnet: $folderPath" -Level 'INFO'
-        }
-        catch {
-            Write-Log -Message "Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)" -Level 'ERROR'
-            [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Toolbox-Ordners: $($_.Exception.Message)", "Fehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
-        }    })
-}
-
-if ($null -ne $btnCheckUpdate) {
-    $btnCheckUpdate.Add_Click({
-        Start-ManualUpdateCheck
-    })
-}
-
 if ($null -ne $btnShowChangelog) {
     $btnShowChangelog.Add_Click({
         Show-ChangelogDialog
