@@ -233,7 +233,7 @@ function Initialize-Settings {
         $settingsPath = $script:Config.Paths.SettingsFile
         
         if (Test-Path $settingsPath) {
-            Write-Log -Message "Lade Einstellungen von: $settingsPath" -Level 'INFO'
+            Write-Log -Message "Lade Einstellungen von: $settingsPath" -Level 'DEBUG'
             $json = Get-Content $settingsPath -Raw | ConvertFrom-Json
             
             # PSObject zu Hashtable konvertieren (gemäß Instructions)
@@ -242,7 +242,7 @@ function Initialize-Settings {
             $json.PSObject.Properties | ForEach-Object {
                 $script:Settings[$_.Name] = $_.Value
             }
-            Write-Log -Message "Einstellungen erfolgreich geladen" -Level 'INFO'
+            Write-Log -Message "Einstellungen erfolgreich geladen" -Level 'DEBUG'
         } else {
             Write-Log -Message "Keine settings.json gefunden, verwende Standard-Einstellungen" -Level 'INFO'
             $script:Settings = Get-DefaultSettings
@@ -262,6 +262,7 @@ function Get-DefaultSettings {
     return @{
         DownloadPath = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
         AutoUpdate = $true
+        ShowDebugLogs = $false
         LogLevel = "INFO"
         WindowPosition = @{
             Left = 100
@@ -285,7 +286,7 @@ function Save-Settings {
         }
         
         $script:Settings | ConvertTo-Json -Depth 3 | Set-Content $settingsPath -Encoding UTF8
-        Write-Log -Message "Einstellungen gespeichert: $settingsPath" -Level 'INFO'
+        Write-Log -Message "Einstellungen gespeichert: $settingsPath" -Level 'DEBUG'
     } catch {
         Write-Log -Message "Fehler beim Speichern der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
     }
@@ -525,7 +526,8 @@ function Set-Setting {
                                         ToolTip="Prüft GitHub auf verfügbare Updates für die DATEV-Toolbox"/>
                                 <Button Name="btnShowChangelog" Content="Changelog anzeigen" Height="25" Margin="0,3,0,3"
                                         ToolTip="Zeigt das Changelog der aktuellen Version und der letzten Updates an"/>
-                                <!-- Hier können zukünftig Einstellungen ergänzt werden -->
+                                <CheckBox Name="chkShowDebugLogs" Content="Debug-Meldungen im Log anzeigen" Margin="0,10,0,3"
+                                          ToolTip="Zeigt detaillierte Debug-Informationen im Log-Fenster an"/>
                             </StackPanel>                        </GroupBox>
                         
                           <!-- Anstehende Update-Termine -->
@@ -577,6 +579,9 @@ $btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
 
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
+
+# Referenz auf Einstellungs-Checkbox holen
+$chkShowDebugLogs = $window.FindName("chkShowDebugLogs")
 #endregion
 
 #region Hilfsfunktionen und Utilities
@@ -588,15 +593,26 @@ function Write-Log {
     #>
     param(
         [Parameter(Mandatory = $true)][string]$Message,
-        [ValidateSet('INFO', 'WARN', 'ERROR')][string]$Level = 'INFO'
+        [ValidateSet('INFO', 'WARN', 'ERROR', 'DEBUG')][string]$Level = 'INFO'
     )
     
     try {
+       # Debug-Meldungen nur anzeigen, wenn die Einstellung aktiviert ist
+       # Direkter Check um Rekursion bei Initialisierung zu vermeiden
+       $showDebug = $false
+       if ($null -ne $script:Settings) {
+           $showDebug = $script:Settings['ShowDebugLogs']
+       }
+       if ($Level -eq 'DEBUG' -and -not $showDebug) {
+           return
+       }
+
         $timestamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
         switch ($Level) {
             'INFO' { $prefix = '[INFO] ' }
             'WARN' { $prefix = '[WARNUNG] ' }
             'ERROR' { $prefix = '[FEHLER] ' }
+            'DEBUG' { $prefix = '[DEBUG] ' }
         }
         $logEntry = "$timestamp $prefix$Message`r`n"
         
@@ -716,11 +732,11 @@ function Register-ButtonHandlers {
         [Parameter(Mandatory = $true)][System.Windows.Window]$Window
     )
     
-    Write-Log -Message "Registriere zentrale Button-Handler..." -Level 'INFO'
+    Write-Log -Message "Registriere zentrale Button-Handler..." -Level 'DEBUG'
     
     # Debug: Zeige alle konfigurierten Buttons
-    Write-Log -Message "Anzahl konfigurierte Buttons: $($script:Config.ButtonMappings.Keys.Count)" -Level 'INFO'
-    Write-Log -Message "Konfigurierte Buttons: $($script:Config.ButtonMappings.Keys -join ', ')" -Level 'INFO'
+    Write-Log -Message "Anzahl konfigurierte Buttons: $($script:Config.ButtonMappings.Keys.Count)" -Level 'DEBUG'
+    Write-Log -Message "Konfigurierte Buttons: $($script:Config.ButtonMappings.Keys -join ', ')" -Level 'DEBUG'
     
     try {
         foreach ($buttonName in $script:Config.ButtonMappings.Keys) {
@@ -731,7 +747,7 @@ function Register-ButtonHandlers {
                 Write-Log -Message "Button '$buttonName' nicht gefunden im GUI - überspringe (Typ: $($buttonConfig.Type))" -Level 'WARN'
                 continue
             } else {
-                Write-Log -Message "Button '$buttonName' gefunden: $($buttonElement.GetType().Name)" -Level 'INFO'
+                Write-Log -Message "Button '$buttonName' gefunden: $($buttonElement.GetType().Name)" -Level 'DEBUG'
             }
             
             # Handler-Typ bestimmen und entsprechenden Event-Handler registrieren (OHNE GetNewClosure)
@@ -743,7 +759,7 @@ function Register-ButtonHandlers {
                         if ($null -ne $url) {
                             # Direkte Registrierung ohne Closure
                             Register-UrlHandler -Button $buttonElement -Url $url
-                            Write-Log -Message "URL-Handler für '$buttonName' registriert (URL: $url)" -Level 'INFO'
+                            Write-Log -Message "URL-Handler für '$buttonName' registriert (URL: $url)" -Level 'DEBUG'
                         } else {
                             Write-Log -Message "URL für '$urlKey' nicht gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
                         }
@@ -756,12 +772,12 @@ function Register-ButtonHandlers {
                         $description = $buttonConfig.Description
                         $possiblePaths = $script:DATEVProgramPaths[$programName]
                         
-                        Write-Log -Message "Debug: Button '$buttonName', Programm '$programName', Pfade: $($possiblePaths -join ', ')" -Level 'INFO'
+                        Write-Log -Message "Debug: Button '$buttonName', Programm '$programName', Pfade: $($possiblePaths -join ', ')" -Level 'DEBUG'
                         
                         if ($null -ne $possiblePaths -and $possiblePaths.Count -gt 0) {
                             # Direkte Registrierung ohne Closure
                             Register-DATEVHandler -Button $buttonElement -ProgramName $programName -PossiblePaths $possiblePaths -Description $description
-                            Write-Log -Message "DATEV-Handler für '$buttonName' registriert" -Level 'INFO'
+                            Write-Log -Message "DATEV-Handler für '$buttonName' registriert" -Level 'DEBUG'
                         } else {
                             Write-Log -Message "Keine DATEV-Pfade für '$programName' gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
                         }
@@ -774,7 +790,7 @@ function Register-ButtonHandlers {
                         $description = $buttonConfig.Description
                         # Direkte Registrierung ohne Closure
                         Register-SystemToolHandler -Button $buttonElement -Command $command -Description $description
-                        Write-Log -Message "SystemTool-Handler für '$buttonName' registriert" -Level 'INFO'
+                        Write-Log -Message "SystemTool-Handler für '$buttonName' registriert" -Level 'DEBUG'
                     }
                 }
                 
@@ -783,7 +799,7 @@ function Register-ButtonHandlers {
                         $functionName = $buttonConfig.FunctionName
                         # Direkte Registrierung ohne Closure
                         Register-FunctionHandler -Button $buttonElement -FunctionName $functionName
-                        Write-Log -Message "Function-Handler für '$buttonName' registriert" -Level 'INFO'
+                        Write-Log -Message "Function-Handler für '$buttonName' registriert" -Level 'DEBUG'
                     }
                 }
                 
@@ -793,7 +809,7 @@ function Register-ButtonHandlers {
                         $functionName = $buttonConfig.FunctionName
                         # Direkte Registrierung ohne Closure
                         Register-TextBlockHandler -TextBlock $buttonElement -FunctionName $functionName
-                        Write-Log -Message "TextBlock-Handler für '$buttonName' registriert" -Level 'INFO'
+                        Write-Log -Message "TextBlock-Handler für '$buttonName' registriert" -Level 'DEBUG'
                     }
                 }
                 
@@ -803,7 +819,7 @@ function Register-ButtonHandlers {
             }
         }
         
-        Write-Log -Message "Button-Handler-Registrierung abgeschlossen" -Level 'INFO'
+        Write-Log -Message "Button-Handler-Registrierung abgeschlossen" -Level 'DEBUG'
     }
     catch {
         Write-Log -Message "Fehler bei der Button-Handler-Registrierung: $($_.Exception.Message)" -Level 'ERROR'
@@ -1731,11 +1747,11 @@ function Initialize-UpdateCheck {
         $shouldCheck = $false
         if ($null -eq $lastCheck) {
             $shouldCheck = $true
-            Write-Log -Message "Erster Update-Check wird durchgeführt" -Level 'INFO'
+            Write-Log -Message "Erster Update-Check wird durchgeführt" -Level 'DEBUG'
         }
         elseif ($lastCheck.AddHours($checkInterval) -lt (Get-Date)) {
             $shouldCheck = $true
-            Write-Log -Message "Update-Check-Intervall erreicht (alle $checkInterval Stunden)" -Level 'INFO'
+            Write-Log -Message "Update-Check-Intervall erreicht (alle $checkInterval Stunden)" -Level 'DEBUG'
         }
           if ($shouldCheck) {            # Stillen Update-Check durchführen
             $updateInfo = Test-ForUpdates -Silent
@@ -1756,7 +1772,7 @@ function Initialize-UpdateCheck {
             Set-Setting -Key "lastUpdateCheck" -Value (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         }
         else {
-            Write-Log -Message "Update-Check übersprungen (letzter Check: $($lastCheck.ToString('yyyy-MM-dd HH:mm')))" -Level 'INFO'
+            Write-Log -Message "Update-Check übersprungen (letzter Check: $($lastCheck.ToString('yyyy-MM-dd HH:mm')))" -Level 'DEBUG'
         }
     }
     catch {
@@ -1804,7 +1820,7 @@ function Get-DATEVDownloads {
         if (Test-Path $appDataFile) {
             $json = Get-Content -Path $appDataFile -Raw -Encoding UTF8
             $downloadsData = $json | ConvertFrom-Json
-            Write-Log -Message "DATEV Downloads erfolgreich aus AppData geladen" -Level 'INFO'
+            Write-Log -Message "DATEV Downloads erfolgreich aus AppData geladen" -Level 'DEBUG'
             
             # Rückgabe als Hashtable mit Downloads und lastUpdated
             return @{
@@ -1834,14 +1850,14 @@ function Update-DATEVDownloads {
     $downloadsUrl = $script:Config.URLs.GitHub.DownloadsConfig
     $localFile = $script:Config.Paths.DownloadsJSON
     
-    Write-Log -Message "Benutzeraktion: Direkt-Downloads aktualisieren geklickt. Lade JSON von $downloadsUrl" -Level 'INFO'
+    Write-Log -Message "Benutzeraktion: Direkt-Downloads aktualisieren geklickt. Lade JSON von $downloadsUrl" -Level 'DEBUG'
     
     try {
         # Verzeichnis erstellen falls es nicht existiert
         $downloadsDir = $script:Config.Paths.AppData
         if (-not (Test-Path $downloadsDir)) {
             New-Item -Path $downloadsDir -ItemType Directory -Force | Out-Null
-            Write-Log -Message "Downloads-Verzeichnis erstellt: $downloadsDir" -Level 'INFO'
+            Write-Log -Message "Downloads-Verzeichnis erstellt: $downloadsDir" -Level 'DEBUG'
         }
         
         # Button während Download deaktivieren
@@ -1855,7 +1871,7 @@ function Update-DATEVDownloads {
         # JSON-Datei herunterladen
         Invoke-WebRequest -Uri $downloadsUrl -OutFile $localFile -UseBasicParsing -TimeoutSec $script:Config.Timeouts.DownloadJSON
         
-        Write-Log -Message "Downloads-JSON erfolgreich aktualisiert: $localFile" -Level 'INFO'
+        Write-Log -Message "Downloads-JSON erfolgreich aktualisiert: $localFile" -Level 'DEBUG'
         
         # ComboBox neu initialisieren mit aktualisierten Daten
         Initialize-DownloadsComboBox
@@ -1922,7 +1938,7 @@ function Initialize-DownloadsComboBox {
         $cmbDirectDownloads.SelectedIndex = 0
         
         if ($cmbDirectDownloads.Items.Count -gt 1) {
-            Write-Log -Message "$($cmbDirectDownloads.Items.Count - 1) Downloads geladen" -Level 'INFO'
+            Write-Log -Message "$($cmbDirectDownloads.Items.Count - 1) Downloads geladen" -Level 'DEBUG'
         }
     }
     catch {
@@ -2146,7 +2162,7 @@ function Add-EventToUI {
 
 # Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei
 function Show-NextUpdateDates {
-    Write-Log -Message "Lese Update-Termine aus ICS-Datei..." -Level 'INFO'
+    Write-Log -Message "Lese Update-Termine aus ICS-Datei..." -Level 'DEBUG'
     $icsFile = $script:Config.Paths.ICSFile
     
     if ($null -eq $spUpdateDates) {
@@ -2169,13 +2185,13 @@ function Show-NextUpdateDates {
     try {
         $icsContent = Get-Content $icsFile -Raw -Encoding UTF8
         $allEvents = ConvertFrom-IcsContent -ICSContent $icsContent
-        Write-Log -Message "ICS: $($allEvents.Count) VEVENTs gefunden" -Level 'INFO'
+        Write-Log -Message "ICS: $($allEvents.Count) VEVENTs gefunden" -Level 'DEBUG'
 
         $upcoming = Get-UpcomingEvents -Events $allEvents -MaxCount 3
-        Write-Log -Message "$($upcoming.Count) anstehende Termine werden angezeigt" -Level 'INFO'
+        Write-Log -Message "$($upcoming.Count) anstehende Termine werden angezeigt" -Level 'DEBUG'
         
         if ($upcoming.Count -eq 0) {
-            Write-Log -Message "Keine anstehenden Termine gefunden" -Level 'INFO'
+            Write-Log -Message "Keine anstehenden Termine gefunden" -Level 'DEBUG'
             $tb = New-Object System.Windows.Controls.TextBlock
             $tb.Text = "Keine anstehenden Termine gefunden."
             $tb.FontStyle = 'Italic'
@@ -2187,7 +2203,7 @@ function Show-NextUpdateDates {
                 Add-EventToUI -Event $ev -Container $spUpdateDates
                 $parsedDate = ConvertFrom-ICSDate -ICSDate $ev.DTSTART
                 if ($parsedDate) {
-                    Write-Log -Message "Termin: $($parsedDate.ToString('dd.MM.yyyy')) - $($ev.SUMMARY)" -Level 'INFO'
+                    Write-Log -Message "Termin: $($parsedDate.ToString('dd.MM.yyyy')) - $($ev.SUMMARY)" -Level 'DEBUG'
                 }
             }
         }
@@ -2207,11 +2223,11 @@ function Initialize-UpdateDates {
     $icsFile = $script:Config.Paths.ICSFile
     
     if (Test-Path $icsFile) {
-        Write-Log -Message "Vorhandene ICS-Datei gefunden. Lade Update-Termine automatisch..." -Level 'INFO'
+        Write-Log -Message "Vorhandene ICS-Datei gefunden. Lade Update-Termine automatisch..." -Level 'DEBUG'
         Show-NextUpdateDates
     }
     else {
-        Write-Log -Message "Keine lokale ICS-Datei gefunden. Update-Termine können manuell aktualisiert werden." -Level 'INFO'
+        Write-Log -Message "Keine lokale ICS-Datei gefunden. Update-Termine können manuell aktualisiert werden." -Level 'DEBUG'
         if ($null -ne $spUpdateDates) {
             $spUpdateDates.Children.Clear()
             $tb = New-Object System.Windows.Controls.TextBlock
@@ -2240,7 +2256,7 @@ function Update-UpdateDates {
     $tb.Foreground = 'Blue'
     $spUpdateDates.Children.Add($tb) | Out-Null
     
-    Write-Log -Message "Benutzeraktion: Update-Termine aktualisieren geklickt. Lade ICS von $icsUrl" -Level 'INFO'
+    Write-Log -Message "Benutzeraktion: Update-Termine aktualisieren geklickt. Lade ICS von $icsUrl" -Level 'DEBUG'
     
     try {
         # TLS 1.2 für sichere Downloads erzwingen
@@ -2255,7 +2271,7 @@ function Update-UpdateDates {
         $tb.Foreground = 'Blue'
         $spUpdateDates.Children.Add($tb) | Out-Null
         
-        Write-Log -Message "ICS-Datei erfolgreich geladen: $icsFile" -Level 'INFO'
+        Write-Log -Message "ICS-Datei erfolgreich geladen: $icsFile" -Level 'DEBUG'
         Show-NextUpdateDates
     }
     catch {
@@ -2275,19 +2291,19 @@ function Update-UpdateDates {
 # Doppelte Open-Url Funktion entfernen (bereits in Hilfsfunktionen definiert)
 
 # Zentrale Handler-Registrierung ausführen
-Write-Log -Message "Starte zentrale Button-Handler-Registrierung..." -Level 'INFO'
+Write-Log -Message "Starte zentrale Button-Handler-Registrierung..." -Level 'DEBUG'
 Register-ButtonHandlers -Window $window
-Write-Log -Message "Zentrale Button-Handler-Registrierung abgeschlossen" -Level 'INFO'
+Write-Log -Message "Zentrale Button-Handler-Registrierung abgeschlossen" -Level 'DEBUG'
 
 # Event-Handler für DATEV Downloads ComboBox
 if ($null -ne $cmbDirectDownloads) {
     $cmbDirectDownloads.Add_SelectionChanged({
-            if ($null -ne $cmbDirectDownloads.SelectedItem -and 
-                $cmbDirectDownloads.SelectedIndex -gt 0 -and 
+            if ($null -ne $cmbDirectDownloads.SelectedItem -and
+                $cmbDirectDownloads.SelectedIndex -gt 0 -and
                 $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
                 $btnDownload.IsEnabled = $true
                 $selectedItem = $cmbDirectDownloads.SelectedItem
-                Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'INFO'
+                Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'DEBUG'
             }
             else {
                 $btnDownload.IsEnabled = $false
@@ -2302,13 +2318,23 @@ else {
 $downloadsJsonPath = $script:Config.Paths.DownloadsJSON
 if (Test-Path $downloadsJsonPath) {
     Initialize-DownloadsComboBox
-    Write-Log -Message "Downloads-ComboBox mit vorhandenen Daten initialisiert" -Level 'INFO'
+    Write-Log -Message "Downloads-ComboBox mit vorhandenen Daten initialisiert" -Level 'DEBUG'
 } else {
-    Write-Log -Message "Keine Downloads-JSON gefunden, ComboBox bleibt leer bis zum ersten Update" -Level 'INFO'
+    Write-Log -Message "Keine Downloads-JSON gefunden, ComboBox bleibt leer bis zum ersten Update" -Level 'DEBUG'
 }
 
 # Settings initialisieren
 Initialize-Settings
+
+# Initialen Status der Checkbox setzen und Event-Handler registrieren
+if ($null -ne $chkShowDebugLogs) {
+    $chkShowDebugLogs.IsChecked = (Get-Setting -Key 'ShowDebugLogs' -DefaultValue $false)
+    $chkShowDebugLogs.Add_Click({
+        $isChecked = $this.IsChecked
+        Set-Setting -Key 'ShowDebugLogs' -Value $isChecked
+        Write-Log -Message "Debug-Meldungen werden jetzt $($isChecked ? 'angezeigt' : 'ausgeblendet')" -Level 'INFO'
+    })
+}
 
 # Update-Termine beim Start laden (falls vorhanden)
 Initialize-UpdateDates
