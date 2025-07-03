@@ -901,48 +901,60 @@ function Open-AppDataFolder {
 #endregion
 
 #region DATEV-Programme und -Tools
-# Funktion zum Finden und Starten von DATEV-Programmen
+# Zentrale Funktion zur robusten Suche nach DATEV-Programmpfaden
+function Get-DATEVExecutablePath {
+    <#
+    .SYNOPSIS
+    Findet den vollständigen Pfad zu einem DATEV-Programm.
+    .DESCRIPTION
+    Sucht nach einem Programm, indem es die %DATEVPP%-Umgebungsvariable,
+    Standard-Installationspfade und die Windows-Registrierung prüft.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ProgramName
+    )
+    
+    $possiblePaths = $script:DATEVProgramPaths[$ProgramName]
+    if (-not $possiblePaths) { return $null }
+
+    # Primäre Suche über Umgebungsvariable
+    if (-not [string]::IsNullOrEmpty($env:DATEVPP)) {
+        foreach ($path in $possiblePaths) {
+            $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
+            if (Test-Path $expandedPath) { return $expandedPath }
+        }
+    }
+
+    # Fallback: Standardpfade und Registrierung
+    $standardBasePaths = @(
+        'C:\DATEV', 'D:\DATEV', 'E:\DATEV',
+        "${env:ProgramFiles(x86)}\DATEV",
+        (Get-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\DATEV\CONFIG\DVSW\SETUP' -Name 'DATEVPP' -ErrorAction SilentlyContinue).DATEVPP
+    ) | Where-Object { -not [string]::IsNullOrEmpty($_) } | Get-Unique
+
+    foreach ($basePath in $standardBasePaths) {
+        foreach ($path in $possiblePaths) {
+            $testPath = $path -replace '%DATEVPP%', $basePath
+            if (Test-Path $testPath) { return $testPath }
+        }
+    }
+    
+    return $null # Nichts gefunden
+}
+
+# Funktion zum Finden und Starten von DATEV-Programmen (jetzt mit zentraler Pfadsuche)
 function Start-DATEVProgram {
     param(
         [Parameter(Mandatory = $true)][string]$ProgramName,
-        [Parameter(Mandatory = $true)][array]$PossiblePaths,
+        [Parameter(Mandatory = $true)][array]$PossiblePaths, # Bleibt für Handler-Kompatibilität
         [string]$Description = $ProgramName
     )
     
     try {
         Write-Log -Message "Suche nach $Description..." -Level 'INFO'
         
-        $foundPath = $null
-        foreach ($path in $PossiblePaths) {
-            # %DATEVPP% durch tatsächlichen DATEV-Pfad ersetzen
-            $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
-            if ([string]::IsNullOrEmpty($env:DATEVPP)) {
-                # Fallback: Standard DATEV-Pfade durchsuchen
-                $standardPaths = @(
-                    'C:\DATEV',
-                    'D:\DATEV',
-                    'E:\DATEV',
-                    "${env:ProgramFiles(x86)}\DATEV",
-                    "${env:ProgramFiles}\DATEV"
-                )
-                
-                foreach ($basePath in $standardPaths) {
-                    $testPath = $path -replace '%DATEVPP%', $basePath
-                    if (Test-Path $testPath) {
-                        $foundPath = $testPath
-                        break
-                    }
-                }
-            }
-            else {
-                if (Test-Path $expandedPath) {
-                    $foundPath = $expandedPath
-                    break
-                }
-            }
-            
-            if ($foundPath) { break }
-        }
+        $foundPath = Get-DATEVExecutablePath -ProgramName $ProgramName
         
         if ($foundPath) {
             Write-Log -Message "Starte $Description von: $foundPath" -Level 'INFO'
@@ -969,44 +981,12 @@ function Start-DATEVProgram {
     }
 }
 
-# Spezielle Funktion für den Leistungsindex (startet das Programm 2x mit unterschiedlichen Parametern)
+# Spezielle Funktion für den Leistungsindex (jetzt mit zentraler Pfadsuche)
 function Start-Leistungsindex {
     try {
         Write-Log -Message "Suche nach Leistungsindex (irw.exe)..." -Level 'INFO'
         
-        $foundPath = $null
-        $possiblePaths = $script:DATEVProgramPaths['Leistungsindex']
-        
-        foreach ($path in $possiblePaths) {
-            # %DATEVPP% durch tatsächlichen DATEV-Pfad ersetzen
-            $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
-            if ([string]::IsNullOrEmpty($env:DATEVPP)) {
-                # Fallback: Standard DATEV-Pfade durchsuchen
-                $standardPaths = @(
-                    'C:\DATEV',
-                    'D:\DATEV',
-                    'E:\DATEV',
-                    "${env:ProgramFiles(x86)}\DATEV",
-                    "${env:ProgramFiles}\DATEV"
-                )
-                
-                foreach ($basePath in $standardPaths) {
-                    $testPath = $path -replace '%DATEVPP%', $basePath
-                    if (Test-Path $testPath) {
-                        $foundPath = $testPath
-                        break
-                    }
-                }
-            }
-            else {
-                if (Test-Path $expandedPath) {
-                    $foundPath = $expandedPath
-                    break
-                }
-            }
-            
-            if ($foundPath) { break }
-        }
+        $foundPath = Get-DATEVExecutablePath -ProgramName 'Leistungsindex'
         
         if ($foundPath) {
             Write-Log -Message "Starte Leistungsindex von: $foundPath" -Level 'INFO'
