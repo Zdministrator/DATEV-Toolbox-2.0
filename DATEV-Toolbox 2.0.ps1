@@ -577,12 +577,6 @@ $btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
 
 # Referenzen auf DATEV Tools Elemente holen
 $spUpdateDates = $window.FindName("spUpdateDates")
-$btnUpdateDates = $window.FindName("btnUpdateDates")
-
-# Referenzen auf Einstellungs-Buttons holen
-$btnOpenFolder = $window.FindName("btnOpenFolder")
-$btnCheckUpdate = $window.FindName("btnCheckUpdate")
-$btnShowChangelog = $window.FindName("btnShowChangelog")
 #endregion
 
 #region Hilfsfunktionen und Utilities
@@ -2066,7 +2060,7 @@ function ConvertFrom-ICSDate {
     }
 }
 
-function Parse-ICSContent {
+function ConvertFrom-IcsContent {
     <#
     .SYNOPSIS
     Parst ICS-Dateiinhalt robust mit Regex und extrahiert VEVENT-Einträge
@@ -2174,7 +2168,7 @@ function Show-NextUpdateDates {
     
     try {
         $icsContent = Get-Content $icsFile -Raw -Encoding UTF8
-        $allEvents = Parse-ICSContent -ICSContent $icsContent
+        $allEvents = ConvertFrom-IcsContent -ICSContent $icsContent
         Write-Log -Message "ICS: $($allEvents.Count) VEVENTs gefunden" -Level 'INFO'
 
         $upcoming = Get-UpcomingEvents -Events $allEvents -MaxCount 3
