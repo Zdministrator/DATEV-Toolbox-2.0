@@ -11,13 +11,13 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.0
+    Version:        2.1.1
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
     
 .LINK
-    https://github.com/username/DATEV-Toolbox-2.0
+    https://github.com/Zdministrator/DATEV-Toolbox-2.0
 #>
 
 #Requires -Version 5.1
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.0"
+$script:AppVersion = "2.1.1"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"

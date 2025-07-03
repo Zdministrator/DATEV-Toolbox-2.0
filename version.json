@@ -1,18 +1,33 @@
 {
-  "version": "2.1.0",
-  "releaseDate": "2025-06-30",
+  "version": "2.1.1",
+  "releaseDate": "2025-07-03",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Major Code-Refactoring: Zentrale Konfiguration implementiert",
-    "• Alle URLs, Pfade, Timeouts und System-Tools in zentrale $script:Config ausgelagert",
-    "• Hardcoded Werte durch konfigurierbare Parameter ersetzt",
-    "• Verbesserte Wartbarkeit und einfachere Anpassungen",
-    "• Strukturierte Code-Organisation mit erweiterten Regionen",
-    "• Konsistente Verwendung von Konfigurationswerten im gesamten Script",
-    "• Fundament für zukünftige Erweiterungen und Verbesserungen gelegt",
-    "Alle bestehenden DATEV-Tools und Features bleiben vollständig funktional"
+    "Stabilität und Kompatibilität: PowerShell 5.1 Optimierung",
+    "• Zentrale Event-Handler-Registrierung für alle Buttons und Tabs implementiert",
+    "• Funktions-Definitionen vor Registrierung verschoben (PowerShell 5.1 Kompatibilität)",
+    "• Redundante Event-Handler entfernt und durch zentrale Zuordnung ersetzt",
+    "• Vollständige Stabilität auf Windows Server 2019 und allen anderen Systemen",
+    "• Code-Struktur verbessert: Bessere Regionen, modulare Funktionen, erweiterte Kommentare",
+    "• Update-Prozess in kleinere, testbare Einheiten aufgeteilt",
+    "• Standardisierte Fehlerbehandlung und Logging durchgängig implementiert",
+    "Alle DATEV-Tools und Features arbeiten jetzt zuverlässig auf allen Systemen"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.0",
+      "releaseDate": "2025-06-30",
+      "changelog": [
+        "Major Code-Refactoring: Zentrale Konfiguration implementiert",
+        "• Alle URLs, Pfade, Timeouts und System-Tools in zentrale $script:Config ausgelagert",
+        "• Hardcoded Werte durch konfigurierbare Parameter ersetzt",
+        "• Verbesserte Wartbarkeit und einfachere Anpassungen",
+        "• Strukturierte Code-Organisation mit erweiterten Regionen",
+        "• Konsistente Verwendung von Konfigurationswerten im gesamten Script",
+        "• Fundament für zukünftige Erweiterungen und Verbesserungen gelegt",
+        "Alle bestehenden DATEV-Tools und Features bleiben vollständig funktional"
+      ]
+    },
     {
       "version": "2.0.9",
       "releaseDate": "2025-06-26",
