@@ -2332,7 +2332,7 @@ if ($null -ne $chkShowDebugLogs) {
     $chkShowDebugLogs.Add_Click({
         $isChecked = $this.IsChecked
         Set-Setting -Key 'ShowDebugLogs' -Value $isChecked
-        Write-Log -Message "Debug-Meldungen werden jetzt $($isChecked ? 'angezeigt' : 'ausgeblendet')" -Level 'INFO'
+        Write-Log -Message "Debug-Meldungen werden jetzt $(if ($isChecked) { 'angezeigt' } else { 'ausgeblendet' })" -Level 'INFO'
     })
 }
 
