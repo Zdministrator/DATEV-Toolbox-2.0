@@ -2086,59 +2086,44 @@ function ConvertFrom-ICSDate {
     }
 }
 
-function ConvertFrom-ICSContent {
+function Parse-ICSContent {
     <#
     .SYNOPSIS
-    Parst ICS-Dateiinhalt und extrahiert VEVENT-Einträge
+    Parst ICS-Dateiinhalt robust mit Regex und extrahiert VEVENT-Einträge
     #>
     param(
         [Parameter(Mandatory = $true)][string]$ICSContent
     )
     
-    $lines = $ICSContent -split "`n"
-    $events = @()
-    $currentEvent = @{}
-    $lastKey = $null
-    
-    foreach ($lineRaw in $lines) {
-        $line = $lineRaw.TrimEnd("`r", "`n")
+    try {
+        # Regex, um ganze VEVENT-Blöcke zu erfassen
+        $eventMatches = $ICSContent | Select-String -Pattern '(?s)BEGIN:VEVENT(.+?)END:VEVENT' -AllMatches
         
-        if ($line -eq "BEGIN:VEVENT") { 
-            $currentEvent = @{}
-            $lastKey = $null 
-        }
-        elseif ($line -eq "END:VEVENT") {
-            if ($currentEvent.DTSTART -and $currentEvent.SUMMARY) {
-                $events += [PSCustomObject]@{
-                    DTSTART     = $currentEvent.DTSTART
-                    SUMMARY     = $currentEvent.SUMMARY
-                    DESCRIPTION = $currentEvent.DESCRIPTION
+        $events = foreach ($match in $eventMatches.Matches) {
+            $eventBlock = $match.Groups[1].Value
+            
+            # Zeilenumbrüche, die von einem Leerzeichen gefolgt werden, entfernen (folded lines)
+            $unfoldedBlock = $eventBlock -replace '(?m)\r?\n\s', ''
+            
+            # Eigenschaften extrahieren
+            $dtstart = if ($unfoldedBlock -match 'DTSTART.*?:(\d{8})') { $matches[1] } else { $null }
+            $summary = if ($unfoldedBlock -match 'SUMMARY:(.+)') { $matches[1].Trim() } else { 'Unbekannter Termin' }
+            $description = if ($unfoldedBlock -match 'DESCRIPTION:(.+)') { $matches[1].Trim() } else { '' }
+
+            if ($dtstart) {
+                [PSCustomObject]@{
+                    DTSTART     = $dtstart
+                    SUMMARY     = $summary
+                    DESCRIPTION = $description.Replace('\n', [Environment]::NewLine).Replace('\,', ',')
                 }
             }
-            $currentEvent = @{}
-            $lastKey = $null
         }
-        elseif ($line -match "^([A-Z]+).*:(.*)$") {
-            $key = $matches[1]
-            $val = $matches[2]
-            $lastKey = $key
-            if ($key -eq "DTSTART") { $currentEvent.DTSTART = $val }
-            elseif ($key -eq "SUMMARY") { $currentEvent.SUMMARY = $val }
-            elseif ($key -eq "DESCRIPTION") { $currentEvent.DESCRIPTION = $val }
-        }
-        elseif ($line -match "^[ \t](.*)$" -and $lastKey) {
-            # Fortgesetzte Zeile (folded line)
-            $continued = $matches[1]
-            if ($lastKey -eq "DESCRIPTION") {
-                $currentEvent.DESCRIPTION += [Environment]::NewLine + $continued
-            }
-            elseif ($lastKey -eq "SUMMARY") {
-                $currentEvent.SUMMARY += $continued
-            }
-        }
+        return $events
     }
-    
-    return $events
+    catch {
+        Write-Log -Message "Fehler beim Parsen des ICS-Inhalts: $($_.Exception.Message)" -Level 'ERROR'
+        return @()
+    }
 }
 
 function Get-UpcomingEvents {
@@ -2209,84 +2194,10 @@ function Show-NextUpdateDates {
     
     try {
         $icsContent = Get-Content $icsFile -Raw -Encoding UTF8
-        $lines = $icsContent -split "`n"
-        $events = @()
-        $currentEvent = @{}
-        $lastKey = $null
-        
-        foreach ($lineRaw in $lines) {
-            $line = $lineRaw.TrimEnd("`r", "`n")
-            if ($line -eq "BEGIN:VEVENT") { 
-                $currentEvent = @{}
-                $lastKey = $null 
-            }
-            elseif ($line -eq "END:VEVENT") {
-                if ($currentEvent.DTSTART -and $currentEvent.SUMMARY) {
-                    $events += [PSCustomObject]@{
-                        DTSTART     = $currentEvent.DTSTART
-                        SUMMARY     = $currentEvent.SUMMARY
-                        DESCRIPTION = $currentEvent.DESCRIPTION
-                    }
-                }
-                $currentEvent = @{}
-                $lastKey = $null
-            }
-            elseif ($line -match "^([A-Z]+).*:(.*)$") {
-                $key = $matches[1]
-                $val = $matches[2]
-                $lastKey = $key
-                if ($key -eq "DTSTART") { $currentEvent.DTSTART = $val }
-                elseif ($key -eq "SUMMARY") { $currentEvent.SUMMARY = $val }
-                elseif ($key -eq "DESCRIPTION") { $currentEvent.DESCRIPTION = $val }
-            }
-            elseif ($line -match "^[ \t](.*)$" -and $lastKey) {
-                # Fortgesetzte Zeile (folded line)
-                $continued = $matches[1]
-                if ($lastKey -eq "DESCRIPTION") {
-                    $currentEvent.DESCRIPTION += [Environment]::NewLine + $continued
-                }
-                elseif ($lastKey -eq "SUMMARY") {
-                    $currentEvent.SUMMARY += $continued
-                }
-            }
-        }
-        
-        Write-Log -Message "ICS: $($events.Count) VEVENTs gefunden" -Level 'INFO'
-        $now = Get-Date
-        $upcoming = $events | Where-Object {
-            $date = $_.DTSTART
-            try {
-                if ($date.Length -eq 8) { 
-                    $parsedDate = [datetime]::ParseExact($date, 'yyyyMMdd', $null) 
-                }
-                elseif ($date.Length -ge 15) { 
-                    $parsedDate = [datetime]::ParseExact($date.Substring(0, 8), 'yyyyMMdd', $null) 
-                }
-                else { 
-                    $parsedDate = $null 
-                }
-                $parsedDate -and $parsedDate -ge $now.Date
-            }
-            catch {
-                $false
-            }
-        } | Sort-Object {
-            try {
-                if ($_.DTSTART.Length -eq 8) { 
-                    [datetime]::ParseExact($_.DTSTART, 'yyyyMMdd', $null) 
-                }
-                elseif ($_.DTSTART.Length -ge 15) { 
-                    [datetime]::ParseExact($_.DTSTART.Substring(0, 8), 'yyyyMMdd', $null) 
-                }
-                else { 
-                    $null 
-                }
-            }
-            catch {
-                $null
-            }
-        } | Select-Object -First 3
-        
+        $allEvents = Parse-ICSContent -ICSContent $icsContent
+        Write-Log -Message "ICS: $($allEvents.Count) VEVENTs gefunden" -Level 'INFO'
+
+        $upcoming = Get-UpcomingEvents -Events $allEvents -MaxCount 3
         Write-Log -Message "$($upcoming.Count) anstehende Termine werden angezeigt" -Level 'INFO'
         
         if ($upcoming.Count -eq 0) {
@@ -2299,32 +2210,10 @@ function Show-NextUpdateDates {
         }
         else {
             foreach ($ev in $upcoming) {
-                $date = $ev.DTSTART
-                try {
-                    if ($date.Length -eq 8) { 
-                        $parsedDate = [datetime]::ParseExact($date, 'yyyyMMdd', $null) 
-                    }
-                    elseif ($date.Length -ge 15) { 
-                        $parsedDate = [datetime]::ParseExact($date.Substring(0, 8), 'yyyyMMdd', $null) 
-                    }
-                    else { 
-                        $parsedDate = $null 
-                    }
-                    
-                    if ($parsedDate) {
-                        $tb = New-Object System.Windows.Controls.TextBlock
-                        $tb.Text = "{0:dd.MM.yyyy} - {1}" -f $parsedDate, $ev.SUMMARY
-                        if ($ev.DESCRIPTION) { 
-                            $tb.ToolTip = $ev.DESCRIPTION 
-                        }
-                        $tb.FontSize = 12
-                        $tb.Margin = '2'
-                        $spUpdateDates.Children.Add($tb) | Out-Null
-                        Write-Log -Message "Termin: $($parsedDate.ToString('dd.MM.yyyy')) - $($ev.SUMMARY)" -Level 'INFO'
-                    }
-                }
-                catch {
-                    Write-Log -Message "Fehler beim Parsen des Datums: $date" -Level 'WARN'
+                Add-EventToUI -Event $ev -Container $spUpdateDates
+                $parsedDate = ConvertFrom-ICSDate -ICSDate $ev.DTSTART
+                if ($parsedDate) {
+                    Write-Log -Message "Termin: $($parsedDate.ToString('dd.MM.yyyy')) - $($ev.SUMMARY)" -Level 'INFO'
                 }
             }
         }
