@@ -190,9 +190,9 @@ function Test-TaskScheduleConflicts {
     
     # Typische Konfliktzeiten definieren
     $conflictTimes = @{
-        'Sicherungslaeufe' = @(1, 2, 3, 4, 5)  # 01:00-05:00
-        'Programmaktualisierung' = @(0, 6)     # 00:00, 06:00
-        'Datenanpassung' = @(23, 0, 1)        # 23:00-01:00
+        'Sicherungslaeufe' = @(21, 22, 23, 0, 1)  # 21:00-01:00
+        'Programmaktualisierung' = @(18, 19, 20, 21, 22)  # 18:00-22:00
+        'Datenanpassung' = @(18, 19, 20, 21, 22, 23)  # 18:00-23:00
     }
     
     $scheduledHour = $ScheduledTime.Hour
