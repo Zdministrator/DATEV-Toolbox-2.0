@@ -1,20 +1,36 @@
 {
-  "version": "2.1.2",
+  "version": "2.1.3",
   "releaseDate": "2025-07-04",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Performance- und Code-Optimierungen: Caching und Stabilität verbessert",
-    "• Performance-optimierte DATEV-Pfadsuche mit intelligentem Caching (5 Min Cache)",
-    "• Runspace-Pool für asynchrone Operationen implementiert (1-3 Threads)",
-    "• StringBuilder für effizienteres String-Handling im Logging-System",
-    "• Verzögertes Settings-Speichern mit Timer-System (2 Sek Delay)",
-    "• Cache-Management für häufig verwendete Einstellungen und Pfade",
-    "• Verbesserte Fehlerbehandlung mit graceful degradation",
-    "• Memory-Management für WebClient und andere Ressourcen optimiert",
-    "• Früher Exit für Debug-Meldungen zur Performance-Steigerung",
-    "Alle DATEV-Tools und Features profitieren von den Performance-Verbesserungen"
+    "Code-Stabilisierung und Funktionalitätserweiterung: Vollständige Implementierung",
+    "• Alle fehlenden Funktionen vollständig implementiert und getestet",
+    "• Event-Handler-Registrierung für alle Button-Typen vervollständigt",
+    "• URL-Handler, DATEV-Handler, SystemTool-Handler und Function-Handler voll funktionsfähig",
+    "• TextBlock-Handler für interaktive Elemente korrekt implementiert",
+    "• Robuste Fehlerbehandlung in allen kritischen Funktionen",
+    "• Performance-Optimierungen für DATEV-Pfadsuche und Logging bestätigt",
+    "• Caching-System für DATEV-Programme und Einstellungen stabilisiert",
+    "• Runspace-Pool für asynchrone Operationen vollständig integriert",
+    "Alle Buttons und Features arbeiten zuverlässig auf allen unterstützten Systemen"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.2",
+      "releaseDate": "2025-07-04",
+      "changelog": [
+        "Performance- und Code-Optimierungen: Caching und Stabilität verbessert",
+        "• Performance-optimierte DATEV-Pfadsuche mit intelligentem Caching (5 Min Cache)",
+        "• Runspace-Pool für asynchrone Operationen implementiert (1-3 Threads)",
+        "• StringBuilder für effizienteres String-Handling im Logging-System",
+        "• Verzögertes Settings-Speichern mit Timer-System (2 Sek Delay)",
+        "• Cache-Management für häufig verwendete Einstellungen und Pfade",
+        "• Verbesserte Fehlerbehandlung mit graceful degradation",
+        "• Memory-Management für WebClient und andere Ressourcen optimiert",
+        "• Früher Exit für Debug-Meldungen zur Performance-Steigerung",
+        "Alle DATEV-Tools und Features profitieren von den Performance-Verbesserungen"
+      ]
+    },
     {
       "version": "2.1.1",
       "releaseDate": "2025-07-03",

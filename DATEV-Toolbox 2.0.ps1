@@ -11,7 +11,7 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.1.2
+    Version:        2.1.3
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.2"
+$script:AppVersion = "2.1.3"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -1547,6 +1547,11 @@ function Test-ForUpdates {
         # Version.json von GitHub laden
         $versionInfo = Invoke-RestMethod -Uri $script:UpdateCheckUrl -TimeoutSec $script:Config.Timeouts.UpdateCheck -UseBasicParsing
         
+        # PowerShell 5.1 Kompatibilität: Sicherstellen, dass wir ein einzelnes Objekt haben
+        if ($versionInfo -is [Array] -and $versionInfo.Count -gt 0) {
+            $versionInfo = $versionInfo[0]
+        }
+        
         $currentVersion = Get-CurrentVersion
         $remoteVersion = $versionInfo.version
         
@@ -1918,9 +1923,14 @@ function Initialize-UpdateCheck {
             Write-Log -Message "Update-Check-Intervall erreicht (alle $checkInterval Stunden)" -Level 'DEBUG'
         }
           if ($shouldCheck) {            # Stillen Update-Check durchführen
-            $updateInfo = Test-ForUpdates -Silent
-            
-            if ($updateInfo.UpdateAvailable) {
+              $updateInfo = Test-ForUpdates -Silent
+              
+              # PowerShell 5.1 Kompatibilität: Array zu Hashtable konvertieren
+              if ($updateInfo -is [Array] -and $updateInfo.Count -gt 0) {
+                  $updateInfo = $updateInfo[0]
+              }
+              
+              if ($updateInfo.UpdateAvailable) {
                 Write-Log -Message "Update verfügbar: Version $($updateInfo.NewVersion)" -Level 'INFO'
                 
                 # Update-Dialog anzeigen
@@ -1950,6 +1960,11 @@ function Start-ManualUpdateCheck {
         Write-Log -Message "Manueller Update-Check gestartet..." -Level 'INFO'
         
         $updateInfo = Test-ForUpdates
+        
+        # PowerShell 5.1 Kompatibilität: Array zu Hashtable konvertieren
+        if ($updateInfo -is [Array] -and $updateInfo.Count -gt 0) {
+            $updateInfo = $updateInfo[0]
+        }
         
         if ($updateInfo.UpdateAvailable) {
             $userWantsUpdate = Show-UpdateDialog -UpdateInfo $updateInfo
