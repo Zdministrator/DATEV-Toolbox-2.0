@@ -126,6 +126,7 @@ $script:Config = @{
         Services = @{ Command = 'services.msc'; Description = 'Dienste' }
         MSConfig = @{ Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
         DiskCleanup = @{ Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
+        TaskScheduler = @{ Command = 'taskschd.msc'; Description = 'Aufgabenplanung' }
         Gpupdate = @{ Command = 'gpupdate.exe'; Arguments = '/force'; Description = 'Gruppenrichtlinien-Update' }
     }
     
@@ -168,6 +169,7 @@ $script:Config = @{
         'btnServices' = @{ Type = 'SystemTool'; Command = 'services.msc'; Description = 'Dienste' }
         'btnMsconfig' = @{ Type = 'SystemTool'; Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
         'btnDiskCleanup' = @{ Type = 'SystemTool'; Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
+        'btnTaskScheduler' = @{ Type = 'SystemTool'; Command = 'taskschd.msc'; Description = 'Aufgabenplanung' }
         
         # Funktions-Handler (Function-Handler)
         'btnLeistungsindex' = @{ Type = 'Function'; FunctionName = 'Start-Leistungsindex' }
@@ -618,6 +620,8 @@ function Close-RunspacePool {
                                         ToolTip="Öffnet die Windows Systemkonfiguration (msconfig.exe)"/>
                                 <Button Name="btnDiskCleanup" Content="Datenträgerbereinigung" Height="25" Margin="0,3,0,3"
                                         ToolTip="Startet die Windows Datenträgerbereinigung für mehr freien Speicher"/>
+                                <Button Name="btnTaskScheduler" Content="Aufgabenplanung" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Öffnet die Windows Aufgabenplanung (taskschd.msc)"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
