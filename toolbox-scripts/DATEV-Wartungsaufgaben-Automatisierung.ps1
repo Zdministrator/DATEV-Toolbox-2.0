@@ -6,8 +6,8 @@
     DATEV Wartungsaufgaben-Automatisierung
     
 .DESCRIPTION
-    Automatisiert die Einrichtung von Windows-Aufgabenplanung für DATEV-Datenbankwartung
-    gemäß Abschnitt 2.3.1 der DATEV-Dokumentation "Microsoft SQL Server (DATEV): Datenbanken optimieren"
+    Automatisiert die Einrichtung von Windows-Aufgabenplanung fuer DATEV-Datenbankwartung
+    gemaess Abschnitt 2.3.1 der DATEV-Dokumentation "Microsoft SQL Server (DATEV): Datenbanken optimieren"
     
 .NOTES
     Version: 1.0
@@ -47,7 +47,7 @@ function Write-DetailedLog {
     # In Datei schreiben
     Add-Content -Path $Global:LogPath -Value $logEntry -Encoding UTF8
     
-    # In GUI-Log anzeigen (falls verfügbar)
+    # In GUI-Log anzeigen (falls verfuegbar)
     if ($Global:MainWindow -and $Global:MainWindow.FindName('LogTextBox')) {
         $Global:MainWindow.FindName('LogTextBox').Dispatcher.Invoke([Action]{
             $Global:MainWindow.FindName('LogTextBox').AppendText("$logEntry`n")
@@ -71,7 +71,7 @@ function Write-DetailedLog {
 function Find-DATEVInstallation {
     Write-DetailedLog "Suche nach DATEV-Installation..."
     
-    # DATEVPP Umgebungsvariable prüfen
+    # DATEVPP Umgebungsvariable pruefen
     $datevPP = [Environment]::GetEnvironmentVariable('DATEVPP', 'Machine')
     if (-not $datevPP) {
         $datevPP = [Environment]::GetEnvironmentVariable('DATEVPP', 'User')
@@ -105,13 +105,13 @@ function Find-DATEVInstallation {
 
 function Get-MaintenanceScripts {
     if (-not $Global:DATEVPath) {
-        Write-DetailedLog "DATEV-Pfad nicht verfügbar" -Level 'ERROR'
+        Write-DetailedLog "DATEV-Pfad nicht verfuegbar" -Level 'ERROR'
         return @()
     }
     
     Write-DetailedLog "Suche nach Wartungsskripten..."
     
-    # SQL Server Editionen prüfen
+    # SQL Server Editionen pruefen
     $editions = @(
         @{ Name = 'Express'; Path = 'B0000453\Maintenance' },
         @{ Name = 'Standard'; Path = 'B0000454\Maintenance' }
@@ -125,10 +125,10 @@ function Get-MaintenanceScripts {
         if (Test-Path $maintenancePath) {
             Write-DetailedLog "Wartungsverzeichnis gefunden: $maintenancePath ($($edition.Name) Edition)" -Level 'SUCCESS'
             
-            # Verfügbare Skripte suchen
+            # Verfuegbare Skripte suchen
             $scriptFiles = @(
-                @{ Name = 'RunMaintenanceWE.cmd'; Description = 'Wöchentliche Wartung (empfohlen)'; Recommended = $true },
-                @{ Name = 'RunMaintenance.cmd'; Description = 'Tägliche Wartung'; Recommended = $false }
+                @{ Name = 'RunMaintenanceWE.cmd'; Description = 'Woechentliche Wartung (empfohlen)'; Recommended = $true },
+                @{ Name = 'RunMaintenance.cmd'; Description = 'Taegliche Wartung'; Recommended = $false }
             )
             
             foreach ($scriptFile in $scriptFiles) {
@@ -145,7 +145,7 @@ function Get-MaintenanceScripts {
                 }
             }
             
-            # INI-Datei prüfen
+            # INI-Datei pruefen
             $iniPath = Join-Path $maintenancePath "scripte"
             if (Test-Path $iniPath) {
                 Write-DetailedLog "Konfigurationsverzeichnis gefunden: $iniPath" -Level 'SUCCESS'
@@ -184,13 +184,13 @@ function Test-TaskScheduleConflicts {
         [string]$Frequency
     )
     
-    Write-DetailedLog "Prüfe Zeitplan-Konflikte für $ScheduledTime ($Frequency)..."
+    Write-DetailedLog "Pruefe Zeitplan-Konflikte fuer $ScheduledTime ($Frequency)..."
     
     $conflicts = @()
     
     # Typische Konfliktzeiten definieren
     $conflictTimes = @{
-        'Sicherungsläufe' = @(1, 2, 3, 4, 5)  # 01:00-05:00
+        'Sicherungslaeufe' = @(1, 2, 3, 4, 5)  # 01:00-05:00
         'Programmaktualisierung' = @(0, 6)     # 00:00, 06:00
         'Datenanpassung' = @(23, 0, 1)        # 23:00-01:00
     }
@@ -203,7 +203,7 @@ function Test-TaskScheduleConflicts {
         }
     }
     
-    # Bestehende DATEV-Aufgaben prüfen
+    # Bestehende DATEV-Aufgaben pruefen
     try {
         $rootFolder = $Global:TaskScheduler.GetFolder('\')
         $datevFolder = $null
@@ -233,7 +233,7 @@ function Test-TaskScheduleConflicts {
         }
     }
     catch {
-        Write-DetailedLog "Warnung: Konnte bestehende Aufgaben nicht prüfen: $($_.Exception.Message)" -Level 'WARNING'
+        Write-DetailedLog "Warnung: Konnte bestehende Aufgaben nicht pruefen: $($_.Exception.Message)" -Level 'WARNING'
     }
     
     if ($conflicts.Count -gt 0) {
@@ -293,7 +293,7 @@ function New-DATEVMaintenanceTask {
         # Principal (Sicherheitskontext)
         $principal = $taskDefinition.Principal
         $principal.LogonType = 5  # TASK_LOGON_SERVICE_ACCOUNT
-        $principal.RunLevel = 1   # TASK_RUNLEVEL_HIGHEST (höchste Privilegien)
+        $principal.RunLevel = 1   # TASK_RUNLEVEL_HIGHEST (hoechste Privilegien)
         $principal.UserId = "SYSTEM"
         
         # Settings
@@ -314,7 +314,7 @@ function New-DATEVMaintenanceTask {
         } else {
             $trigger = $triggers.Create(3)  # TASK_TRIGGER_WEEKLY
             $trigger.WeeksInterval = 1
-            $trigger.DaysOfWeek = [Math]::Pow(2, $DayOfWeek)  # Bitmaske für Wochentag
+            $trigger.DaysOfWeek = [Math]::Pow(2, $DayOfWeek)  # Bitmaske fuer Wochentag
         }
         
         $trigger.StartBoundary = $StartTime.ToString("yyyy-MM-ddTHH:mm:ss")
@@ -350,47 +350,47 @@ function New-DATEVMaintenanceTask {
 # ===================================================================================================
 
 function Test-Prerequisites {
-    Write-DetailedLog "Prüfe Systemvoraussetzungen..."
+    Write-DetailedLog "Pruefe Systemvoraussetzungen..."
     
     $issues = @()
     
-    # Administrator-Rechte prüfen
+    # Administrator-Rechte pruefen
     $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         $issues += "Administrator-Rechte erforderlich"
     }
     
-    # PowerShell-Version prüfen
+    # PowerShell-Version pruefen
     if ($PSVersionTable.PSVersion.Major -lt 5) {
-        $issues += "PowerShell 5.1 oder höher erforderlich"
+        $issues += "PowerShell 5.1 oder hoeher erforderlich"
     }
     
-    # Task Scheduler Service prüfen
+    # Task Scheduler Service pruefen
     $taskService = Get-Service -Name "Schedule" -ErrorAction SilentlyContinue
     if (-not $taskService -or $taskService.Status -ne 'Running') {
-        $issues += "Task Scheduler Service nicht verfügbar"
+        $issues += "Task Scheduler Service nicht verfuegbar"
     }
     
-    # DATEV-Installation prüfen
+    # DATEV-Installation pruefen
     if (-not (Find-DATEVInstallation)) {
         $issues += "DATEV-Installation nicht gefunden"
     }
     
-    # Wartungsskripte prüfen
+    # Wartungsskripte pruefen
     $scripts = Get-MaintenanceScripts
     if ($scripts.Count -eq 0) {
         $issues += "Keine DATEV-Wartungsskripte gefunden"
     }
     
     if ($issues.Count -gt 0) {
-        Write-DetailedLog "Systemvoraussetzungen nicht erfüllt:" -Level 'ERROR'
+        Write-DetailedLog "Systemvoraussetzungen nicht erfuellt:" -Level 'ERROR'
         foreach ($issue in $issues) {
             Write-DetailedLog "  - $issue" -Level 'ERROR'
         }
         return $false
     }
     
-    Write-DetailedLog "Alle Systemvoraussetzungen erfüllt" -Level 'SUCCESS'
+    Write-DetailedLog "Alle Systemvoraussetzungen erfuellt" -Level 'SUCCESS'
     return $true
 }
 
@@ -399,11 +399,10 @@ function Test-Prerequisites {
 # ===================================================================================================
 
 $xaml = @"
-<Window x:Class="MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DATEV Wartungsaufgaben-Automatisierung" 
-        Height="700" Width="900" 
+        Title="DATEV Wartungsaufgaben-Automatisierung"
+        Height="700" Width="900"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">
     
@@ -447,7 +446,7 @@ $xaml = @"
             <StackPanel>
                 <TextBlock Text="DATEV Wartungsaufgaben-Automatisierung" 
                           FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                <TextBlock Text="Automatisierte Einrichtung der Windows-Aufgabenplanung für DATEV-Datenbankwartung" 
+                <TextBlock Text="Automatisierte Einrichtung der Windows-Aufgabenplanung fuer DATEV-Datenbankwartung" 
                           FontSize="12" Foreground="White" HorizontalAlignment="Center" Margin="0,5,0,0"/>
             </StackPanel>
         </Border>
@@ -471,13 +470,13 @@ $xaml = @"
                         </Grid.ColumnDefinitions>
                         
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Status:" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Name="DATEVStatusText" Text="Nicht geprüft" VerticalAlignment="Center"/>
-                        <Button Grid.Row="0" Grid.Column="2" Name="ScanButton" Content="Scannen" Click="ScanButton_Click"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Name="DATEVStatusText" Text="Nicht geprueft" VerticalAlignment="Center"/>
+                        <Button Grid.Row="0" Grid.Column="2" Name="ScanButton" Content="Scannen"/>
                         
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Installation:" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="1" Grid.Column="1" Name="DATEVPathText" IsReadOnly="True"/>
                         
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Verfügbare Skripte:" VerticalAlignment="Top" Margin="0,10,0,0"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Verfuegbare Skripte:" VerticalAlignment="Top" Margin="0,10,0,0"/>
                         <ListBox Grid.Row="2" Grid.Column="1" Name="ScriptsListBox" Height="80" Margin="5,10,5,5"/>
                     </Grid>
                 </GroupBox>
@@ -506,7 +505,7 @@ $xaml = @"
                         <ComboBox Grid.Row="2" Grid.Column="1" Name="ScriptComboBox"/>
                         
                         <CheckBox Grid.Row="3" Grid.Column="1" Name="HighestPrivilegesCheck" 
-                                 Content="Mit höchsten Privilegien ausführen" IsChecked="True"/>
+                                 Content="Mit hoechsten Privilegien ausfuehren" IsChecked="True"/>
                     </Grid>
                 </GroupBox>
                 
@@ -525,10 +524,10 @@ $xaml = @"
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Häufigkeit:" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Haeufigkeit:" VerticalAlignment="Center"/>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                            <RadioButton Name="WeeklyRadio" Content="Wöchentlich (empfohlen)" IsChecked="True" GroupName="Frequency"/>
-                            <RadioButton Name="DailyRadio" Content="Täglich" GroupName="Frequency"/>
+                            <RadioButton Name="WeeklyRadio" Content="Woechentlich (empfohlen)" IsChecked="True" GroupName="Frequency"/>
+                            <RadioButton Name="DailyRadio" Content="Taeglich" GroupName="Frequency"/>
                         </StackPanel>
                         
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Wochentag:" VerticalAlignment="Center" Name="WeekdayLabel"/>
@@ -553,8 +552,8 @@ $xaml = @"
                         <TextBlock Grid.Row="3" Grid.Column="1" Name="ConflictsText" TextWrapping="Wrap" 
                                   Foreground="Orange" Margin="5,10,5,5"/>
                         
-                        <Button Grid.Row="4" Grid.Column="1" Name="CheckConflictsButton" Content="Konflikte prüfen" 
-                               Click="CheckConflictsButton_Click" HorizontalAlignment="Left"/>
+                        <Button Grid.Row="4" Grid.Column="1" Name="CheckConflictsButton" Content="Konflikte pruefen"
+                                HorizontalAlignment="Left"/>
                     </Grid>
                 </GroupBox>
                 
@@ -575,10 +574,10 @@ $xaml = @"
         <!-- Action Buttons -->
         <Border Grid.Row="4" Background="#FFF5F5F5" Padding="10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Name="PreviewButton" Content="Vorschau" Click="PreviewButton_Click"/>
-                <Button Name="CreateButton" Content="Aufgabe erstellen" Click="CreateButton_Click" 
+                <Button Name="PreviewButton" Content="Vorschau"/>
+                <Button Name="CreateButton" Content="Aufgabe erstellen"
                        Background="#FF4CAF50" Foreground="White"/>
-                <Button Name="CancelButton" Content="Abbrechen" Click="CancelButton_Click"/>
+                <Button Name="CancelButton" Content="Abbrechen"/>
             </StackPanel>
         </Border>
         
@@ -644,7 +643,7 @@ function Initialize-TimeComboBoxes {
 }
 
 function Initialize-DefaultValues {
-    $Global:MainWindow.FindName('TaskNameText').Text = "DATEV_Wartung_Wöchentlich_$(Get-Date -Format 'yyyyMMdd')"
+    $Global:MainWindow.FindName('TaskNameText').Text = "DATEV_Wartung_Woechentlich_$(Get-Date -Format 'yyyyMMdd')"
     $Global:MainWindow.FindName('DescriptionText').Text = "Automatische DATEV-Datenbankwartung (erstellt durch DATEV-Toolbox 2.0)"
 }
 
@@ -656,13 +655,13 @@ function ScanButton_Click {
     $scriptsList = $Global:MainWindow.FindName('ScriptsListBox')
     $scriptCombo = $Global:MainWindow.FindName('ScriptComboBox')
     
-    # UI zurücksetzen
+    # UI zuruecksetzen
     $scriptsList.Items.Clear()
     $scriptCombo.Items.Clear()
     
     if (Find-DATEVInstallation) {
         $statusText.Text = "DATEV-Installation gefunden"
-        $statusText.Foreground = "Green"
+        $statusText.Foreground = [System.Windows.Media.Brushes]::Green
         $pathText.Text = $Global:DATEVPath
         
         $scripts = Get-MaintenanceScripts
@@ -679,7 +678,7 @@ function ScanButton_Click {
                 Script = $script
             })
             
-            # Empfohlenes Skript vorauswählen
+            # Empfohlenes Skript vorauswaehlen
             if ($script.Recommended) {
                 $scriptCombo.SelectedIndex = $scriptCombo.Items.Count - 1
             }
@@ -687,14 +686,14 @@ function ScanButton_Click {
         
         if ($scripts.Count -eq 0) {
             $statusText.Text = "Keine Wartungsskripte gefunden"
-            $statusText.Foreground = "Red"
+            $statusText.Foreground = [System.Windows.Media.Brushes]::Red
         } else {
             $statusText.Text = "$($scripts.Count) Wartungsskripte gefunden"
-            $statusText.Foreground = "Green"
+            $statusText.Foreground = [System.Windows.Media.Brushes]::Green
         }
     } else {
         $statusText.Text = "DATEV-Installation nicht gefunden"
-        $statusText.Foreground = "Red"
+        $statusText.Foreground = [System.Windows.Media.Brushes]::Red
         $pathText.Text = ""
     }
 }
@@ -710,19 +709,19 @@ function FrequencyChanged {
         
         # Aufgabenname anpassen
         $taskNameText = $Global:MainWindow.FindName('TaskNameText')
-        $taskNameText.Text = "DATEV_Wartung_Wöchentlich_$(Get-Date -Format 'yyyyMMdd')"
+        $taskNameText.Text = "DATEV_Wartung_Woechentlich_$(Get-Date -Format 'yyyyMMdd')"
     } else {
         $weekdayLabel.Visibility = 'Collapsed'
         $weekdayCombo.Visibility = 'Collapsed'
         
         # Aufgabenname anpassen
         $taskNameText = $Global:MainWindow.FindName('TaskNameText')
-        $taskNameText.Text = "DATEV_Wartung_Täglich_$(Get-Date -Format 'yyyyMMdd')"
+        $taskNameText.Text = "DATEV_Wartung_Taeglich_$(Get-Date -Format 'yyyyMMdd')"
     }
 }
 
 function CheckConflictsButton_Click {
-    Write-DetailedLog "Prüfe Zeitplan-Konflikte..."
+    Write-DetailedLog "Pruefe Zeitplan-Konflikte..."
     
     $hourCombo = $Global:MainWindow.FindName('HourComboBox')
     $minuteCombo = $Global:MainWindow.FindName('MinuteComboBox')
@@ -730,8 +729,8 @@ function CheckConflictsButton_Click {
     $conflictsText = $Global:MainWindow.FindName('ConflictsText')
     
     if ($hourCombo.SelectedItem -eq $null -or $minuteCombo.SelectedItem -eq $null) {
-        $conflictsText.Text = "Bitte wählen Sie eine Uhrzeit aus."
-        $conflictsText.Foreground = "Red"
+        $conflictsText.Text = "Bitte waehlen Sie eine Uhrzeit aus."
+        $conflictsText.Foreground = [System.Windows.Media.Brushes]::Red
         return
     }
     
@@ -744,11 +743,11 @@ function CheckConflictsButton_Click {
     $conflicts = Test-TaskScheduleConflicts -ScheduledTime $scheduledTime -Frequency $frequency
     
     if ($conflicts.Count -eq 0) {
-        $conflictsText.Text = "Keine Konflikte erkannt ✓"
-        $conflictsText.Foreground = "Green"
+        $conflictsText.Text = "Keine Konflikte erkannt"
+        $conflictsText.Foreground = [System.Windows.Media.Brushes]::Green
     } else {
         $conflictsText.Text = "Potentielle Konflikte: $($conflicts -join ', ')"
-        $conflictsText.Foreground = "Orange"
+        $conflictsText.Foreground = [System.Windows.Media.Brushes]::Orange
     }
 }
 
@@ -767,15 +766,15 @@ Aufgaben-Vorschau:
 Name: $($config.TaskName)
 Beschreibung: $($config.Description)
 Skript: $($config.ScriptPath)
-Häufigkeit: $($config.Frequency)
+Haeufigkeit: $($config.Frequency)
 $(if ($config.Frequency -eq 'Weekly') { "Wochentag: $($config.DayOfWeekName)" })
 Startzeit: $($config.StartTime.ToString('HH:mm'))
-Höchste Privilegien: $($config.HighestPrivileges)
+Hoechste Privilegien: $($config.HighestPrivileges)
 
-Nächste Ausführung: $($config.NextRun.ToString('dd.MM.yyyy HH:mm'))
+Naechste Ausfuehrung: $($config.NextRun.ToString('dd.MM.yyyy HH:mm'))
 "@
     
-    [System.Windows.MessageBox]::Show($previewText, "Aufgaben-Vorschau", "OK", "Information")
+    [System.Windows.MessageBox]::Show($previewText, "Aufgaben-Vorschau", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
 }
 
 function CreateButton_Click {
@@ -805,14 +804,14 @@ function CreateButton_Click {
         
         if ($success) {
             Write-DetailedLog "Wartungsaufgabe erfolgreich erstellt!" -Level 'SUCCESS'
-            [System.Windows.MessageBox]::Show("Die DATEV-Wartungsaufgabe wurde erfolgreich erstellt!`n`nName: $($config.TaskName)`nNächste Ausführung: $($config.NextRun.ToString('dd.MM.yyyy HH:mm'))", "Erfolg", "OK", "Information")
+            [System.Windows.MessageBox]::Show("Die DATEV-Wartungsaufgabe wurde erfolgreich erstellt!`n`nName: $($config.TaskName)`nNaechste Ausfuehrung: $($config.NextRun.ToString('dd.MM.yyyy HH:mm'))", "Erfolg", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
         } else {
             throw "Aufgabenerstellung fehlgeschlagen"
         }
     }
     catch {
         Write-DetailedLog "Fehler bei der Aufgabenerstellung: $($_.Exception.Message)" -Level 'ERROR'
-        [System.Windows.MessageBox]::Show("Fehler bei der Aufgabenerstellung:`n`n$($_.Exception.Message)", "Fehler", "OK", "Error")
+        [System.Windows.MessageBox]::Show("Fehler bei der Aufgabenerstellung:`n`n$($_.Exception.Message)", "Fehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
     }
     finally {
         # Progress Bar ausblenden
@@ -841,22 +840,22 @@ function Get-TaskConfiguration {
     
     # Validierung
     if ([string]::IsNullOrWhiteSpace($taskNameText.Text)) {
-        [System.Windows.MessageBox]::Show("Bitte geben Sie einen Aufgabennamen ein.", "Validierungsfehler", "OK", "Warning")
+        [System.Windows.MessageBox]::Show("Bitte geben Sie einen Aufgabennamen ein.", "Validierungsfehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
         return $null
     }
     
     if ([string]::IsNullOrWhiteSpace($descriptionText.Text)) {
-        [System.Windows.MessageBox]::Show("Bitte geben Sie eine Beschreibung ein.", "Validierungsfehler", "OK", "Warning")
+        [System.Windows.MessageBox]::Show("Bitte geben Sie eine Beschreibung ein.", "Validierungsfehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
         return $null
     }
     
     if ($scriptCombo.SelectedItem -eq $null) {
-        [System.Windows.MessageBox]::Show("Bitte wählen Sie ein Wartungsskript aus.", "Validierungsfehler", "OK", "Warning")
+        [System.Windows.MessageBox]::Show("Bitte waehlen Sie ein Wartungsskript aus.", "Validierungsfehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
         return $null
     }
     
     if ($hourCombo.SelectedItem -eq $null -or $minuteCombo.SelectedItem -eq $null) {
-        [System.Windows.MessageBox]::Show("Bitte wählen Sie eine Uhrzeit aus.", "Validierungsfehler", "OK", "Warning")
+        [System.Windows.MessageBox]::Show("Bitte waehlen Sie eine Uhrzeit aus.", "Validierungsfehler", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
         return $null
     }
     
@@ -908,17 +907,17 @@ function Start-MainApplication {
     Write-DetailedLog "DATEV Wartungsaufgaben-Automatisierung wird gestartet..." -Level 'SUCCESS'
     Write-DetailedLog "Version: 1.0 | PowerShell: $($PSVersionTable.PSVersion) | OS: $([Environment]::OSVersion.VersionString)"
     
-    # Systemvoraussetzungen prüfen
+    # Systemvoraussetzungen pruefen
     if (-not (Test-Prerequisites)) {
-        Write-DetailedLog "Systemvoraussetzungen nicht erfüllt. Anwendung wird beendet." -Level 'ERROR'
-        Read-Host "Drücken Sie Enter zum Beenden..."
+        Write-DetailedLog "Systemvoraussetzungen nicht erfuellt. Anwendung wird beendet." -Level 'ERROR'
+        Read-Host "Druecken Sie Enter zum Beenden..."
         return
     }
     
     # Task Scheduler initialisieren
     if (-not (Initialize-TaskScheduler)) {
         Write-DetailedLog "Task Scheduler konnte nicht initialisiert werden. Anwendung wird beendet." -Level 'ERROR'
-        Read-Host "Drücken Sie Enter zum Beenden..."
+        Read-Host "Druecken Sie Enter zum Beenden..."
         return
     }
     
@@ -933,7 +932,7 @@ function Start-MainApplication {
         $Global:MainWindow.ShowDialog() | Out-Null
     } else {
         Write-DetailedLog "GUI konnte nicht initialisiert werden. Anwendung wird beendet." -Level 'ERROR'
-        Read-Host "Drücken Sie Enter zum Beenden..."
+        Read-Host "Druecken Sie Enter zum Beenden..."
     }
     
     Write-DetailedLog "Anwendung beendet."
@@ -944,12 +943,12 @@ function Start-MainApplication {
 # ANWENDUNGSSTART
 # ===================================================================================================
 
-# Fehlerbehandlung für unbehandelte Exceptions
+# Fehlerbehandlung fuer unbehandelte Exceptions
 $ErrorActionPreference = 'Stop'
 trap {
     Write-DetailedLog "Unbehandelte Exception: $($_.Exception.Message)" -Level 'ERROR'
     Write-DetailedLog "Stack Trace: $($_.ScriptStackTrace)" -Level 'ERROR'
-    Read-Host "Drücken Sie Enter zum Beenden..."
+    Read-Host "Druecken Sie Enter zum Beenden..."
     exit 1
 }
 
