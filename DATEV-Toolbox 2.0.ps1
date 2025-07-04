@@ -1557,6 +1557,10 @@ function Test-ForUpdates {
         
         Write-Log -Message "Aktuelle Version: $currentVersion, Verfügbare Version: $remoteVersion" -Level 'INFO'
         
+        if ([string]::IsNullOrEmpty($remoteVersion)) {
+            throw "Remote-Version konnte nicht gelesen werden"
+        }
+        
         $comparison = Compare-Version -Version1 $currentVersion -Version2 $remoteVersion
         
         if ($comparison -lt 0) {
@@ -1779,11 +1783,24 @@ function Update-SettingsForUpdate {
     $settingsHash.lastUpdateCheck = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
     $settingsHash.lastInstalledVersion = $UpdateInfo.NewVersion
     $settingsHash.lastBackupPath = $BackupPath
-    $settingsHash.updateHistory = if ($settingsHash.updateHistory) { $settingsHash.updateHistory } else { @() }
-    $settingsHash.updateHistory += @{
+    # Update-History als Array initialisieren oder erweitern
+    if (-not $settingsHash.updateHistory) {
+        $settingsHash.updateHistory = @()
+    }
+    
+    # Neuen Eintrag zur Update-History hinzufügen
+    $newHistoryEntry = @{
         version = $UpdateInfo.NewVersion
         date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         backupPath = $BackupPath
+    }
+    
+    # Array erweitern (PowerShell 5.1 kompatibel)
+    $currentHistory = $settingsHash.updateHistory
+    if ($currentHistory -is [array]) {
+        $settingsHash.updateHistory = $currentHistory + $newHistoryEntry
+    } else {
+        $settingsHash.updateHistory = @($currentHistory, $newHistoryEntry)
     }
     
     # Einstellungen in globale Variable übertragen und speichern
@@ -1963,10 +1980,26 @@ function Start-ManualUpdateCheck {
         
         # PowerShell 5.1 Kompatibilität: Array zu Hashtable konvertieren
         if ($updateInfo -is [Array] -and $updateInfo.Count -gt 0) {
-            $updateInfo = $updateInfo[0]
+            # Suche nach dem korrekten Hashtable-Element im Array
+            $correctElement = $null
+            for ($i = 0; $i -lt $updateInfo.Count; $i++) {
+                $element = $updateInfo[$i]
+                if ($element -is [hashtable] -and $element.ContainsKey('UpdateAvailable')) {
+                    $correctElement = $element
+                    break
+                }
+            }
+            
+            if ($null -ne $correctElement) {
+                $updateInfo = $correctElement
+            } else {
+                Write-Log -Message "Kein korrektes Hashtable-Element im Array gefunden" -Level 'ERROR'
+                $updateInfo = $updateInfo[0]
+            }
         }
         
         if ($updateInfo.UpdateAvailable) {
+            Write-Log -Message "DIAGNOSE: Update verfügbar - zeige Dialog" -Level 'DEBUG'
             $userWantsUpdate = Show-UpdateDialog -UpdateInfo $updateInfo
             
             if ($userWantsUpdate) {
@@ -1974,16 +2007,43 @@ function Start-ManualUpdateCheck {
             }
         }
         else {
-            [System.Windows.MessageBox]::Show(
-                "Sie verwenden bereits die neueste Version ($($updateInfo.CurrentVersion)).",
-                "Kein Update verfügbar",
-                [System.Windows.MessageBoxButton]::OK,
-                [System.Windows.MessageBoxImage]::Information
-            )
+            # Prüfen warum kein Update verfügbar ist
+            if ($updateInfo.Error) {
+                [System.Windows.MessageBox]::Show(
+                    "Fehler beim Update-Check:`n$($updateInfo.Error)`n`nPrüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+                    "Update-Check fehlgeschlagen",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+            }
+            elseif ([string]::IsNullOrEmpty($updateInfo.CurrentVersion) -or [string]::IsNullOrEmpty($updateInfo.NewVersion)) {
+                [System.Windows.MessageBox]::Show(
+                    "Update-Check unvollständig:`nAktuelle Version: '$($updateInfo.CurrentVersion)'`nVerfügbare Version: '$($updateInfo.NewVersion)'`n`nMöglicherweise besteht ein Netzwerkproblem.",
+                    "Update-Check unvollständig",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Warning
+                )
+            }
+            else {
+                [System.Windows.MessageBox]::Show(
+                    "Sie verwenden bereits die neueste Version ($($updateInfo.CurrentVersion)).",
+                    "Kein Update verfügbar",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Information
+                )
+            }
         }
     }
     catch {
+        Write-Log -Message "DIAGNOSE: Exception in Start-ManualUpdateCheck: $($_.Exception.Message)" -Level 'ERROR'
         Write-Log -Message "Fehler beim manuellen Update-Check: $($_.Exception.Message)" -Level 'ERROR'
+        
+        [System.Windows.MessageBox]::Show(
+            "Unerwarteter Fehler beim Update-Check:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
     }
 }
 #endregion
