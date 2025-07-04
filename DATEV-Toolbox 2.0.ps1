@@ -224,10 +224,23 @@ Add-Type -AssemblyName PresentationFramework
 # Benutzereinstellungen verwalten (Laden, Speichern, Zugriff)
 $script:Settings = $null
 
+# Performance-Optimierung: Cache-Variablen
+$script:IsDebugEnabled = $false
+$script:LogStringBuilder = New-Object System.Text.StringBuilder
+$script:SettingsCache = @{}
+$script:SettingsDirty = $false
+$script:SettingsSaveTimer = $null
+$script:CachedDATEVPaths = @{}
+$script:PathCacheExpiry = @{}
+
+# Performance-Optimierung: Runspace-Pool für asynchrone Operationen
+$script:RunspacePool = $null
+$script:ActiveJobs = @{}
+
 function Initialize-Settings {
     <#
     .SYNOPSIS
-    Initialisiert die Benutzereinstellungen aus der settings.json Datei
+    Initialisiert die Benutzereinstellungen mit Performance-Caching
     #>
     try {
         $settingsPath = $script:Config.Paths.SettingsFile
@@ -237,8 +250,7 @@ function Initialize-Settings {
             $json = Get-Content $settingsPath -Raw | ConvertFrom-Json
             
             # PSObject zu Hashtable konvertieren (gemäß Instructions)
-            $script:Settings = @{
-            }
+            $script:Settings = @{}
             $json.PSObject.Properties | ForEach-Object {
                 $script:Settings[$_.Name] = $_.Value
             }
@@ -248,9 +260,16 @@ function Initialize-Settings {
             $script:Settings = Get-DefaultSettings
             Save-Settings
         }
+        
+        # Performance-Cache für häufig verwendete Settings
+        $script:IsDebugEnabled = $script:Settings['ShowDebugLogs']
+        $script:SettingsNeedSave = $false
+        
+        Write-Log -Message "Einstellungen initialisiert (Debug: $script:IsDebugEnabled)" -Level 'INFO'
     } catch {
         Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
         $script:Settings = Get-DefaultSettings
+        $script:IsDebugEnabled = $false
     }
 }
 
@@ -275,7 +294,7 @@ function Get-DefaultSettings {
 function Save-Settings {
     <#
     .SYNOPSIS
-    Speichert die aktuellen Einstellungen in die settings.json Datei
+    Speichert Settings sofort (interne Funktion)
     #>
     try {
         $settingsPath = $script:Config.Paths.SettingsFile
@@ -286,6 +305,7 @@ function Save-Settings {
         }
         
         $script:Settings | ConvertTo-Json -Depth 3 | Set-Content $settingsPath -Encoding UTF8
+        $script:SettingsNeedSave = $false
         Write-Log -Message "Einstellungen gespeichert: $settingsPath" -Level 'DEBUG'
     } catch {
         Write-Log -Message "Fehler beim Speichern der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
@@ -295,7 +315,7 @@ function Save-Settings {
 function Get-Setting {
     <#
     .SYNOPSIS
-    Liefert einen Einstellungswert zurück
+    Liefert einen Einstellungswert zurück (Performance-optimiert)
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -307,16 +327,22 @@ function Get-Setting {
         Initialize-Settings
     }
     
-    if ($script:Settings.ContainsKey($Key)) {
-        return $script:Settings[$Key]
+    # Häufig verwendete Settings aus Cache
+    switch ($Key) {
+        'ShowDebugLogs' { return $script:IsDebugEnabled }
+        default {
+            if ($script:Settings.ContainsKey($Key)) {
+                return $script:Settings[$Key]
+            }
+            return $DefaultValue
+        }
     }
-    return $DefaultValue
 }
 
 function Set-Setting {
     <#
     .SYNOPSIS
-    Setzt einen Einstellungswert
+    Setzt einen Einstellungswert (mit verzögertem Speichern)
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -329,8 +355,90 @@ function Set-Setting {
         Initialize-Settings
     }
     
+    $oldValue = $script:Settings[$Key]
     $script:Settings[$Key] = $Value
-    Save-Settings
+    
+    # Cache-Update für Performance-kritische Settings
+    if ($Key -eq 'ShowDebugLogs') {
+        $script:IsDebugEnabled = $Value
+    }
+    
+    # Verzögertes Speichern markieren
+    $script:SettingsNeedSave = $true
+    
+    # Timer für verzögertes Speichern starten (falls nicht bereits aktiv)
+    if ($null -eq $script:SettingsSaveTimer) {
+        $script:SettingsSaveTimer = New-Object System.Windows.Threading.DispatcherTimer
+        $script:SettingsSaveTimer.Interval = [TimeSpan]::FromSeconds(2)
+        $script:SettingsSaveTimer.Add_Tick({
+            if ($script:SettingsNeedSave) {
+                Save-Settings
+            }
+            $script:SettingsSaveTimer.Stop()
+            $script:SettingsSaveTimer = $null
+        })
+    }
+    $script:SettingsSaveTimer.Start()
+    
+    Write-Log -Message "Einstellung '$Key' gesetzt: $Value (war: $oldValue)" -Level 'DEBUG'
+}
+
+# Performance-Hilfsfunktionen für Cache-Management
+function Clear-DATEVPathCache {
+    <#
+    .SYNOPSIS
+    Leert den DATEV-Pfad-Cache (nützlich bei Installationsänderungen)
+    #>
+    $script:CachedDATEVPaths.Clear()
+    $script:PathCacheExpiry.Clear()
+    Write-Log -Message "DATEV-Pfad-Cache geleert" -Level 'INFO'
+}
+
+function Initialize-RunspacePool {
+    <#
+    .SYNOPSIS
+    Initialisiert den Runspace-Pool für bessere Performance bei asynchronen Operationen
+    #>
+    try {
+        if ($null -eq $script:RunspacePool) {
+            $script:RunspacePool = [runspacefactory]::CreateRunspacePool(1, 3)
+            $script:RunspacePool.Open()
+            Write-Log -Message "Runspace-Pool initialisiert (1-3 Threads)" -Level 'DEBUG'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Initialisieren des Runspace-Pools: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Close-RunspacePool {
+    <#
+    .SYNOPSIS
+    Schließt den Runspace-Pool ordnungsgemäß
+    #>
+    try {
+        if ($null -ne $script:RunspacePool) {
+            # Aktive Jobs beenden
+            foreach ($jobId in $script:ActiveJobs.Keys) {
+                $job = $script:ActiveJobs[$jobId]
+                if ($job.PowerShell -and -not $job.AsyncResult.IsCompleted) {
+                    $job.PowerShell.Stop()
+                }
+                if ($job.PowerShell) {
+                    $job.PowerShell.Dispose()
+                }
+            }
+            $script:ActiveJobs.Clear()
+            
+            $script:RunspacePool.Close()
+            $script:RunspacePool.Dispose()
+            $script:RunspacePool = $null
+            Write-Log -Message "Runspace-Pool ordnungsgemäß geschlossen" -Level 'DEBUG'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Schließen des Runspace-Pools: $($_.Exception.Message)" -Level 'WARN'
+    }
 }
 #endregion
 
@@ -585,43 +693,44 @@ $chkShowDebugLogs = $window.FindName("chkShowDebugLogs")
 #endregion
 
 #region Hilfsfunktionen und Utilities
-# Logging-System
+# Logging-System (Performance-optimiert)
 function Write-Log {
     <#
     .SYNOPSIS
-    Zentrale Logging-Funktion für die Anwendung
+    Zentrale Logging-Funktion für die Anwendung (Performance-optimiert)
     #>
     param(
         [Parameter(Mandatory = $true)][string]$Message,
         [ValidateSet('INFO', 'WARN', 'ERROR', 'DEBUG')][string]$Level = 'INFO'
     )
     
+    # Früher Exit für Debug-Meldungen (Performance-kritisch)
+    if ($Level -eq 'DEBUG' -and -not $script:IsDebugEnabled) {
+        return
+    }
+    
     try {
-       # Debug-Meldungen nur anzeigen, wenn die Einstellung aktiviert ist
-       # Direkter Check um Rekursion bei Initialisierung zu vermeiden
-       $showDebug = $false
-       if ($null -ne $script:Settings) {
-           $showDebug = $script:Settings['ShowDebugLogs']
-       }
-       if ($Level -eq 'DEBUG' -and -not $showDebug) {
-           return
-       }
-
+        # StringBuilder für bessere String-Performance
+        $script:LogStringBuilder.Clear()
         $timestamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+        
         switch ($Level) {
             'INFO' { $prefix = '[INFO] ' }
             'WARN' { $prefix = '[WARNUNG] ' }
             'ERROR' { $prefix = '[FEHLER] ' }
             'DEBUG' { $prefix = '[DEBUG] ' }
         }
-        $logEntry = "$timestamp $prefix$Message`r`n"
         
+        [void]$script:LogStringBuilder.Append($timestamp).Append(' ').Append($prefix).Append($Message).Append("`r`n")
+        $logEntry = $script:LogStringBuilder.ToString()
+        
+        # UI-Update nur wenn TextBox verfügbar
         if ($null -ne $txtLog) {
-            $txtLog.AppendText($logEntry) # Log-Eintrag anhängen
-            $txtLog.ScrollToEnd()         # Automatisch nach unten scrollen
+            $txtLog.AppendText($logEntry)
+            $txtLog.ScrollToEnd()
         }
         
-        # Warnungen und Fehler zusätzlich in Error-Log.txt speichern
+        # Fehler-Log nur bei WARN/ERROR
         if ($Level -eq 'WARN' -or $Level -eq 'ERROR') {
             $logFile = $script:Config.Paths.ErrorLog
             $logDir = Split-Path $logFile -Parent
@@ -911,32 +1020,75 @@ function Open-AppDataFolder {
 #endregion
 
 #region DATEV-Programme und -Tools
-# Zentrale Funktion zur robusten Suche nach DATEV-Programmpfaden
+# Zentrale Funktion zur robusten Suche nach DATEV-Programmpfaden (Performance-optimiert mit Caching)
 function Get-DATEVExecutablePath {
     <#
     .SYNOPSIS
-    Findet den vollständigen Pfad zu einem DATEV-Programm.
+    Findet den vollständigen Pfad zu einem DATEV-Programm mit Performance-Caching.
     .DESCRIPTION
     Sucht nach einem Programm, indem es die %DATEVPP%-Umgebungsvariable,
     Standard-Installationspfade und die Windows-Registrierung prüft.
+    Verwendet Caching für bessere Performance bei wiederholten Aufrufen.
     #>
     param(
         [Parameter(Mandatory = $true)]
         [string]$ProgramName
     )
     
+    # Cache-Check: Ist der Pfad bereits bekannt und noch gültig?
+    if ($script:CachedDATEVPaths.ContainsKey($ProgramName)) {
+        $cachedEntry = $script:CachedDATEVPaths[$ProgramName]
+        $cacheExpiry = $script:PathCacheExpiry[$ProgramName]
+        
+        # Cache ist noch gültig (5 Minuten)
+        if ($cacheExpiry -gt (Get-Date)) {
+            # Pfad nochmal validieren (schneller als komplette Suche)
+            if (Test-Path $cachedEntry.Path) {
+                Write-Log -Message "DATEV-Pfad aus Cache: $ProgramName -> $($cachedEntry.Path)" -Level 'DEBUG'
+                return $cachedEntry.Path
+            } else {
+                # Cache-Eintrag ist ungültig, entfernen
+                $script:CachedDATEVPaths.Remove($ProgramName)
+                $script:PathCacheExpiry.Remove($ProgramName)
+                Write-Log -Message "Cache-Eintrag für $ProgramName ungültig geworden, entfernt" -Level 'DEBUG'
+            }
+        } else {
+            # Cache abgelaufen, entfernen
+            $script:CachedDATEVPaths.Remove($ProgramName)
+            $script:PathCacheExpiry.Remove($ProgramName)
+            Write-Log -Message "Cache für $ProgramName abgelaufen, wird neu gesucht" -Level 'DEBUG'
+        }
+    }
+    
     $possiblePaths = $script:DATEVProgramPaths[$ProgramName]
-    if (-not $possiblePaths) { return $null }
+    if (-not $possiblePaths) {
+        Write-Log -Message "Keine Pfad-Definitionen für $ProgramName gefunden" -Level 'WARN'
+        return $null
+    }
+
+    Write-Log -Message "Suche DATEV-Programm: $ProgramName" -Level 'DEBUG'
 
     # Primäre Suche über Umgebungsvariable
     if (-not [string]::IsNullOrEmpty($env:DATEVPP)) {
+        Write-Log -Message "Prüfe DATEVPP-Umgebungsvariable: $env:DATEVPP" -Level 'DEBUG'
         foreach ($path in $possiblePaths) {
             $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
-            if (Test-Path $expandedPath) { return $expandedPath }
+            if (Test-Path $expandedPath) {
+                # Erfolgreichen Pfad cachen
+                $script:CachedDATEVPaths[$ProgramName] = @{
+                    Path = $expandedPath
+                    Source = 'DATEVPP-Environment'
+                    Found = Get-Date
+                }
+                $script:PathCacheExpiry[$ProgramName] = (Get-Date).AddMinutes(5)
+                Write-Log -Message "DATEV-Programm gefunden (DATEVPP): $expandedPath" -Level 'DEBUG'
+                return $expandedPath
+            }
         }
     }
 
     # Fallback: Standardpfade und Registrierung
+    Write-Log -Message "DATEVPP nicht verfügbar, prüfe Standardpfade und Registrierung" -Level 'DEBUG'
     $standardBasePaths = @(
         'C:\DATEV', 'D:\DATEV', 'E:\DATEV',
         "${env:ProgramFiles(x86)}\DATEV",
@@ -944,12 +1096,24 @@ function Get-DATEVExecutablePath {
     ) | Where-Object { -not [string]::IsNullOrEmpty($_) } | Get-Unique
 
     foreach ($basePath in $standardBasePaths) {
+        Write-Log -Message "Prüfe Basispfad: $basePath" -Level 'DEBUG'
         foreach ($path in $possiblePaths) {
             $testPath = $path -replace '%DATEVPP%', $basePath
-            if (Test-Path $testPath) { return $testPath }
+            if (Test-Path $testPath) {
+                # Erfolgreichen Pfad cachen
+                $script:CachedDATEVPaths[$ProgramName] = @{
+                    Path = $testPath
+                    Source = "StandardPath-$basePath"
+                    Found = Get-Date
+                }
+                $script:PathCacheExpiry[$ProgramName] = (Get-Date).AddMinutes(5)
+                Write-Log -Message "DATEV-Programm gefunden (Standard): $testPath" -Level 'DEBUG'
+                return $testPath
+            }
         }
     }
     
+    Write-Log -Message "DATEV-Programm $ProgramName nicht gefunden" -Level 'WARN'
     return $null # Nichts gefunden
 }
 
@@ -2342,8 +2506,32 @@ Initialize-UpdateDates
 # Automatischen Update-Check durchführen
 Initialize-UpdateCheck
 
+# Performance-Optimierungen initialisieren
+Initialize-RunspacePool
+
+# Window-Closing Event für ordnungsgemäße Bereinigung
+$window.Add_Closing({
+    Write-Log -Message "Anwendung wird beendet, bereinige Ressourcen..." -Level 'INFO'
+    
+    # Settings sofort speichern falls noch ausstehend
+    if ($script:SettingsNeedSave) {
+        Save-Settings
+    }
+    
+    # Runspace-Pool schließen
+    Close-RunspacePool
+    
+    # Timer stoppen falls aktiv
+    if ($null -ne $script:SettingsSaveTimer) {
+        $script:SettingsSaveTimer.Stop()
+        $script:SettingsSaveTimer = $null
+    }
+    
+    Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
+})
+
 # Startup-Log schreiben
-Write-Log -Message "DATEV-Toolbox 2.0 gestartet" -Level 'INFO'
+Write-Log -Message "DATEV-Toolbox 2.0 gestartet (Performance-optimiert)" -Level 'INFO'
 
 # GUI anzeigen und auf Benutzerinteraktion warten
 $window.ShowDialog() | Out-Null
