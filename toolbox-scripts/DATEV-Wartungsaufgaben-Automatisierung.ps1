@@ -673,10 +673,12 @@ function ScanButton_Click {
             }
             
             $scriptsList.Items.Add($displayText)
-            $scriptCombo.Items.Add([PSCustomObject]@{
-                DisplayText = $displayText
-                Script = $script
-            })
+            
+            # ComboBoxItem mit Tag erstellen
+            $comboItem = New-Object System.Windows.Controls.ComboBoxItem
+            $comboItem.Content = $displayText
+            $comboItem.Tag = $script
+            $scriptCombo.Items.Add($comboItem)
             
             # Empfohlenes Skript vorauswaehlen
             if ($script.Recommended) {
@@ -880,7 +882,7 @@ function Get-TaskConfiguration {
     return [PSCustomObject]@{
         TaskName = $taskNameText.Text
         Description = $descriptionText.Text
-        ScriptPath = $scriptCombo.SelectedItem.Script.Path
+        ScriptPath = $scriptCombo.SelectedItem.Tag.Path
         StartTime = $startTime
         Frequency = $frequency
         DayOfWeek = $dayOfWeek
