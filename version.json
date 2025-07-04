@@ -1,19 +1,35 @@
 {
-  "version": "2.1.1",
-  "releaseDate": "2025-07-03",
+  "version": "2.1.2",
+  "releaseDate": "2025-07-04",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Stabilität und Kompatibilität: PowerShell 5.1 Optimierung",
-    "• Zentrale Event-Handler-Registrierung für alle Buttons und Tabs implementiert",
-    "• Funktions-Definitionen vor Registrierung verschoben (PowerShell 5.1 Kompatibilität)",
-    "• Redundante Event-Handler entfernt und durch zentrale Zuordnung ersetzt",
-    "• Vollständige Stabilität auf Windows Server 2019 und allen anderen Systemen",
-    "• Code-Struktur verbessert: Bessere Regionen, modulare Funktionen, erweiterte Kommentare",
-    "• Update-Prozess in kleinere, testbare Einheiten aufgeteilt",
-    "• Standardisierte Fehlerbehandlung und Logging durchgängig implementiert",
-    "Alle DATEV-Tools und Features arbeiten jetzt zuverlässig auf allen Systemen"
+    "Performance- und Code-Optimierungen: Caching und Stabilität verbessert",
+    "• Performance-optimierte DATEV-Pfadsuche mit intelligentem Caching (5 Min Cache)",
+    "• Runspace-Pool für asynchrone Operationen implementiert (1-3 Threads)",
+    "• StringBuilder für effizienteres String-Handling im Logging-System",
+    "• Verzögertes Settings-Speichern mit Timer-System (2 Sek Delay)",
+    "• Cache-Management für häufig verwendete Einstellungen und Pfade",
+    "• Verbesserte Fehlerbehandlung mit graceful degradation",
+    "• Memory-Management für WebClient und andere Ressourcen optimiert",
+    "• Früher Exit für Debug-Meldungen zur Performance-Steigerung",
+    "Alle DATEV-Tools und Features profitieren von den Performance-Verbesserungen"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.1",
+      "releaseDate": "2025-07-03",
+      "changelog": [
+        "Stabilität und Kompatibilität: PowerShell 5.1 Optimierung",
+        "• Zentrale Event-Handler-Registrierung für alle Buttons und Tabs implementiert",
+        "• Funktions-Definitionen vor Registrierung verschoben (PowerShell 5.1 Kompatibilität)",
+        "• Redundante Event-Handler entfernt und durch zentrale Zuordnung ersetzt",
+        "• Vollständige Stabilität auf Windows Server 2019 und allen anderen Systemen",
+        "• Code-Struktur verbessert: Bessere Regionen, modulare Funktionen, erweiterte Kommentare",
+        "• Update-Prozess in kleinere, testbare Einheiten aufgeteilt",
+        "• Standardisierte Fehlerbehandlung und Logging durchgängig implementiert",
+        "Alle DATEV-Tools und Features arbeiten jetzt zuverlässig auf allen Systemen"
+      ]
+    },
     {
       "version": "2.1.0",
       "releaseDate": "2025-06-30",
