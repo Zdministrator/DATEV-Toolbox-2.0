@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-06-26",
+  "lastUpdated": "2025-07-16",
   "downloads": [
     {
       "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
@@ -79,6 +79,11 @@
       "name": "Sicherheitspaket compact V. 7.89",
       "url": "https://download.datev.de/download/sipacompact/sipacompact.exe",
       "description": "DATEV Sicherheitspaket compact Version 7.89"
+    },
+    {
+      "name": "DATEV Serverprep Tool",
+      "url": "https://download.datev.de/download/datevitfix/serverprep.exe",
+      "description": "DATEV Serverprep Tool zur Vorbereitung und Konfiguration von Windows-Servern für DATEV-Installationen"
     }
   ]
 }
