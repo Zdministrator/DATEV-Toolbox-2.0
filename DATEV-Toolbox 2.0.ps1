@@ -379,8 +379,12 @@ function Set-Setting {
             $script:SettingsSaveTimer.Stop()
             $script:SettingsSaveTimer = $null
         })
+        $script:SettingsSaveTimer.Start()
+    } else {
+        # Timer bereits aktiv, nur neu starten
+        $script:SettingsSaveTimer.Stop()
+        $script:SettingsSaveTimer.Start()
     }
-    $script:SettingsSaveTimer.Start()
     
     Write-Log -Message "Einstellung '$Key' gesetzt: $Value (war: $oldValue)" -Level 'DEBUG'
 }
