@@ -5,12 +5,13 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 ## 📋 Features
 
 - **🆕 Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
+- **🆕 Kompakte UI**: Optimierte GroupBox-Abstände für platzsparende Darstellung (v2.1.4)
 - **WPF-GUI**: Moderne tab-basierte Benutzeroberfläche
 - **DATEV Programme**: Direkter Start von DATEV-Arbeitsplatz, Installationsmanager und Servicetool
 - **DATEV Tools**: Zugriff auf KonfigDB-Tools, EODBconfig und EO Aufgabenplanung
 - **Performance Tools**: NGENALL 4.0 und Leistungsindex für Systemoptimierung
 - **System Tools**: Integrierte Windows-Systemtools (Task-Manager, Ressourcenmonitor, etc.)
-- **🆕 Aktionen-Bereich**: Gruppenrichtlinien-Update (gpupdate /force) mit asynchroner Ausführung
+- **🆕 Erweiterte Gruppenrichtlinien-Updates**: Progress-Dialog mit Abbruch-Funktion und Prozess-Überwachung (v2.1.4)
 - **Automatische Updates**: Selbst-aktualisierendes System mit GitHub-Integration
 - **DATEV Online Tools**: Schnellzugriff auf wichtige DATEV-Portale und -Services
 - **🆕 Erweiterte Downloads**: Verwaltung und Download von DATEV-Software mit Aktualisierungsdatum
@@ -164,8 +165,22 @@ Aktuelle Version: **2.1.0**
 - **Variable-Cleanup**: Ungenutzte Variablen entfernt
 
 ### Changelog (Neueste Versionen)
+- **v2.1.4**: 🎨 UI-Optimierung + Erweiterte Prozess-Überwachung + Memory-Fixes (Qualitäts-Update)
+- **v2.1.3**: 🔧 Code-Stabilisierung + Vollständige Funktions-Implementierung (Stabilität)
+- **v2.1.2**: ⚡ Performance-Optimierungen + Caching + Memory-Management (Performance)
+- **v2.1.1**: 🛡️ PowerShell 5.1 Kompatibilität + Event-Handler-Optimierung (Kompatibilität)
 - **v2.1.0**: 🎯 Zentrale Konfiguration + Code-Qualität + Wartbarkeit (Major Update)
-- **v2.0.9**: Kritischer Update-Bugfix + Changelog-Viewer + Aktionen-Bereich
+
+#### 🎨 UI-Verbesserungen (v2.1.4)
+- **Kompakte Darstellung**: GroupBox-Abstände reduziert für bessere Raumausnutzung
+- **Progress-Dialog**: Visueller Fortschritt für Gruppenrichtlinien-Updates mit Abbruch-Funktion
+- **Benutzerfreundlichkeit**: Elapsed-Time-Anzeige und interaktive Kontrolle
+
+#### 🔧 Prozess-Überwachung (v2.1.4)
+- **Duplizierter Prozess-Check**: Verhindert mehrfache gpupdate-Ausführungen
+- **Exit-Code-Auswertung**: Korrekte Prozess-Status-Erkennung mit Output-Capture
+- **Memory-Leak-Fixes**: Ordnungsgemäße Ressourcen-Freigabe in allen kritischen Bereichen
+- **Thread-sichere Updates**: Dispatcher-basierte UI-Updates für bessere Stabilität
 
 #### 🔧 Aktionen-Bereich (v2.0.9)
 - **Gruppenrichtlinien-Update**: Führt `gpupdate /force` asynchron aus
