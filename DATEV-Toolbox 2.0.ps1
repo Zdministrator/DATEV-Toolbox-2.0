@@ -1256,54 +1256,14 @@ function Start-Gpupdate {
         
         Write-Log -Message "Gruppenrichtlinien-Update läuft im Hintergrund (PID: $($process.Id))..." -Level 'INFO'
         
-        # Runspace für asynchrone Prozess-Überwachung
-        $runspace = [runspacefactory]::CreateRunspace()
-        $runspace.Open()
-        $runspace.SessionStateProxy.SetVariable('ProcessId', $process.Id)
-        
-        $powershell = [powershell]::Create()
-        $powershell.Runspace = $runspace
-        
-        [void]$powershell.AddScript({
-            param($ProcessId)
-            try {
-                # Warten auf Prozess-Ende
-                $process = Get-Process -Id $ProcessId -ErrorAction SilentlyContinue
-                if ($process) {
-                    $process.WaitForExit()
-                    return @{
-                        Success = $true
-                        ExitCode = $process.ExitCode
-                        ProcessId = $ProcessId
-                    }
-                }
-                return @{
-                    Success = $false
-                    Error = "Prozess nicht gefunden"
-                    ProcessId = $ProcessId
-                }
-            }
-            catch {
-                return @{
-                    Success = $false
-                    Error = $_.Exception.Message
-                    ProcessId = $ProcessId
-                }
-            }
-        }).AddArgument($process.Id)
-        
-        # Asynchrone Ausführung starten
-        $asyncResult = $powershell.BeginInvoke()
-        
-        # Timer für periodische Überprüfung
+        # Vereinfachter Ansatz ohne komplexe Runspace-Logik für bessere Stabilität
+        # Timer für periodische Prozess-Überprüfung
         $timer = New-Object System.Windows.Threading.DispatcherTimer
-        $timer.Interval = [TimeSpan]::FromMilliseconds(1000) # 1 Sekunde
+        $timer.Interval = [TimeSpan]::FromSeconds(1)
         
         # Referenzen für Timer-Callback speichern
         $timer.Tag = @{
-            PowerShell = $powershell
-            AsyncResult = $asyncResult
-            Runspace = $runspace
+            Process = $process
             StartTime = Get-Date
         }
         
@@ -1414,6 +1374,7 @@ function Show-ChangelogDialog {
     .SYNOPSIS
     Zeigt das Changelog der aktuellen Version und der letzten Updates an
     #>
+    $webClient = $null
     try {
         Write-Log -Message "Lade Changelog von GitHub..." -Level 'INFO'
         
@@ -1463,9 +1424,6 @@ function Show-ChangelogDialog {
         
         Write-Log -Message "Changelog erfolgreich angezeigt" -Level 'INFO'
         
-        # WebClient ordnungsgemäß entsorgen
-        $webClient.Dispose()
-        
     }
     catch {
         Write-Log -Message "Fehler beim Laden des Changelogs: $($_.Exception.Message)" -Level 'ERROR'
@@ -1475,6 +1433,18 @@ function Show-ChangelogDialog {
             [System.Windows.MessageBoxButton]::OK,
             [System.Windows.MessageBoxImage]::Error
         )
+    }
+    finally {
+        # WebClient ordnungsgemäß entsorgen (immer ausführen)
+        if ($null -ne $webClient) {
+            try {
+                $webClient.Dispose()
+                Write-Log -Message "WebClient ordnungsgemäß disposed" -Level 'DEBUG'
+            }
+            catch {
+                Write-Log -Message "Fehler beim Entsorgen des WebClients: $($_.Exception.Message)" -Level 'WARN'
+            }
+        }
     }
 }
 #endregion
@@ -2206,6 +2176,7 @@ function Start-BackgroundDownload {
         [Parameter(Mandatory = $true)][string]$FileName
     )
     
+    $webClient = $null
     try {
         # Download-Ordner erstellen
         $downloadFolder = $script:Config.Paths.Downloads
@@ -2241,35 +2212,71 @@ function Start-BackgroundDownload {
         # TLS 1.2 für sichere Downloads erzwingen
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         
-        # WebClient für Download erstellen
+        # WebClient für Download erstellen (PowerShell 5.1 kompatibel)
         $webClient = New-Object System.Net.WebClient
+        # Hinweis: WebClient in PowerShell 5.1 hat keine Timeout-Eigenschaft
+        # Standard-Timeout wird verwendet (ca. 100 Sekunden)
         
-        # Event-Handler für Download-Completion
+        # Event-Handler für Download-Completion (mit verbessertem Disposal)
         $webClient.add_DownloadFileCompleted({
-                param($webClientSender, $downloadEventArgs)
-                # Dateiname aus UserState oder aus der lokalen Variable extrahieren
-                $currentFileName = if ($downloadEventArgs.UserState) { $downloadEventArgs.UserState } else { $FileName }
+            param($webClientSender, $downloadEventArgs)
             
+            try {
+                # Dateiname aus UserState extrahieren
+                $currentFileName = if ($downloadEventArgs.UserState) { $downloadEventArgs.UserState } else { "unbekannte Datei" }
+                
                 if ($null -eq $downloadEventArgs.Error -and -not $downloadEventArgs.Cancelled) {
                     Write-Log -Message "Download erfolgreich abgeschlossen: $currentFileName" -Level 'INFO'
+                    
+                    # Optional: Download-Ordner öffnen bei erfolgreichem Download
+                    $result = [System.Windows.MessageBox]::Show(
+                        "Download erfolgreich abgeschlossen: $currentFileName`n`nMöchten Sie den Download-Ordner öffnen?",
+                        "Download abgeschlossen",
+                        [System.Windows.MessageBoxButton]::YesNo,
+                        [System.Windows.MessageBoxImage]::Information
+                    )
+                    
+                    if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+                        Open-DownloadFolder
+                    }
+                }
+                elseif ($downloadEventArgs.Cancelled) {
+                    Write-Log -Message "Download abgebrochen: $currentFileName" -Level 'WARN'
                 }
                 else {
                     Write-Log -Message "Download fehlgeschlagen: $($downloadEventArgs.Error.Message)" -Level 'ERROR'
+                    [System.Windows.MessageBox]::Show(
+                        "Download fehlgeschlagen: $currentFileName`n`nFehler: $($downloadEventArgs.Error.Message)",
+                        "Download-Fehler",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Error
+                    )
                 }
-            
-                # UI zurücksetzen
-                $btnDownload.IsEnabled = $true
-            
-                # WebClient sicher entsorgen
+            }
+            catch {
+                Write-Log -Message "Fehler im Download-Completion-Handler: $($_.Exception.Message)" -Level 'ERROR'
+            }
+            finally {
+                # UI zurücksetzen (immer ausführen)
+                try {
+                    $btnDownload.IsEnabled = $true
+                }
+                catch {
+                    Write-Log -Message "Fehler beim Zurücksetzen der UI: $($_.Exception.Message)" -Level 'WARN'
+                }
+                
+                # WebClient sicher entsorgen (immer ausführen)
                 try {
                     if ($null -ne $webClientSender -and $webClientSender -is [System.Net.WebClient]) {
                         $webClientSender.Dispose()
+                        Write-Log -Message "WebClient ordnungsgemäß disposed" -Level 'DEBUG'
                     }
                 }
                 catch {
                     Write-Log -Message "Fehler beim Entsorgen des WebClients: $($_.Exception.Message)" -Level 'WARN'
                 }
-            })
+            }
+        })
         
         # Asynchronen Download starten mit Dateiname als UserState
         $webClient.DownloadFileAsync($Url, $filePath, $FileName)
@@ -2277,7 +2284,33 @@ function Start-BackgroundDownload {
     }
     catch {
         Write-Log -Message "Fehler beim Starten des Downloads: $($_.Exception.Message)" -Level 'ERROR'
-        $btnDownload.IsEnabled = $true
+        
+        # UI zurücksetzen bei Fehler
+        try {
+            $btnDownload.IsEnabled = $true
+        }
+        catch {
+            Write-Log -Message "Fehler beim Zurücksetzen der UI nach Download-Fehler: $($_.Exception.Message)" -Level 'WARN'
+        }
+        
+        # WebClient entsorgen falls erstellt aber nicht erfolgreich gestartet
+        if ($null -ne $webClient) {
+            try {
+                $webClient.Dispose()
+                Write-Log -Message "WebClient nach Fehler ordnungsgemäß disposed" -Level 'DEBUG'
+            }
+            catch {
+                Write-Log -Message "Fehler beim Entsorgen des WebClients nach Hauptfehler: $($_.Exception.Message)" -Level 'WARN'
+            }
+        }
+        
+        # Benutzer über Fehler informieren
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Starten des Downloads:`n$($_.Exception.Message)",
+            "Download-Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
     }
 }
 #endregion
