@@ -465,10 +465,10 @@ function Close-RunspacePool {
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- DATEV Programme -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV Programme" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnDATEVArbeitsplatz" Content="DATEV-Arbeitsplatz" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Startet den DATEV-Arbeitsplatz mit maximiertem Fenster"/>
                                 <Button Name="btnInstallationsmanager" Content="Installationsmanager" Height="25" Margin="0,3,0,3" 
@@ -479,10 +479,10 @@ function Close-RunspacePool {
                         </GroupBox>
                         
                         <!-- DATEV Tools -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV Tools" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnKonfigDBTools" Content="KonfigDB-Tools" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet die DATEV Konfigurations-Datenbank Tools"/>
                                 <Button Name="btnEODBconfig" Content="EODBconfig" Height="25" Margin="0,3,0,3" 
@@ -492,10 +492,10 @@ function Close-RunspacePool {
                             </StackPanel>
                         </GroupBox>
                           <!-- Performance Tools -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="Performance Tools" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Erzwingt die Neuerstellung der .NET Native Images für bessere Performance"/>
                                 <Button Name="btnLeistungsindex" Content="Leistungsindex ermitteln" Height="25" Margin="0,3,0,3" 
@@ -508,10 +508,10 @@ function Close-RunspacePool {
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Hilfe und Support -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="Hilfe und Support" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnHilfeCenter" Content="❓ DATEV Hilfe Center" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet das DATEV Hilfe Center im Browser"/>
                                 <Button Name="btnServicekontakte" Content="✉ Servicekontakte" Height="25" Margin="0,3,0,3" 
@@ -522,10 +522,10 @@ function Close-RunspacePool {
                         </GroupBox>
                         
                         <!-- Cloud -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="Cloud" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnMyDATEV" Content="myDATEV Portal" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet das zentrale myDATEV Portal"/>
                                 <Button Name="btnDUO" Content="DATEV Unternehmen Online" Height="25" Margin="0,3,0,3" 
@@ -542,10 +542,10 @@ function Close-RunspacePool {
                         </GroupBox>
                         
                         <!-- Verwaltung und Technik -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="Verwaltung und Technik" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnSmartLogin" Content="SmartLogin Administration" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Verwaltet DATEV SmartLogin Einstellungen und Benutzer"/>
                                 <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="25" Margin="0,3,0,3" 
@@ -558,7 +558,7 @@ function Close-RunspacePool {
                 </ScrollViewer>
             </TabItem>            <TabItem Header="Downloads">
                 <StackPanel Orientation="Vertical" Margin="10">
-                    <GroupBox Margin="0,0,0,10">
+                    <GroupBox Margin="0,0,0,5">
                         <GroupBox.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Direkt Downloads" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
@@ -566,7 +566,7 @@ function Close-RunspacePool {
                                            ToolTip="Direkt-Downloads aktualisieren" VerticalAlignment="Center" 
                                            Cursor="Hand" Foreground="Black"/>
                             </StackPanel>
-                        </GroupBox.Header>                        <StackPanel Orientation="Vertical" Margin="10">                            <ComboBox Name="cmbDirectDownloads" Margin="0,0,0,10" Height="25"/>
+                        </GroupBox.Header>                        <StackPanel Orientation="Vertical" Margin="8">                            <ComboBox Name="cmbDirectDownloads" Margin="0,0,0,10" Height="25"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -581,11 +581,11 @@ function Close-RunspacePool {
                     </GroupBox>
                     
                     <!-- DATEV Online Downloads -->
-                    <GroupBox Margin="0,0,0,10">
+                    <GroupBox Margin="0,0,0,5">
                         <GroupBox.Header>
                             <TextBlock Text="Downloads von datev.de" FontWeight="Bold" FontSize="12"/>
                         </GroupBox.Header>
-                        <StackPanel Orientation="Vertical" Margin="10">                            <Button Name="btnDATEVDownloadbereich" Content="DATEV Downloadbereich" Height="25" Margin="0,3,0,3"
+                        <StackPanel Orientation="Vertical" Margin="8">                            <Button Name="btnDATEVDownloadbereich" Content="DATEV Downloadbereich" Height="25" Margin="0,3,0,3"
                                     ToolTip="Öffnet den zentralen DATEV Downloadbereich für Updates und Tools"/>
                             <Button Name="btnDATEVSmartDocs" Content="DATEV Smart Docs" Height="25" Margin="0,3,0,3"
                                     ToolTip="Zugang zu DATEV Smart Docs für Dokumentation und Anleitungen"/>
@@ -597,22 +597,22 @@ function Close-RunspacePool {
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Aktionen -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="Aktionen" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">
+                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnGpupdate" Content="🔄 Gruppenrichtlinien aktualisieren" Height="25" Margin="0,3,0,3"
                                         ToolTip="Führt gpupdate /force aus um Gruppenrichtlinien sofort zu aktualisieren"/>
                             </StackPanel>
                         </GroupBox>
                         
                         <!-- System Tools -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="System Tools" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>
-                            <StackPanel Orientation="Vertical" Margin="10">                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"
+                            <StackPanel Orientation="Vertical" Margin="8">                                <Button Name="btnTaskManager" Content="Task-Manager" Height="25" Margin="0,3,0,3"
                                         ToolTip="Öffnet den Windows Task-Manager zur Prozessverwaltung"/>
                                 <Button Name="btnResourceMonitor" Content="Ressourcenmonitor" Height="25" Margin="0,3,0,3"
                                         ToolTip="Startet den Windows Ressourcenmonitor für detaillierte Systemanalyse"/>
@@ -633,10 +633,10 @@ function Close-RunspacePool {
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Einstellungen -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <TextBlock Text="DATEV-Toolbox Einstellungen" FontWeight="Bold" FontSize="12"/>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">                                <Button Name="btnOpenFolder" Content="Toolbox Ordner öffnen" Height="25" Margin="0,3,0,3"
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">                                <Button Name="btnOpenFolder" Content="Toolbox Ordner öffnen" Height="25" Margin="0,3,0,3"
                                         ToolTip="Öffnet den AppData-Ordner der DATEV-Toolbox mit Einstellungen und Logs"/>
                                 <Button Name="btnCheckUpdate" Content="Nach Script Updates suchen" Height="25" Margin="0,3,0,3"
                                         ToolTip="Prüft GitHub auf verfügbare Updates für die DATEV-Toolbox"/>
@@ -647,7 +647,7 @@ function Close-RunspacePool {
                             </StackPanel>                        </GroupBox>
                         
                           <!-- Anstehende Update-Termine -->
-                        <GroupBox Margin="5,5,5,10">
+                        <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Anstehende DATEV Update-Termine" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
@@ -655,7 +655,7 @@ function Close-RunspacePool {
                                                ToolTip="Update-Termine aktualisieren" VerticalAlignment="Center" 
                                                Cursor="Hand" Foreground="Black"/>
                                 </StackPanel>
-                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="10">
+                            </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <StackPanel Name="spUpdateDates" Orientation="Vertical" Margin="0,0,0,0">
                                     <TextBlock Text="Klicken Sie auf 'Update-Termine aktualisieren'." 
                                                FontStyle="Italic" Foreground="Gray"/>
@@ -1247,48 +1247,147 @@ function Start-Gpupdate {
     <#
     .SYNOPSIS
     Führt gpupdate /force aus, um Gruppenrichtlinien sofort zu aktualisieren (asynchron)
+    .DESCRIPTION
+    Überarbeitete Version mit korrekter Prozess-Überwachung, Memory-Management und Benutzerinteraktion
     #>
     try {
         Write-Log -Message "Starte Gruppenrichtlinien-Update (gpupdate /force)..." -Level 'INFO'
         
-        # gpupdate /force asynchron ausführen ohne GUI zu blockieren
-        $process = Start-Process -FilePath 'gpupdate.exe' -ArgumentList '/force' -PassThru -WindowStyle Hidden
+        # Prüfen ob bereits ein gpupdate läuft
+        $existingProcesses = Get-Process -Name "gpupdate" -ErrorAction SilentlyContinue
+        if ($existingProcesses) {
+            $result = [System.Windows.MessageBox]::Show(
+                "Es läuft bereits ein Gruppenrichtlinien-Update ($($existingProcesses.Count) Prozess(e)).`n`nMöchten Sie trotzdem ein neues Update starten?",
+                "Gruppenrichtlinien-Update läuft bereits",
+                [System.Windows.MessageBoxButton]::YesNo,
+                [System.Windows.MessageBoxImage]::Question
+            )
+            
+            if ($result -eq [System.Windows.MessageBoxResult]::No) {
+                Write-Log -Message "Gruppenrichtlinien-Update abgebrochen - bereits laufender Prozess" -Level 'INFO'
+                return
+            }
+        }
+        
+        # gpupdate /force starten mit verbesserter Konfiguration
+        $processStartInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $processStartInfo.FileName = "gpupdate.exe"
+        $processStartInfo.Arguments = "/force"
+        $processStartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+        $processStartInfo.UseShellExecute = $false
+        $processStartInfo.RedirectStandardOutput = $true
+        $processStartInfo.RedirectStandardError = $true
+        $processStartInfo.CreateNoWindow = $true
+        
+        $process = [System.Diagnostics.Process]::Start($processStartInfo)
+        
+        if ($null -eq $process) {
+            throw "Konnte gpupdate-Prozess nicht starten"
+        }
         
         Write-Log -Message "Gruppenrichtlinien-Update läuft im Hintergrund (PID: $($process.Id))..." -Level 'INFO'
         
-        # Vereinfachter Ansatz ohne komplexe Runspace-Logik für bessere Stabilität
-        # Timer für periodische Prozess-Überprüfung
+        # Progress-Dialog anzeigen (nicht-blockierend)
+        $progressDialog = New-Object System.Windows.Window
+        $progressDialog.Title = "Gruppenrichtlinien-Update"
+        $progressDialog.Width = 400
+        $progressDialog.Height = 150
+        $progressDialog.WindowStartupLocation = 'CenterOwner'
+        $progressDialog.Owner = $window
+        $progressDialog.ResizeMode = 'NoResize'
+        $progressDialog.WindowStyle = 'ToolWindow'
+        
+        $progressStackPanel = New-Object System.Windows.Controls.StackPanel
+        $progressStackPanel.Margin = '10'
+        
+        $progressLabel = New-Object System.Windows.Controls.Label
+        $progressLabel.Content = "Gruppenrichtlinien werden aktualisiert..."
+        $progressLabel.HorizontalAlignment = 'Center'
+        $progressStackPanel.Children.Add($progressLabel) | Out-Null
+        
+        $progressBar = New-Object System.Windows.Controls.ProgressBar
+        $progressBar.IsIndeterminate = $true
+        $progressBar.Height = 20
+        $progressBar.Margin = '0,10'
+        $progressStackPanel.Children.Add($progressBar) | Out-Null
+        
+        $cancelButton = New-Object System.Windows.Controls.Button
+        $cancelButton.Content = "Abbrechen"
+        $cancelButton.Width = 80
+        $cancelButton.HorizontalAlignment = 'Center'
+        $cancelButton.Margin = '0,10,0,0'
+        $progressStackPanel.Children.Add($cancelButton) | Out-Null
+        
+        $progressDialog.Content = $progressStackPanel
+        
+        # Timer für Prozess-Überwachung (korrigierte Implementierung)
         $timer = New-Object System.Windows.Threading.DispatcherTimer
         $timer.Interval = [TimeSpan]::FromSeconds(1)
         
-        # Referenzen für Timer-Callback speichern
+        # Korrekte Datenstruktur für Timer-Callback
         $timer.Tag = @{
             Process = $process
             StartTime = Get-Date
+            ProgressDialog = $progressDialog
+            OutputData = New-Object System.Text.StringBuilder
+            ErrorData = New-Object System.Text.StringBuilder
         }
         
+        # Cancel-Button Event-Handler
+        $cancelButton.Add_Click({
+            $timerData = $timer.Tag
+            $currentProcess = $timerData.Process
+            
+            try {
+                if ($null -ne $currentProcess -and -not $currentProcess.HasExited) {
+                    $currentProcess.Kill()
+                    Write-Log -Message "Gruppenrichtlinien-Update abgebrochen (PID: $($currentProcess.Id))" -Level 'INFO'
+                }
+            }
+            catch {
+                Write-Log -Message "Fehler beim Abbrechen des Prozesses: $($_.Exception.Message)" -Level 'WARN'
+            }
+            
+            $timer.Stop()
+            $timerData.ProgressDialog.Close()
+        })
+        
+        # Timer-Tick Event-Handler (korrigierte Logik)
         $timer.Add_Tick({
             param($timerSender, $timerEventArgs)
             
             try {
                 $timerData = $timerSender.Tag
-                $asyncResult = $timerData.AsyncResult
-                $powershell = $timerData.PowerShell
-                $runspace = $timerData.Runspace
+                $currentProcess = $timerData.Process
                 $startTime = $timerData.StartTime
+                $currentDialog = $timerData.ProgressDialog
                 
-                # Timeout nach Konfigurations-Wert
-                if ((Get-Date) - $startTime -gt [TimeSpan]::FromMinutes($script:Config.Timeouts.GpupdateTimeout)) {
+                # Timeout-Prüfung
+                $elapsed = (Get-Date) - $startTime
+                if ($elapsed -gt [TimeSpan]::FromMinutes($script:Config.Timeouts.GpupdateTimeout)) {
                     $timerSender.Stop()
                     Write-Log -Message "Gruppenrichtlinien-Update Timeout nach $($script:Config.Timeouts.GpupdateTimeout) Minuten erreicht" -Level 'WARN'
                     
-                    # Cleanup
-                    $powershell.Dispose()
-                    $runspace.Close()
-                    $runspace.Dispose()
+                    # Prozess beenden
+                    try {
+                        if ($null -ne $currentProcess -and -not $currentProcess.HasExited) {
+                            $currentProcess.Kill()
+                            $currentProcess.WaitForExit(5000) # 5 Sekunden warten
+                        }
+                    }
+                    catch {
+                        Write-Log -Message "Fehler beim Beenden des Timeout-Prozesses: $($_.Exception.Message)" -Level 'WARN'
+                    }
+                    finally {
+                        if ($null -ne $currentProcess) {
+                            $currentProcess.Dispose()
+                        }
+                    }
+                    
+                    $currentDialog.Close()
                     
                     [System.Windows.MessageBox]::Show(
-                        "Das Gruppenrichtlinien-Update dauert ungewöhnlich lange.`nDer Prozess läuft möglicherweise noch im Hintergrund.",
+                        "Das Gruppenrichtlinien-Update wurde nach $($script:Config.Timeouts.GpupdateTimeout) Minuten abgebrochen.`n`nDer Prozess dauerte ungewöhnlich lange.",
                         "Timeout",
                         [System.Windows.MessageBoxButton]::OK,
                         [System.Windows.MessageBoxImage]::Warning
@@ -1296,65 +1395,100 @@ function Start-Gpupdate {
                     return
                 }
                 
-                # Prüfen ob Ausführung abgeschlossen
-                if ($asyncResult.IsCompleted) {
+                # Prozess-Status prüfen
+                if ($null -eq $currentProcess) {
                     $timerSender.Stop()
+                    $currentDialog.Close()
+                    Write-Log -Message "Prozess-Referenz verloren" -Level 'ERROR'
+                    return
+                }
+                
+                # Prüfen ob Prozess beendet ist
+                if ($currentProcess.HasExited) {
+                    $timerSender.Stop()
+                    $currentDialog.Close()
                     
+                    $exitCode = $currentProcess.ExitCode
+                    
+                    # Output lesen falls verfügbar
+                    $output = ""
+                    $errorOutput = ""
                     try {
-                        $result = $powershell.EndInvoke($asyncResult)
-                        
-                        if ($result.Success -and $result.ExitCode -eq 0) {
-                            Write-Log -Message "Gruppenrichtlinien erfolgreich aktualisiert (PID: $($result.ProcessId))" -Level 'INFO'
-                            [System.Windows.MessageBox]::Show(
-                                "Gruppenrichtlinien wurden erfolgreich aktualisiert.`n`nDie neuen Richtlinien sind jetzt aktiv.",
-                                "Gruppenrichtlinien aktualisiert",
-                                [System.Windows.MessageBoxButton]::OK,
-                                [System.Windows.MessageBoxImage]::Information
-                            )
-                        } 
-                        elseif ($result.Success) {
-                            Write-Log -Message "Gpupdate wurde mit Exit-Code $($result.ExitCode) beendet" -Level 'WARN'
-                            [System.Windows.MessageBox]::Show(
-                                "Gruppenrichtlinien-Update wurde mit Warnungen abgeschlossen.`nExit-Code: $($result.ExitCode)`n`nPrüfen Sie das Log für weitere Details.",
-                                "Gruppenrichtlinien-Update",
-                                [System.Windows.MessageBoxButton]::OK,
-                                [System.Windows.MessageBoxImage]::Warning
-                            )
+                        if (-not $currentProcess.StandardOutput.EndOfStream) {
+                            $output = $currentProcess.StandardOutput.ReadToEnd()
                         }
-                        else {
-                            Write-Log -Message "Fehler beim Gruppenrichtlinien-Update: $($result.Error)" -Level 'ERROR'
-                            [System.Windows.MessageBox]::Show(
-                                "Fehler beim Gruppenrichtlinien-Update:`n$($result.Error)",
-                                "Fehler",
-                                [System.Windows.MessageBoxButton]::OK,
-                                [System.Windows.MessageBoxImage]::Error
-                            )
+                        if (-not $currentProcess.StandardError.EndOfStream) {
+                            $errorOutput = $currentProcess.StandardError.ReadToEnd()
                         }
                     }
                     catch {
-                        Write-Log -Message "Fehler beim Abrufen des Runspace-Ergebnisses: $($_.Exception.Message)" -Level 'ERROR'
+                        Write-Log -Message "Konnte Prozess-Output nicht lesen: $($_.Exception.Message)" -Level 'DEBUG'
+                    }
+                    
+                    # Prozess-Ressourcen freigeben
+                    try {
+                        $currentProcess.Dispose()
+                    }
+                    catch {
+                        Write-Log -Message "Fehler beim Dispose des Prozesses: $($_.Exception.Message)" -Level 'WARN'
+                    }
+                    
+                    # Ergebnis auswerten und anzeigen
+                    if ($exitCode -eq 0) {
+                        Write-Log -Message "Gruppenrichtlinien erfolgreich aktualisiert (Exit-Code: $exitCode)" -Level 'INFO'
                         [System.Windows.MessageBox]::Show(
-                            "Fehler beim Abrufen des Update-Ergebnisses:`n$($_.Exception.Message)",
-                            "Fehler",
+                            "Gruppenrichtlinien wurden erfolgreich aktualisiert.`n`nDie neuen Richtlinien sind jetzt aktiv.",
+                            "Gruppenrichtlinien aktualisiert",
                             [System.Windows.MessageBoxButton]::OK,
-                            [System.Windows.MessageBoxImage]::Error
+                            [System.Windows.MessageBoxImage]::Information
                         )
                     }
-                    finally {
-                        # Cleanup
-                        $powershell.Dispose()
-                        $runspace.Close()
-                        $runspace.Dispose()
+                    else {
+                        Write-Log -Message "Gruppenrichtlinien-Update beendet mit Exit-Code: $exitCode" -Level 'WARN'
+                        if (-not [string]::IsNullOrEmpty($errorOutput)) {
+                            Write-Log -Message "Gpupdate Fehler-Output: $errorOutput" -Level 'WARN'
+                        }
+                        
+                        $message = "Gruppenrichtlinien-Update wurde mit Warnungen abgeschlossen.`nExit-Code: $exitCode"
+                        if (-not [string]::IsNullOrEmpty($errorOutput)) {
+                            $message += "`n`nFehler: $($errorOutput.Substring(0, [Math]::Min(200, $errorOutput.Length)))"
+                        }
+                        
+                        [System.Windows.MessageBox]::Show(
+                            $message,
+                            "Gruppenrichtlinien-Update",
+                            [System.Windows.MessageBoxButton]::OK,
+                            [System.Windows.MessageBoxImage]::Warning
+                        )
                     }
                 }
+                
+                # Progress-Dialog-Status aktualisieren (elapsed time)
+                $elapsedText = "Gruppenrichtlinien werden aktualisiert... ({0:mm\:ss})" -f $elapsed
+                $currentDialog.Dispatcher.Invoke([Action]{
+                    $progressLabel.Content = $elapsedText
+                })
+                
             }
             catch {
                 $timerSender.Stop()
+                if ($null -ne $timerData.ProgressDialog) {
+                    $timerData.ProgressDialog.Close()
+                }
                 Write-Log -Message "Fehler im Timer-Callback: $($_.Exception.Message)" -Level 'ERROR'
+                
+                [System.Windows.MessageBox]::Show(
+                    "Fehler bei der Überwachung des Gruppenrichtlinien-Updates:`n$($_.Exception.Message)",
+                    "Fehler",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
             }
         })
         
+        # Timer starten und Progress-Dialog anzeigen
         $timer.Start()
+        $progressDialog.ShowDialog() | Out-Null
         
     }
     catch {
