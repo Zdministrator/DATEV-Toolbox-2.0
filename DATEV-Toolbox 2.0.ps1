@@ -1051,22 +1051,25 @@ function Get-DATEVExecutablePath {
         # Cache ist noch gültig (5 Minuten)
         if ($cacheExpiry -gt (Get-Date)) {
             # Pfad nochmal validieren (schneller als komplette Suche)
-            if (Test-Path $cachedEntry.Path) {
-                Write-Log -Message "DATEV-Pfad aus Cache: $ProgramName -> $($cachedEntry.Path)" -Level 'DEBUG' | Out-Null
-                Write-Log -Message "DIAGNOSE: Cache-Rückgabe-Typ: $($cachedEntry.Path.GetType().FullName)" -Level 'DEBUG' | Out-Null
-                Write-Log -Message "DIAGNOSE: Cache-Pfad ist Array: $($cachedEntry.Path -is [Array])" -Level 'DEBUG' | Out-Null
-                return $cachedEntry.Path
+            $cachedPath = $cachedEntry.Path
+            
+            # Sicherstellen dass wir einen String zurückgeben (Cache-Konsistenz)
+            $pathToValidate = if ($cachedPath -is [Array]) { $cachedPath[0] } else { $cachedPath }
+            
+            if (Test-Path $pathToValidate) {
+                Write-Log -Message "DATEV-Pfad aus Cache: $ProgramName -> $pathToValidate" -Level 'DEBUG'
+                return $pathToValidate  # Immer String zurückgeben
             } else {
                 # Cache-Eintrag ist ungültig, entfernen
                 $script:CachedDATEVPaths.Remove($ProgramName)
                 $script:PathCacheExpiry.Remove($ProgramName)
-                Write-Log -Message "Cache-Eintrag für $ProgramName ungültig geworden, entfernt" -Level 'DEBUG' | Out-Null
+                Write-Log -Message "Cache-Eintrag für $ProgramName ungültig geworden, entfernt" -Level 'DEBUG'
             }
         } else {
             # Cache abgelaufen, entfernen
             $script:CachedDATEVPaths.Remove($ProgramName)
             $script:PathCacheExpiry.Remove($ProgramName)
-            Write-Log -Message "Cache für $ProgramName abgelaufen, wird neu gesucht" -Level 'DEBUG' | Out-Null
+            Write-Log -Message "Cache für $ProgramName abgelaufen, wird neu gesucht" -Level 'DEBUG'
         }
     }
     
@@ -1076,11 +1079,11 @@ function Get-DATEVExecutablePath {
         return $null
     }
 
-    Write-Log -Message "Suche DATEV-Programm: $ProgramName" -Level 'DEBUG' | Out-Null
+    Write-Log -Message "Suche DATEV-Programm: $ProgramName" -Level 'DEBUG'
 
     # Primäre Suche über Umgebungsvariable
     if (-not [string]::IsNullOrEmpty($env:DATEVPP)) {
-        Write-Log -Message "Prüfe DATEVPP-Umgebungsvariable: $env:DATEVPP" -Level 'DEBUG' | Out-Null
+        Write-Log -Message "Prüfe DATEVPP-Umgebungsvariable: $env:DATEVPP" -Level 'DEBUG'
         foreach ($path in $possiblePaths) {
             $expandedPath = $path -replace '%DATEVPP%', $env:DATEVPP
             if (Test-Path $expandedPath) {
@@ -1091,15 +1094,14 @@ function Get-DATEVExecutablePath {
                     Found = Get-Date
                 }
                 $script:PathCacheExpiry[$ProgramName] = (Get-Date).AddMinutes(5)
-                Write-Log -Message "DATEV-Programm gefunden (DATEVPP): $expandedPath" -Level 'DEBUG' | Out-Null
-                Write-Log -Message "DIAGNOSE: Rückgabe-Typ (DATEVPP): $($expandedPath.GetType().FullName)" -Level 'DEBUG' | Out-Null
+                Write-Log -Message "DATEV-Programm gefunden (DATEVPP): $expandedPath" -Level 'DEBUG'
                 return $expandedPath
             }
         }
     }
 
     # Fallback: Standardpfade und Registrierung
-    Write-Log -Message "DATEVPP nicht verfügbar, prüfe Standardpfade und Registrierung" -Level 'DEBUG' | Out-Null
+    Write-Log -Message "DATEVPP nicht verfügbar, prüfe Standardpfade und Registrierung" -Level 'DEBUG'
     $standardBasePaths = @(
         'C:\DATEV', 'D:\DATEV', 'E:\DATEV',
         "${env:ProgramFiles(x86)}\DATEV",
@@ -1107,25 +1109,24 @@ function Get-DATEVExecutablePath {
     ) | Where-Object { -not [string]::IsNullOrEmpty($_) } | Get-Unique
 
     foreach ($basePath in $standardBasePaths) {
-        Write-Log -Message "Prüfe Basispfad: $basePath" -Level 'DEBUG' | Out-Null
+        Write-Log -Message "Prüfe Basispfad: $basePath" -Level 'DEBUG'
         foreach ($path in $possiblePaths) {
             $testPath = $path -replace '%DATEVPP%', $basePath
             if (Test-Path $testPath) {
-                # Erfolgreichen Pfad cachen
+                # Erfolgreichen Pfad cachen (immer als String)
                 $script:CachedDATEVPaths[$ProgramName] = @{
                     Path = $testPath
                     Source = "StandardPath-$basePath"
                     Found = Get-Date
                 }
                 $script:PathCacheExpiry[$ProgramName] = (Get-Date).AddMinutes(5)
-                Write-Log -Message "DATEV-Programm gefunden (Standard): $testPath" -Level 'DEBUG' | Out-Null
-                Write-Log -Message "DIAGNOSE: Rückgabe-Typ (Standard): $($testPath.GetType().FullName)" -Level 'DEBUG' | Out-Null
+                Write-Log -Message "DATEV-Programm gefunden (Standard): $testPath" -Level 'DEBUG'
                 return $testPath
             }
         }
     }
     
-    Write-Log -Message "DATEV-Programm $ProgramName nicht gefunden" -Level 'WARN' | Out-Null
+    Write-Log -Message "DATEV-Programm $ProgramName nicht gefunden" -Level 'WARN'
     return $null # Nichts gefunden
 }
 
@@ -1142,31 +1143,10 @@ function Start-DATEVProgram {
         
         $foundPath = Get-DATEVExecutablePath -ProgramName $ProgramName
         
-        # DIAGNOSE: Typ und Inhalt des gefundenen Pfads prüfen
-        if ($null -ne $foundPath) {
-            Write-Log -Message "DIAGNOSE: foundPath Typ: $($foundPath.GetType().FullName)" -Level 'DEBUG'
-            Write-Log -Message "DIAGNOSE: foundPath Inhalt: $foundPath" -Level 'DEBUG'
-            Write-Log -Message "DIAGNOSE: foundPath ist Array: $($foundPath -is [Array])" -Level 'DEBUG'
-            if ($foundPath -is [Array]) {
-                Write-Log -Message "DIAGNOSE: Array-Länge: $($foundPath.Count)" -Level 'DEBUG'
-                Write-Log -Message "DIAGNOSE: Erstes Element: $($foundPath[0])" -Level 'DEBUG'
-            }
-        }
-        
         if ($foundPath) {
-            # DIAGNOSE: Sicherstellen dass wir einen String haben
-            $pathString = if ($foundPath -is [Array]) {
-                Write-Log -Message "DIAGNOSE: Konvertiere Array zu String (erstes Element)" -Level 'DEBUG'
-                $foundPath[0]
-            } else {
-                $foundPath
-            }
-            
-            Write-Log -Message "Starte $Description von: $pathString" -Level 'INFO'
-            if ($null -ne $pathString) {
-                Write-Log -Message "DIAGNOSE: Finale pathString: $pathString (Typ: $($pathString.GetType().FullName))" -Level 'DEBUG'
-            }
-            Start-Process -FilePath $pathString
+            # Da Get-DATEVExecutablePath jetzt immer einen String zurückgibt
+            Write-Log -Message "Starte $Description von: $foundPath" -Level 'INFO'
+            Start-Process -FilePath $foundPath
         }
         else {
             Write-Log -Message "$Description wurde nicht gefunden. Überprüfen Sie die DATEV-Installation." -Level 'WARN'
