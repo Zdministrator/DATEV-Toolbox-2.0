@@ -85,7 +85,7 @@ $script:Config = @{
             WeitereApps = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
             
             # Download-Bereiche
-            Downloadbereich = "https://www.datev.de/download/"
+            Downloadbereich = "https://apps.datev.de/myupdates/download-v2/lists/products/"
             SmartDocs = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
             DatentraegerPortal = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
             

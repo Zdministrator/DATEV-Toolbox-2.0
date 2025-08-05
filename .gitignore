@@ -16,6 +16,9 @@ Error-Log.txt
 settings.json
 # datev-downloads.json wird versioniert
 
+# Blogposts und temporäre Dateien
+Blogpost-*.md
+
 # System-Dateien
 *.DS_Store
 Thumbs.db
