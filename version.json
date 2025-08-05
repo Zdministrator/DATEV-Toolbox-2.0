@@ -1,20 +1,36 @@
 {
-  "version": "2.1.4",
-  "releaseDate": "2025-07-18",
+  "version": "2.1.5",
+  "releaseDate": "2025-08-05",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "UI-Optimierung und Funktions-Verbesserungen: Kompaktere Darstellung und robuste Prozess-Überwachung",
-    "• GroupBox-Abstände im gesamten GUI reduziert für kompaktere und platzsparendere Darstellung",
-    "• Vollständige Überarbeitung der Gruppenrichtlinien-Update Funktion (Start-Gpupdate)",
-    "• Progress-Dialog mit Benutzer-Abbruch-Funktionalität und visueller Fortschrittsanzeige",
-    "• Verbesserte Prozess-Überwachung mit korrekter Exit-Code-Auswertung und Output-Capture",
-    "• Duplizierter Prozess-Check verhindert mehrfache gleichzeitige gpupdate-Ausführungen",
-    "• Memory-Leak-Fixes und ordnungsgemäße Ressourcen-Freigabe in allen kritischen Bereichen",
-    "• Thread-sichere UI-Updates über Dispatcher für bessere Stabilität",
-    "• WebClient Download-Funktionen PowerShell 5.1 kompatibel gemacht (Timeout-Property entfernt)",
-    "Alle Features arbeiten jetzt noch stabiler und benutzerfreundlicher"
+    "Bugfix-Release: StringBuilder-Ausgabe und Code-Stabilisierung",
+    "• StringBuilder-Terminal-Ausgabe Problem behoben: Keine störenden Kapazitäts-Anzeigen mehr beim Start",
+    "• StringBuilder.Clear() und StringBuilder.Append() Operationen mit $null unterdrückt",
+    "• Saubere Terminal-Ausgabe für professionelle Benutzeroberfläche",
+    "• GPUpdate-Funktion vollständig vereinfacht (von 200+ auf 50 Zeilen Code)",
+    "• Entfernung der komplexen Timer-basierten Lösung zugunsten einfacher CMD-Ausführung",
+    "• Download-Links für neue DATEV myUpdates API-Struktur aktualisiert",
+    "• Alle kritischen Bugs aus vorherigen Versionen final behoben",
+    "• PowerShell 5.1 Kompatibilität und Performance-Optimierungen beibehalten",
+    "Deutlich stabilere und benutzerfreundlichere Anwendung ohne kosmetische Störungen"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.4",
+      "releaseDate": "2025-07-18",
+      "changelog": [
+        "UI-Optimierung und Funktions-Verbesserungen: Kompaktere Darstellung und robuste Prozess-Überwachung",
+        "• GroupBox-Abstände im gesamten GUI reduziert für kompaktere und platzsparendere Darstellung",
+        "• Vollständige Überarbeitung der Gruppenrichtlinien-Update Funktion (Start-Gpupdate)",
+        "• Progress-Dialog mit Benutzer-Abbruch-Funktionalität und visueller Fortschrittsanzeige",
+        "• Verbesserte Prozess-Überwachung mit korrekter Exit-Code-Auswertung und Output-Capture",
+        "• Duplizierter Prozess-Check verhindert mehrfache gleichzeitige gpupdate-Ausführungen",
+        "• Memory-Leak-Fixes und ordnungsgemäße Ressourcen-Freigabe in allen kritischen Bereichen",
+        "• Thread-sichere UI-Updates über Dispatcher für bessere Stabilität",
+        "• WebClient Download-Funktionen PowerShell 5.1 kompatibel gemacht (Timeout-Property entfernt)",
+        "Alle Features arbeiten jetzt noch stabiler und benutzerfreundlicher"
+      ]
+    },
     {
       "version": "2.1.3",
       "releaseDate": "2025-07-04",

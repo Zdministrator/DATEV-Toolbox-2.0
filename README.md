@@ -124,7 +124,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Version
-Aktuelle Version: **2.1.0**
+Aktuelle Version: **2.1.5**
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -140,27 +140,41 @@ Aktuelle Version: **2.1.0**
 - DATEV-Installation (für DATEV-Tools, optional)
 - Internetverbindung für Updates und Downloads
 
-### Neue Features in Version 2.1.0
+### Neue Features in Version 2.1.5
 
-#### 🎯 Zentrale Konfiguration (Major Update)
-- **Zentrale URLs**: Alle GitHub und DATEV URLs in `$script:Config` zentralisiert
-- **Zentrale Pfade**: Alle AppData, Downloads und System-Pfade konfigurierbar
-- **Konfigurierbare Timeouts**: Update-Check (10s), Downloads (15s/30s), ICS (15s)
-- **Konfigurierbare Limits**: Max Backups (5), Min Dateigröße (1000 Bytes)
-- **System-Tools-Definition**: Zentrale Definition aller Windows-Tools
-- **Wartbarkeit**: Alle URLs, Pfade und Magic Numbers an einem Ort
-- **Consistency**: Einheitliche Zugriffsmuster auf Konfigurationswerte
+#### 🐛 Bugfix-Release: StringBuilder und Code-Stabilisierung
+- **StringBuilder-Terminal-Ausgabe behoben**: Keine störenden Kapazitäts-Anzeigen mehr beim Start
+- **Saubere UI**: StringBuilder.Clear() und StringBuilder.Append() Operationen unterdrückt
+- **GPUpdate vereinfacht**: Von 200+ auf 50 Zeilen Code reduziert, einfachere CMD-Ausführung
+- **Download-Links aktualisiert**: Neue DATEV myUpdates API-Struktur berücksichtigt
+- **Performance beibehalten**: Alle Optimierungen aus v2.1.4 bleiben erhalten
+- **PowerShell 5.1 Kompatibilität**: Vollständig getestet und bestätigt
 
-#### 🔧 Code-Qualität und Robustheit
-- **Eliminierung von Magic Numbers**: Keine hartkodierten Werte mehr im Code
-- **URL-Zentralisierung**: 21+ URLs durch zentrale Konfiguration ersetzt
-- **Pfad-Zentralisierung**: Alle AppData-Pfade systematisch zentralisiert
-- **Timeout-Management**: Konfigurierbare Zeitüberschreitungen für alle Netzwerk-Operationen
-- **Bessere Lesbarkeit**: Selbstdokumentierender Code durch sprechende Konfigurationsnamen
+#### 📈 Verbesserungen aus vorherigen Versionen
+- **Kompakte UI**: Optimierte GroupBox-Abstände für platzsparendere Darstellung (v2.1.4)
+- **Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
 
-#### 🐛 Syntaxfehler-Bereinigung
-- **Automatische Variablen**: Probleme mit `$sender` und `$s` behoben
-- **Parameter-Umbenennung**: `$timerSender`, `$webClientSender` für bessere Kompatibilität
+## 🔄 Update-Historie
+
+### Version 2.1.5 (2025-08-05)
+- **StringBuilder-Terminal-Ausgabe behoben**: Keine störenden Debug-Anzeigen mehr
+- **GPUpdate-Funktion vereinfacht**: Von 200+ auf 50 Zeilen reduziert
+- **Download-Links modernisiert**: Für neue DATEV myUpdates API-Struktur
+- **Code-Stabilisierung**: Alle kritischen Bugs behoben
+- **Performance beibehalten**: Optimierungen aus v2.1.4 erhalten
+
+### Version 2.1.4 (2025-07-18)
+- **UI-Optimierung**: Kompaktere GroupBox-Abstände für bessere Raumnutzung
+- **Robuste Prozess-Überwachung**: Verbesserte gpupdate-Funktion mit Progress-Dialog
+- **Memory-Leak-Fixes**: Ordnungsgemäße Ressourcen-Freigabe
+- **PowerShell 5.1 Kompatibilität**: WebClient-Funktionen angepasst
+
+### Version 2.1.3 (2025-07-04)
+- **Vollständige Feature-Implementierung**: Alle Button-Handler funktionsfähig
+- **Event-Handler-System**: URL-, DATEV-, SystemTool- und Function-Handler
+- **Performance-Optimierungen**: Caching und asynchrone Operationen
+
+## 🛠️ Technische Details
 - **Code-Formatierung**: Einrückungen und Zeilenumbrüche korrigiert
 - **Variable-Cleanup**: Ungenutzte Variablen entfernt
 

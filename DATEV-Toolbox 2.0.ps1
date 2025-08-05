@@ -11,7 +11,7 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.1.4
+    Version:        2.1.5
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.4"
+$script:AppVersion = "2.1.5"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
