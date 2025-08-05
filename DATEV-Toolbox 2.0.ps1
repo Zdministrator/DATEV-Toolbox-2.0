@@ -719,7 +719,7 @@ function Write-Log {
     
     try {
         # StringBuilder für bessere String-Performance
-        $script:LogStringBuilder.Clear()
+        $null = $script:LogStringBuilder.Clear()
         $timestamp = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
         
         switch ($Level) {
@@ -729,7 +729,7 @@ function Write-Log {
             'DEBUG' { $prefix = '[DEBUG] ' }
         }
         
-        [void]$script:LogStringBuilder.Append($timestamp).Append(' ').Append($prefix).Append($Message).Append("`r`n")
+        $null = $script:LogStringBuilder.Append($timestamp).Append(' ').Append($prefix).Append($Message).Append("`r`n")
         $logEntry = $script:LogStringBuilder.ToString()
         
         # UI-Update nur wenn TextBox verfügbar
