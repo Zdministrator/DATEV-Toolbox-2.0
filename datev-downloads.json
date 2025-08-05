@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-07-16",
+  "lastUpdated": "2025-08-05",
   "downloads": [
     {
       "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
@@ -20,11 +20,6 @@
       "name": "DATEVnet: Proxyeinstellungen V. 1.8",
       "url": "https://download.datev.de/download/proxysetter/proxysetter.exe",
       "description": "Tool zur Konfiguration der DATEVnet Proxy-Einstellungen"
-    },
-    {
-      "name": "SWM-Treibererweiterung V. 7.88",
-      "url": "https://download.datev.de/download/srel/swm-treiber-erweiterung_sr_b0000119_7.88.exe",
-      "description": "Software-Manager Treibererweiterung Version 7.88"
     },
     {
       "name": "DATEVnet Einzel-/Telearbeitsplatz",
