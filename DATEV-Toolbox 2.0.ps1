@@ -1246,14 +1246,15 @@ function Start-SystemTool {
 function Start-Gpupdate {
     <#
     .SYNOPSIS
-    Führt gpupdate /force aus, um Gruppenrichtlinien sofort zu aktualisieren (asynchron)
+    Führt gpupdate /force in einer neuen CMD aus (vereinfachte Version)
     .DESCRIPTION
-    Überarbeitete Version mit korrekter Prozess-Überwachung, Memory-Management und Benutzerinteraktion
+    Startet gpupdate /force in einem separaten CMD-Fenster, das sichtbar bleibt
+    bis der Prozess abgeschlossen ist. Deutlich einfacher als die bisherige Lösung.
     #>
     try {
-        Write-Log -Message "Starte Gruppenrichtlinien-Update (gpupdate /force)..." -Level 'INFO'
+        Write-Log -Message "Starte Gruppenrichtlinien-Update (gpupdate /force) in neuer CMD..." -Level 'INFO'
         
-        # Prüfen ob bereits ein gpupdate läuft
+        # Prüfen ob bereits ein gpupdate läuft (optional)
         $existingProcesses = Get-Process -Name "gpupdate" -ErrorAction SilentlyContinue
         if ($existingProcesses) {
             $result = [System.Windows.MessageBox]::Show(
@@ -1269,226 +1270,21 @@ function Start-Gpupdate {
             }
         }
         
-        # gpupdate /force starten mit verbesserter Konfiguration
-        $processStartInfo = New-Object System.Diagnostics.ProcessStartInfo
-        $processStartInfo.FileName = "gpupdate.exe"
-        $processStartInfo.Arguments = "/force"
-        $processStartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-        $processStartInfo.UseShellExecute = $false
-        $processStartInfo.RedirectStandardOutput = $true
-        $processStartInfo.RedirectStandardError = $true
-        $processStartInfo.CreateNoWindow = $true
+        # CMD-Befehl zusammenstellen
+        $cmdArguments = '/k "echo =============================================== && echo DATEV-Toolbox 2.0 - Gruppenrichtlinien-Update && echo =============================================== && echo. && echo Starte Gruppenrichtlinien-Update... && echo. && gpupdate /force && echo. && echo =============================================== && echo Gruppenrichtlinien-Update abgeschlossen! && echo =============================================== && echo. && echo Fenster kann geschlossen werden. && pause"'
         
-        $process = [System.Diagnostics.Process]::Start($processStartInfo)
+        # CMD-Fenster starten
+        Start-Process -FilePath "cmd.exe" -ArgumentList $cmdArguments -WindowStyle Normal
         
-        if ($null -eq $process) {
-            throw "Konnte gpupdate-Prozess nicht starten"
-        }
+        Write-Log -Message "Gruppenrichtlinien-Update in separater CMD gestartet" -Level 'INFO'
         
-        Write-Log -Message "Gruppenrichtlinien-Update läuft im Hintergrund (PID: $($process.Id))..." -Level 'INFO'
-        
-        # Progress-Dialog anzeigen (nicht-blockierend)
-        $progressDialog = New-Object System.Windows.Window
-        $progressDialog.Title = "Gruppenrichtlinien-Update"
-        $progressDialog.Width = 400
-        $progressDialog.Height = 150
-        $progressDialog.WindowStartupLocation = 'CenterOwner'
-        $progressDialog.Owner = $window
-        $progressDialog.ResizeMode = 'NoResize'
-        $progressDialog.WindowStyle = 'ToolWindow'
-        
-        $progressStackPanel = New-Object System.Windows.Controls.StackPanel
-        $progressStackPanel.Margin = '10'
-        
-        $progressLabel = New-Object System.Windows.Controls.Label
-        $progressLabel.Content = "Gruppenrichtlinien werden aktualisiert..."
-        $progressLabel.HorizontalAlignment = 'Center'
-        $progressStackPanel.Children.Add($progressLabel) | Out-Null
-        
-        $progressBar = New-Object System.Windows.Controls.ProgressBar
-        $progressBar.IsIndeterminate = $true
-        $progressBar.Height = 20
-        $progressBar.Margin = '0,10'
-        $progressStackPanel.Children.Add($progressBar) | Out-Null
-        
-        $cancelButton = New-Object System.Windows.Controls.Button
-        $cancelButton.Content = "Abbrechen"
-        $cancelButton.Width = 80
-        $cancelButton.HorizontalAlignment = 'Center'
-        $cancelButton.Margin = '0,10,0,0'
-        $progressStackPanel.Children.Add($cancelButton) | Out-Null
-        
-        $progressDialog.Content = $progressStackPanel
-        
-        # Timer für Prozess-Überwachung (korrigierte Implementierung)
-        $timer = New-Object System.Windows.Threading.DispatcherTimer
-        $timer.Interval = [TimeSpan]::FromSeconds(1)
-        
-        # Korrekte Datenstruktur für Timer-Callback
-        $timer.Tag = @{
-            Process = $process
-            StartTime = Get-Date
-            ProgressDialog = $progressDialog
-            OutputData = New-Object System.Text.StringBuilder
-            ErrorData = New-Object System.Text.StringBuilder
-        }
-        
-        # Cancel-Button Event-Handler
-        $cancelButton.Add_Click({
-            $timerData = $timer.Tag
-            $currentProcess = $timerData.Process
-            
-            try {
-                if ($null -ne $currentProcess -and -not $currentProcess.HasExited) {
-                    $currentProcess.Kill()
-                    Write-Log -Message "Gruppenrichtlinien-Update abgebrochen (PID: $($currentProcess.Id))" -Level 'INFO'
-                }
-            }
-            catch {
-                Write-Log -Message "Fehler beim Abbrechen des Prozesses: $($_.Exception.Message)" -Level 'WARN'
-            }
-            
-            $timer.Stop()
-            $timerData.ProgressDialog.Close()
-        })
-        
-        # Timer-Tick Event-Handler (korrigierte Logik)
-        $timer.Add_Tick({
-            param($timerSender, $timerEventArgs)
-            
-            try {
-                $timerData = $timerSender.Tag
-                $currentProcess = $timerData.Process
-                $startTime = $timerData.StartTime
-                $currentDialog = $timerData.ProgressDialog
-                
-                # Timeout-Prüfung
-                $elapsed = (Get-Date) - $startTime
-                if ($elapsed -gt [TimeSpan]::FromMinutes($script:Config.Timeouts.GpupdateTimeout)) {
-                    $timerSender.Stop()
-                    Write-Log -Message "Gruppenrichtlinien-Update Timeout nach $($script:Config.Timeouts.GpupdateTimeout) Minuten erreicht" -Level 'WARN'
-                    
-                    # Prozess beenden
-                    try {
-                        if ($null -ne $currentProcess -and -not $currentProcess.HasExited) {
-                            $currentProcess.Kill()
-                            $currentProcess.WaitForExit(5000) # 5 Sekunden warten
-                        }
-                    }
-                    catch {
-                        Write-Log -Message "Fehler beim Beenden des Timeout-Prozesses: $($_.Exception.Message)" -Level 'WARN'
-                    }
-                    finally {
-                        if ($null -ne $currentProcess) {
-                            $currentProcess.Dispose()
-                        }
-                    }
-                    
-                    $currentDialog.Close()
-                    
-                    [System.Windows.MessageBox]::Show(
-                        "Das Gruppenrichtlinien-Update wurde nach $($script:Config.Timeouts.GpupdateTimeout) Minuten abgebrochen.`n`nDer Prozess dauerte ungewöhnlich lange.",
-                        "Timeout",
-                        [System.Windows.MessageBoxButton]::OK,
-                        [System.Windows.MessageBoxImage]::Warning
-                    )
-                    return
-                }
-                
-                # Prozess-Status prüfen
-                if ($null -eq $currentProcess) {
-                    $timerSender.Stop()
-                    $currentDialog.Close()
-                    Write-Log -Message "Prozess-Referenz verloren" -Level 'ERROR'
-                    return
-                }
-                
-                # Prüfen ob Prozess beendet ist
-                if ($currentProcess.HasExited) {
-                    $timerSender.Stop()
-                    $currentDialog.Close()
-                    
-                    $exitCode = $currentProcess.ExitCode
-                    
-                    # Output lesen falls verfügbar
-                    $output = ""
-                    $errorOutput = ""
-                    try {
-                        if (-not $currentProcess.StandardOutput.EndOfStream) {
-                            $output = $currentProcess.StandardOutput.ReadToEnd()
-                        }
-                        if (-not $currentProcess.StandardError.EndOfStream) {
-                            $errorOutput = $currentProcess.StandardError.ReadToEnd()
-                        }
-                    }
-                    catch {
-                        Write-Log -Message "Konnte Prozess-Output nicht lesen: $($_.Exception.Message)" -Level 'DEBUG'
-                    }
-                    
-                    # Prozess-Ressourcen freigeben
-                    try {
-                        $currentProcess.Dispose()
-                    }
-                    catch {
-                        Write-Log -Message "Fehler beim Dispose des Prozesses: $($_.Exception.Message)" -Level 'WARN'
-                    }
-                    
-                    # Ergebnis auswerten und anzeigen
-                    if ($exitCode -eq 0) {
-                        Write-Log -Message "Gruppenrichtlinien erfolgreich aktualisiert (Exit-Code: $exitCode)" -Level 'INFO'
-                        [System.Windows.MessageBox]::Show(
-                            "Gruppenrichtlinien wurden erfolgreich aktualisiert.`n`nDie neuen Richtlinien sind jetzt aktiv.",
-                            "Gruppenrichtlinien aktualisiert",
-                            [System.Windows.MessageBoxButton]::OK,
-                            [System.Windows.MessageBoxImage]::Information
-                        )
-                    }
-                    else {
-                        Write-Log -Message "Gruppenrichtlinien-Update beendet mit Exit-Code: $exitCode" -Level 'WARN'
-                        if (-not [string]::IsNullOrEmpty($errorOutput)) {
-                            Write-Log -Message "Gpupdate Fehler-Output: $errorOutput" -Level 'WARN'
-                        }
-                        
-                        $message = "Gruppenrichtlinien-Update wurde mit Warnungen abgeschlossen.`nExit-Code: $exitCode"
-                        if (-not [string]::IsNullOrEmpty($errorOutput)) {
-                            $message += "`n`nFehler: $($errorOutput.Substring(0, [Math]::Min(200, $errorOutput.Length)))"
-                        }
-                        
-                        [System.Windows.MessageBox]::Show(
-                            $message,
-                            "Gruppenrichtlinien-Update",
-                            [System.Windows.MessageBoxButton]::OK,
-                            [System.Windows.MessageBoxImage]::Warning
-                        )
-                    }
-                }
-                
-                # Progress-Dialog-Status aktualisieren (elapsed time)
-                $elapsedText = "Gruppenrichtlinien werden aktualisiert... ({0:mm\:ss})" -f $elapsed
-                $currentDialog.Dispatcher.Invoke([Action]{
-                    $progressLabel.Content = $elapsedText
-                })
-                
-            }
-            catch {
-                $timerSender.Stop()
-                if ($null -ne $timerData.ProgressDialog) {
-                    $timerData.ProgressDialog.Close()
-                }
-                Write-Log -Message "Fehler im Timer-Callback: $($_.Exception.Message)" -Level 'ERROR'
-                
-                [System.Windows.MessageBox]::Show(
-                    "Fehler bei der Überwachung des Gruppenrichtlinien-Updates:`n$($_.Exception.Message)",
-                    "Fehler",
-                    [System.Windows.MessageBoxButton]::OK,
-                    [System.Windows.MessageBoxImage]::Error
-                )
-            }
-        })
-        
-        # Timer starten und Progress-Dialog anzeigen
-        $timer.Start()
-        $progressDialog.ShowDialog() | Out-Null
+        # Benutzer informieren
+        [System.Windows.MessageBox]::Show(
+            "Das Gruppenrichtlinien-Update wurde in einem separaten CMD-Fenster gestartet.`n`nDas Fenster zeigt den Fortschritt an und kann nach Abschluss geschlossen werden.",
+            "Gruppenrichtlinien-Update gestartet",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Information
+        )
         
     }
     catch {
