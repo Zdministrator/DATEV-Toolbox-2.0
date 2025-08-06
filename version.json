@@ -1,20 +1,37 @@
 {
-  "version": "2.1.5",
-  "releaseDate": "2025-08-05",
+  "version": "2.1.6",
+  "releaseDate": "2025-08-06",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Bugfix-Release: StringBuilder-Ausgabe und Code-Stabilisierung",
-    "• StringBuilder-Terminal-Ausgabe Problem behoben: Keine störenden Kapazitäts-Anzeigen mehr beim Start",
-    "• StringBuilder.Clear() und StringBuilder.Append() Operationen mit $null unterdrückt",
-    "• Saubere Terminal-Ausgabe für professionelle Benutzeroberfläche",
-    "• GPUpdate-Funktion vollständig vereinfacht (von 200+ auf 50 Zeilen Code)",
-    "• Entfernung der komplexen Timer-basierten Lösung zugunsten einfacher CMD-Ausführung",
-    "• Download-Links für neue DATEV myUpdates API-Struktur aktualisiert",
-    "• Alle kritischen Bugs aus vorherigen Versionen final behoben",
-    "• PowerShell 5.1 Kompatibilität und Performance-Optimierungen beibehalten",
-    "Deutlich stabilere und benutzerfreundlichere Anwendung ohne kosmetische Störungen"
+    "Memory Management und Thread-Safety Release: Professionelle Speicherverwaltung",
+    "• Event-Handler Memory Leak Prevention System implementiert ($script:ComboBoxEventRegistered)",
+    "• Automatische Cleanup-Mechanismen für WPF-Event-Handler (Downloads-ComboBox)",
+    "• Thread-Safety für Settings-Timer mit Monitor-Lock Pattern ($script:SettingsLock)",
+    "• Race Condition Prevention bei Settings-Speicherung und Timer-Verwaltung",
+    "• Performance-optimierte StringBuilder-Logging mit Memory-Effizienz",
+    "• Zentrale Konfigurationsverwaltung und DATEV-Pfad-Caching verbessert",
+    "• Runspace-Pool für asynchrone Operationen mit ordnungsgemäßer Ressourcen-Freigabe",
+    "• Umfassende try-finally Exception-Safety in allen kritischen Bereichen",
+    "• PowerShell 5.1 Kompatibilität und Thread-sichere Operationen gewährleistet",
+    "Hochperformante und speicherschonende Anwendung für langfristige Nutzung"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.5",
+      "releaseDate": "2025-08-05",
+      "changelog": [
+        "Bugfix-Release: StringBuilder-Ausgabe und Code-Stabilisierung",
+        "• StringBuilder-Terminal-Ausgabe Problem behoben: Keine störenden Kapazitäts-Anzeigen mehr beim Start",
+        "• StringBuilder.Clear() und StringBuilder.Append() Operationen mit $null unterdrückt",
+        "• Saubere Terminal-Ausgabe für professionelle Benutzeroberfläche",
+        "• GPUpdate-Funktion vollständig vereinfacht (von 200+ auf 50 Zeilen Code)",
+        "• Entfernung der komplexen Timer-basierten Lösung zugunsten einfacher CMD-Ausführung",
+        "• Download-Links für neue DATEV myUpdates API-Struktur aktualisiert",
+        "• Alle kritischen Bugs aus vorherigen Versionen final behoben",
+        "• PowerShell 5.1 Kompatibilität und Performance-Optimierungen beibehalten",
+        "Deutlich stabilere und benutzerfreundlichere Anwendung ohne kosmetische Störungen"
+      ]
+    },
     {
       "version": "2.1.4",
       "releaseDate": "2025-07-18",
