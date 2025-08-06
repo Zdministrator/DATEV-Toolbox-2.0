@@ -235,6 +235,10 @@ $script:SettingsSaveTimer = $null
 $script:CachedDATEVPaths = @{}
 $script:PathCacheExpiry = @{}
 
+# Event-Handler Memory Leak Prevention
+$script:ComboBoxEventRegistered = $false
+$script:ComboBoxHandler = $null
+
 # Performance-Optimierung: Runspace-Pool für asynchrone Operationen
 $script:RunspacePool = $null
 $script:ActiveJobs = @{}
@@ -2051,6 +2055,12 @@ function Initialize-DownloadsComboBox {
             return
         }
         
+        # Event-Handler Memory Leak Fix: Handler neu registrieren
+        if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler) {
+            $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+            Write-Log -Message "ComboBox Event-Handler für Neuinitialisierung entfernt" -Level 'DEBUG'
+        }
+        
         $downloadsData = Get-DATEVDownloads
         $downloads = $downloadsData.downloads
         $lastUpdated = $downloadsData.lastUpdated
@@ -2089,6 +2099,13 @@ function Initialize-DownloadsComboBox {
         
         # Platzhalter als Standardauswahl setzen
         $cmbDirectDownloads.SelectedIndex = 0
+        
+        # Event-Handler neu registrieren nach Initialisierung
+        if ($null -ne $script:ComboBoxHandler) {
+            $cmbDirectDownloads.Add_SelectionChanged($script:ComboBoxHandler)
+            $script:ComboBoxEventRegistered = $true
+            Write-Log -Message "ComboBox Event-Handler nach Initialisierung neu registriert" -Level 'DEBUG'
+        }
         
         if ($cmbDirectDownloads.Items.Count -gt 1) {
             Write-Log -Message "$($cmbDirectDownloads.Items.Count - 1) Downloads geladen" -Level 'DEBUG'
@@ -2511,20 +2528,32 @@ Write-Log -Message "Starte zentrale Button-Handler-Registrierung..." -Level 'DEB
 Register-ButtonHandlers -Window $window
 Write-Log -Message "Zentrale Button-Handler-Registrierung abgeschlossen" -Level 'DEBUG'
 
-# Event-Handler für DATEV Downloads ComboBox
+# Event-Handler für DATEV Downloads ComboBox (Memory Leak Fix)
 if ($null -ne $cmbDirectDownloads) {
-    $cmbDirectDownloads.Add_SelectionChanged({
-            if ($null -ne $cmbDirectDownloads.SelectedItem -and
-                $cmbDirectDownloads.SelectedIndex -gt 0 -and
-                $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
-                $btnDownload.IsEnabled = $true
-                $selectedItem = $cmbDirectDownloads.SelectedItem
-                Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'DEBUG'
-            }
-            else {
-                $btnDownload.IsEnabled = $false
-            }
-        })
+    # Alte Event-Handler entfernen vor Neuregistrierung
+    if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler) {
+        $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+        Write-Log -Message "Alter ComboBox Event-Handler entfernt" -Level 'DEBUG'
+    }
+    
+    # Neuen Handler erstellen und speichern
+    $script:ComboBoxHandler = {
+        if ($null -ne $cmbDirectDownloads.SelectedItem -and
+            $cmbDirectDownloads.SelectedIndex -gt 0 -and
+            $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
+            $btnDownload.IsEnabled = $true
+            $selectedItem = $cmbDirectDownloads.SelectedItem
+            Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'DEBUG'
+        }
+        else {
+            $btnDownload.IsEnabled = $false
+        }
+    }
+    
+    # Handler registrieren und Status merken
+    $cmbDirectDownloads.Add_SelectionChanged($script:ComboBoxHandler)
+    $script:ComboBoxEventRegistered = $true
+    Write-Log -Message "Neuer ComboBox Event-Handler registriert" -Level 'DEBUG'
 }
 else {
     Write-Log -Message "ComboBox 'cmbDirectDownloads' konnte nicht gefunden werden" -Level 'WARN'
@@ -2568,6 +2597,17 @@ $window.Add_Closing({
     # Settings sofort speichern falls noch ausstehend
     if ($script:SettingsNeedSave) {
         Save-Settings
+    }
+    
+    # Event-Handler bereinigen (Memory Leak Prevention)
+    if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler -and $null -ne $cmbDirectDownloads) {
+        try {
+            $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+            Write-Log -Message "ComboBox Event-Handler beim Cleanup entfernt" -Level 'DEBUG'
+        }
+        catch {
+            Write-Log -Message "Fehler beim Entfernen des ComboBox Event-Handlers: $($_.Exception.Message)" -Level 'WARN'
+        }
     }
     
     # Runspace-Pool schließen

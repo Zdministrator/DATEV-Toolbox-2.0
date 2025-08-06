@@ -18,6 +18,7 @@ settings.json
 
 # Blogposts und temporäre Dateien
 Blogpost-*.md
+Teams-Post-*.txt
 
 # System-Dateien
 *.DS_Store
