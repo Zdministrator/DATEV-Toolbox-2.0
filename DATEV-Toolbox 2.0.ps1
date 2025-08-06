@@ -11,7 +11,7 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.1.6
+    Version:        2.1.7
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.6"
+$script:AppVersion = "2.1.7"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -1336,7 +1336,7 @@ function Start-Gpupdate {
 function Show-ChangelogDialog {
     <#
     .SYNOPSIS
-    Zeigt das Changelog der aktuellen Version und der letzten Updates an
+    Zeigt das Changelog der aktuellen Version und der letzten Updates in einem scrollbaren Fenster an
     #>
     $webClient = $null
     try {
@@ -1355,36 +1355,96 @@ function Show-ChangelogDialog {
         $versionData = $versionJson | ConvertFrom-Json
         
         # Changelog-Text zusammenstellen
-        $changelogText = "DATEV-Toolbox 2.0 - Changelog`n"
-        $changelogText += "=" * 50 + "`n`n"
+        $changelogText = "DATEV-Toolbox 2.0 - Changelog`r`n"
+        $changelogText += "=" * 60 + "`r`n`r`n"
         
         # Aktuelle Version
-        $changelogText += "📦 Version $($versionData.version) ($(Get-Date $versionData.releaseDate -Format 'dd.MM.yyyy'))`n"
-        $changelogText += "-" * 30 + "`n"
+        $changelogText += "📦 Version $($versionData.version) ($(Get-Date $versionData.releaseDate -Format 'dd.MM.yyyy'))`r`n"
+        $changelogText += "-" * 40 + "`r`n"
         foreach ($change in $versionData.changelog) {
-            $changelogText += "• $change`n"
+            $changelogText += "• $change`r`n"
         }
-        $changelogText += "`n"
+        $changelogText += "`r`n"
         
-        # Vorherige Versionen
+        # Vorherige Versionen (maximal 10 für bessere Performance)
         if ($versionData.previousVersions) {
-            foreach ($prevVersion in $versionData.previousVersions) {
-                $changelogText += "📦 Version $($prevVersion.version) ($(Get-Date $prevVersion.releaseDate -Format 'dd.MM.yyyy'))`n"
-                $changelogText += "-" * 30 + "`n"
+            $maxVersions = [Math]::Min(10, $versionData.previousVersions.Count)
+            for ($i = 0; $i -lt $maxVersions; $i++) {
+                $prevVersion = $versionData.previousVersions[$i]
+                $changelogText += "📦 Version $($prevVersion.version) ($(Get-Date $prevVersion.releaseDate -Format 'dd.MM.yyyy'))`r`n"
+                $changelogText += "-" * 40 + "`r`n"
                 foreach ($change in $prevVersion.changelog) {
-                    $changelogText += "• $change`n"
+                    $changelogText += "• $change`r`n"
                 }
-                $changelogText += "`n"
+                $changelogText += "`r`n"
+            }
+            
+            # Hinweis wenn mehr Versionen verfügbar sind
+            if ($versionData.previousVersions.Count -gt 10) {
+                $changelogText += "... und $($versionData.previousVersions.Count - 10) weitere Versionen`r`n"
+                $changelogText += "Vollständige Historie: https://github.com/Zdministrator/DATEV-Toolbox-2.0`r`n"
             }
         }
         
-        # Changelog in MessageBox anzeigen
-        [System.Windows.MessageBox]::Show(
-            $changelogText,
-            "DATEV-Toolbox 2.0 - Changelog",
-            [System.Windows.MessageBoxButton]::OK,
-            [System.Windows.MessageBoxImage]::Information
-        )
+        # Erstelle WPF-Fenster für scrollbares Changelog
+        $changelogWindow = New-Object System.Windows.Window
+        $changelogWindow.Title = "DATEV-Toolbox 2.0 - Changelog"
+        $changelogWindow.Width = 800
+        $changelogWindow.Height = 600
+        $changelogWindow.WindowStartupLocation = "CenterOwner"
+        $changelogWindow.Owner = $window
+        $changelogWindow.ResizeMode = "CanResize"
+        $changelogWindow.MinWidth = 600
+        $changelogWindow.MinHeight = 400
+        
+        # Grid-Layout erstellen
+        $grid = New-Object System.Windows.Controls.Grid
+        $grid.Margin = "10"
+        
+        # Zwei Zeilen: TextBox und Button
+        $row1 = New-Object System.Windows.Controls.RowDefinition
+        $row1.Height = New-Object System.Windows.GridLength(1, [System.Windows.GridUnitType]::Star)
+        $row2 = New-Object System.Windows.Controls.RowDefinition
+        $row2.Height = New-Object System.Windows.GridLength(40)
+        
+        $grid.RowDefinitions.Add($row1)
+        $grid.RowDefinitions.Add($row2)
+        
+        # Scrollbare TextBox für Changelog
+        $textBox = New-Object System.Windows.Controls.TextBox
+        $textBox.Text = $changelogText
+        $textBox.IsReadOnly = $true
+        $textBox.TextWrapping = "Wrap"
+        $textBox.VerticalScrollBarVisibility = "Auto"
+        $textBox.HorizontalScrollBarVisibility = "Auto"
+        $textBox.FontFamily = "Consolas, Courier New, monospace"
+        $textBox.FontSize = 12
+        $textBox.Margin = "0,0,0,10"
+        $textBox.Padding = "10"
+        $textBox.Background = "#F8F8F8"
+        
+        [System.Windows.Controls.Grid]::SetRow($textBox, 0)
+        $grid.Children.Add($textBox)
+        
+        # Schließen-Button
+        $closeButton = New-Object System.Windows.Controls.Button
+        $closeButton.Content = "Schließen"
+        $closeButton.Width = 100
+        $closeButton.Height = 30
+        $closeButton.HorizontalAlignment = "Right"
+        $closeButton.VerticalAlignment = "Top"
+        $closeButton.Add_Click({
+            $changelogWindow.Close()
+        })
+        
+        [System.Windows.Controls.Grid]::SetRow($closeButton, 1)
+        $grid.Children.Add($closeButton)
+        
+        # Grid zum Fenster hinzufügen
+        $changelogWindow.Content = $grid
+        
+        # Fenster anzeigen
+        $changelogWindow.ShowDialog() | Out-Null
         
         Write-Log -Message "Changelog erfolgreich angezeigt" -Level 'INFO'
         
