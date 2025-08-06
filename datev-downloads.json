@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-05",
+  "lastUpdated": "2025-08-06",
   "downloads": [
     {
       "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
@@ -79,6 +79,11 @@
       "name": "DATEV Serverprep Tool",
       "url": "https://download.datev.de/download/datevitfix/serverprep.exe",
       "description": "DATEV Serverprep Tool zur Vorbereitung und Konfiguration von Windows-Servern für DATEV-Installationen"
+    },
+    {
+      "name": "Deinstallationsnacharbeitentool V. 3.11",
+      "url": "https://download.datev.de/download/deinstallationsnacharbeiten_v311/deinstnacharbeitentool.exe",
+      "description": "DATEV Deinstallationsnacharbeitentool zur Bereinigung nach DATEV-Deinstallationen"
     }
   ]
 }
