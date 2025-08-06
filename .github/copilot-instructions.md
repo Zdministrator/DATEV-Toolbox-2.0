@@ -137,3 +137,17 @@ Write-Log -Message "Fehler: $($_.Exception.Message)" -Level 'ERROR'
 - **Asynchrone Operationen**: Downloads und Updates nicht blockierend
 - **Resource-Cleanup**: Temporäre Dateien nach Gebrauch löschen
 - **Efficient Logging**: Log-Level für Performance-kritische Bereiche beachten
+
+## ⚠️ Wichtige Entwicklungsrichtlinien
+
+### Version-Management
+- **NIEMALS Versionsnummern ohne ausdrückliche Anweisung ändern**
+- **KEINE automatischen Version-Updates** bei kleinen Änderungen
+- **Nur auf direkte Aufforderung** Versionen in PowerShell-Skript oder version.json aktualisieren
+- **Versionierung liegt ausschließlich beim Entwickler**
+
+### Dokumentation und Zusammenfassungen
+- **KEINE automatischen Zusammenfassungen oder Dokumentationen erstellen**
+- **KEINE Release-Notes oder Changelog-Dateien** ohne ausdrückliche Bitte
+- **NUR die angeforderten Änderungen durchführen**
+- **Bei Unsicherheit nachfragen** statt anzunehmen

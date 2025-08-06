@@ -1,20 +1,35 @@
 {
-  "version": "2.1.7",
+  "version": "2.1.8",
   "releaseDate": "2025-08-06",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "UI/UX-Verbesserung: Scrollbares Changelog-Fenster",
-    "• Changelog-Dialog von MessageBox auf scrollbares WPF-Fenster umgestellt",
-    "• Größenverstellbares Fenster (800x600, min. 600x400) für bessere Lesbarkeit",
-    "• Vertikale und horizontale Scrollbalken für lange Changelog-Listen",
-    "• Monospace-Font (Consolas) für bessere Formatierung und Lesbarkeit",
-    "• Maximale Anzeige von 10 Versionen für bessere Performance",
-    "• Hinweis auf vollständige Historie bei mehr als 10 Versionen",
-    "• Memory Management: WebClient ordnungsgemäß disposed",
-    "• Professionelle Benutzeroberfläche mit verbesserter Usability",
-    "Deutlich benutzerfreundlichere Changelog-Anzeige für umfangreiche Versionshistorien"
+    "GUI-Erweiterung: Neuer Dokumente-Tab und Download-Ergänzung",
+    "• Neuer 'Dokumente' Tab zwischen Downloads und System hinzugefügt",
+    "• Vorbereitung für zukünftige Dokumenten- und Anleitungs-Features",
+    "• Saubere Tab-Struktur für bessere Navigation und Benutzerfreundlichkeit",
+    "• Deinstallationsnacharbeitentool V. 3.11 zur Download-Liste hinzugefügt",
+    "• Download-Links aktualisiert und erweitert für vollständige DATEV-Tool-Abdeckung",
+    "• Benutzeroberfläche vorbereitet für zukünftige Content-Erweiterungen",
+    "• Konsistente UI-Gestaltung mit ScrollViewer und GroupBox-Struktur",
+    "Erweiterte Navigation und mehr Download-Optionen für DATEV-Umgebungen"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.7",
+      "releaseDate": "2025-08-06",
+      "changelog": [
+        "UI/UX-Verbesserung: Scrollbares Changelog-Fenster",
+        "• Changelog-Dialog von MessageBox auf scrollbares WPF-Fenster umgestellt",
+        "• Größenverstellbares Fenster (800x600, min. 600x400) für bessere Lesbarkeit",
+        "• Vertikale und horizontale Scrollbalken für lange Changelog-Listen",
+        "• Monospace-Font (Consolas) für bessere Formatierung und Lesbarkeit",
+        "• Maximale Anzeige von 10 Versionen für bessere Performance",
+        "• Hinweis auf vollständige Historie bei mehr als 10 Versionen",
+        "• Memory Management: WebClient ordnungsgemäß disposed",
+        "• Professionelle Benutzeroberfläche mit verbesserter Usability",
+        "Deutlich benutzerfreundlichere Changelog-Anzeige für umfangreiche Versionshistorien"
+      ]
+    },
     {
       "version": "2.1.6",
       "releaseDate": "2025-08-06",

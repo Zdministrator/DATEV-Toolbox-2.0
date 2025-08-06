@@ -11,7 +11,7 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.1.7
+    Version:        2.1.8
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.7"
+$script:AppVersion = "2.1.8"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -627,7 +627,27 @@ function Close-RunspacePool {
                                     ToolTip="Portal für DVD/CD-ROM Downloads und Datenträger-Bestellungen"/>
                         </StackPanel>
                     </GroupBox>                </StackPanel>
-            </TabItem>            <TabItem Header="System">
+            </TabItem>
+            
+            <TabItem Header="Dokumente">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <!-- Platzhalter für zukünftige Dokumenten-Features -->
+                        <GroupBox Margin="3,3,3,5">
+                            <GroupBox.Header>
+                                <TextBlock Text="Dokumente und Anleitungen" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="8">
+                                <TextBlock Text="Dieser Bereich wird in zukünftigen Versionen erweitert." 
+                                           TextAlignment="Center" Margin="0,20,0,20" 
+                                           FontStyle="Italic" Foreground="Gray"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            
+            <TabItem Header="System">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
                         <!-- Aktionen -->
