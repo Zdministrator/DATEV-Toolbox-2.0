@@ -239,6 +239,9 @@ $script:PathCacheExpiry = @{}
 $script:ComboBoxEventRegistered = $false
 $script:ComboBoxHandler = $null
 
+# Thread-Safety für Settings-Timer
+$script:SettingsLock = New-Object System.Object
+
 # Performance-Optimierung: Runspace-Pool für asynchrone Operationen
 $script:RunspacePool = $null
 $script:ActiveJobs = @{}
@@ -300,7 +303,7 @@ function Get-DefaultSettings {
 function Save-Settings {
     <#
     .SYNOPSIS
-    Speichert Settings sofort (interne Funktion)
+    Speichert Settings sofort (thread-sichere interne Funktion)
     #>
     try {
         $settingsPath = $script:Config.Paths.SettingsFile
@@ -310,11 +313,14 @@ function Save-Settings {
             New-Item -ItemType Directory -Path $settingsDir -Force | Out-Null
         }
         
+        # Thread-sichere Settings-Serialisierung
+        # Hinweis: Diese Funktion wird nur innerhalb des Monitor-Locks aufgerufen
         $script:Settings | ConvertTo-Json -Depth 3 | Set-Content $settingsPath -Encoding UTF8
         $script:SettingsNeedSave = $false
         Write-Log -Message "Einstellungen gespeichert: $settingsPath" -Level 'DEBUG'
     } catch {
         Write-Log -Message "Fehler beim Speichern der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
+        throw
     }
 }
 
@@ -348,7 +354,7 @@ function Get-Setting {
 function Set-Setting {
     <#
     .SYNOPSIS
-    Setzt einen Einstellungswert (mit verzögertem Speichern)
+    Setzt einen Einstellungswert (mit thread-sicherem verzögertem Speichern)
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -361,36 +367,60 @@ function Set-Setting {
         Initialize-Settings
     }
     
-    $oldValue = $script:Settings[$Key]
-    $script:Settings[$Key] = $Value
-    
-    # Cache-Update für Performance-kritische Settings
-    if ($Key -eq 'ShowDebugLogs') {
-        $script:IsDebugEnabled = $Value
-    }
-    
-    # Verzögertes Speichern markieren
-    $script:SettingsNeedSave = $true
-    
-    # Timer für verzögertes Speichern starten (falls nicht bereits aktiv)
-    if ($null -eq $script:SettingsSaveTimer) {
-        $script:SettingsSaveTimer = New-Object System.Windows.Threading.DispatcherTimer
-        $script:SettingsSaveTimer.Interval = [TimeSpan]::FromSeconds(2)
-        $script:SettingsSaveTimer.Add_Tick({
-            if ($script:SettingsNeedSave) {
-                Save-Settings
-            }
+    # Thread-sichere Settings-Verwaltung
+    [System.Threading.Monitor]::Enter($script:SettingsLock)
+    try {
+        $oldValue = $script:Settings[$Key]
+        $script:Settings[$Key] = $Value
+        
+        # Cache-Update für Performance-kritische Settings
+        if ($Key -eq 'ShowDebugLogs') {
+            $script:IsDebugEnabled = $Value
+        }
+        
+        # Verzögertes Speichern markieren
+        $script:SettingsNeedSave = $true
+        
+        # Thread-sichere Timer-Erstellung/Verwaltung
+        if ($null -eq $script:SettingsSaveTimer) {
+            $script:SettingsSaveTimer = New-Object System.Windows.Threading.DispatcherTimer
+            $script:SettingsSaveTimer.Interval = [TimeSpan]::FromSeconds(2)
+            $script:SettingsSaveTimer.Add_Tick({
+                # Timer-Tick-Handler ist auch thread-sicher
+                [System.Threading.Monitor]::Enter($script:SettingsLock)
+                try {
+                    if ($script:SettingsNeedSave) {
+                        Save-Settings
+                    }
+                    $script:SettingsSaveTimer.Stop()
+                    $script:SettingsSaveTimer = $null
+                }
+                catch {
+                    Write-Log -Message "Fehler beim Settings-Timer-Tick: $($_.Exception.Message)" -Level 'ERROR'
+                }
+                finally {
+                    [System.Threading.Monitor]::Exit($script:SettingsLock)
+                }
+            })
+            $script:SettingsSaveTimer.Start()
+            Write-Log -Message "Settings-Timer erstellt und gestartet (thread-sicher)" -Level 'DEBUG'
+        } else {
+            # Timer bereits aktiv, nur neu starten
             $script:SettingsSaveTimer.Stop()
-            $script:SettingsSaveTimer = $null
-        })
-        $script:SettingsSaveTimer.Start()
-    } else {
-        # Timer bereits aktiv, nur neu starten
-        $script:SettingsSaveTimer.Stop()
-        $script:SettingsSaveTimer.Start()
+            $script:SettingsSaveTimer.Start()
+            Write-Log -Message "Settings-Timer neu gestartet (thread-sicher)" -Level 'DEBUG'
+        }
+        
+        Write-Log -Message "Einstellung '$Key' gesetzt: $Value (war: $oldValue)" -Level 'DEBUG'
     }
-    
-    Write-Log -Message "Einstellung '$Key' gesetzt: $Value (war: $oldValue)" -Level 'DEBUG'
+    catch {
+        Write-Log -Message "Fehler beim Setzen der Einstellung '$Key': $($_.Exception.Message)" -Level 'ERROR'
+        throw
+    }
+    finally {
+        # Lock IMMER freigeben (auch bei Exceptions)
+        [System.Threading.Monitor]::Exit($script:SettingsLock)
+    }
 }
 
 # Performance-Hilfsfunktionen für Cache-Management
@@ -2613,10 +2643,20 @@ $window.Add_Closing({
     # Runspace-Pool schließen
     Close-RunspacePool
     
-    # Timer stoppen falls aktiv
-    if ($null -ne $script:SettingsSaveTimer) {
-        $script:SettingsSaveTimer.Stop()
-        $script:SettingsSaveTimer = $null
+    # Thread-sichere Timer-Bereinigung
+    [System.Threading.Monitor]::Enter($script:SettingsLock)
+    try {
+        if ($null -ne $script:SettingsSaveTimer) {
+            $script:SettingsSaveTimer.Stop()
+            $script:SettingsSaveTimer = $null
+            Write-Log -Message "Settings-Timer thread-sicher gestoppt" -Level 'DEBUG'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Thread-sicheren Timer-Stopp: $($_.Exception.Message)" -Level 'WARN'
+    }
+    finally {
+        [System.Threading.Monitor]::Exit($script:SettingsLock)
     }
     
     Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
