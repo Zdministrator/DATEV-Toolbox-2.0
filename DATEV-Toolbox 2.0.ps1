@@ -2494,7 +2494,7 @@ function Initialize-DocumentsList {
     Initialisiert die Dokumente-Liste im GUI
     #>
     try {
-        $documentsPanel = $script:MainWindow.FindName("spDocumentsList")
+        $documentsPanel = $window.FindName("spDocumentsList")
         if (-not $documentsPanel) {
             Write-Log -Message "Dokumente-Panel nicht gefunden" -Level 'WARN'
             return
