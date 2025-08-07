@@ -2421,6 +2421,7 @@ function Get-DATEVDocuments {
             $documents = @()
             foreach ($doc in $documentsData.documents) {
                 $documents += @{
+                    id = $doc.id
                     title = $doc.title
                     url = $doc.url  
                     description = $doc.description
@@ -2469,6 +2470,7 @@ function Update-DATEVDocuments {
             $documents = @()
             foreach ($doc in $documentsData.documents) {
                 $documents += @{
+                    id = $doc.id
                     title = $doc.title
                     url = $doc.url
                     description = $doc.description
@@ -2532,7 +2534,7 @@ function Initialize-DocumentsList {
             
             # Titel als anklickbarer Link
             $titleLink = New-Object System.Windows.Controls.TextBlock
-            $titleLink.Text = $doc.title
+            $titleLink.Text = "$($doc.id) - $($doc.title)"
             $titleLink.FontWeight = "Bold"
             $titleLink.Foreground = "Blue"
             $titleLink.Cursor = "Hand"
