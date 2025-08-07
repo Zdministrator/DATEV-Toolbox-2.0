@@ -2,9 +2,22 @@
   "lastUpdated": "2025-08-07",
   "documents": [
     {
+      "id": "1080019",
       "title": "DATEV-Software deinstallieren",
       "url": "https://apps.datev.de/help-center/documents/1080019",
       "description": "In diesem Dokument erfahren Sie, wie Sie an einem Rechner alle DATEV-Programme deinstallieren."
+    },
+    {
+      "id": "1024271",
+      "title": "DATEV Mittelstand: Freischaltcode (FSC) auslesen",
+      "url": "https://apps.datev.de/help-center/documents/1024271",
+      "description": "In diesem Dokument erfahren Sie, wie Sie den aktuellen Freischaltcode zu Ihrem DATEV-Mittelstand-Programm (Freischaltversion) anzeigen."
+    },
+    {
+      "id": "1080106",
+      "title": "Auf eine neue Version von Microsoft Office umsteigen",
+      "url": "https://apps.datev.de/help-center/documents/1080106",
+      "description": "In diesem Dokument erfahren Sie, wie Sie den Umstieg auf eine aktuelle Version von Microsoft Office durchführen."
     }
   ]
 }

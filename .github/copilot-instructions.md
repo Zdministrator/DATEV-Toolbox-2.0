@@ -152,3 +152,31 @@ Write-Log -Message "Fehler: $($_.Exception.Message)" -Level 'ERROR'
 - **KEINE Release-Notes oder Changelog-Dateien** ohne ausdrückliche Bitte
 - **NUR die angeforderten Änderungen durchführen**
 - **Bei Unsicherheit nachfragen** statt anzunehmen
+
+## 🌐 Web-Scraping und Browser-Automatisierung
+
+### Playwright MCP Integration
+- **Bevorzugtes Tool**: Playwright Browser für DATEV Help-Center Scraping
+- **JavaScript-Rendering**: Playwright löst das "Loading..."-Problem bei dynamischen DATEV-Seiten
+- **Automatische Extraktion**: Titel und Beschreibung aus DATEV-Dokumenten
+- **Browser-Navigation**: Vollständige Browser-Simulation für komplexe Webseiten
+
+### DATEV Help-Center Scraping
+- **URL-Pattern**: `https://apps.datev.de/help-center/documents/[DOKUMENT_ID]`
+- **Extraktion-Felder**: `title`, `description`, `id` (aus URL)
+- **JSON-Struktur**: Konsistente Struktur für datev-dokumente.json
+- **Fehlerbehandlung**: Graceful Fallback bei Scraping-Problemen
+
+### Playwright-Workflow
+```javascript
+// Standard-Workflow für DATEV-Dokumente
+1. mcp_playwright_browser_navigate zur DATEV-URL
+2. Automatische Extraktion von Titel und Beschreibung
+3. JSON-Update mit strukturierten Daten
+4. mcp_playwright_browser_close nach Verarbeitung
+```
+
+### Alternative Tools
+- **Fallback**: `fetch_webpage` für einfache HTML-Seiten
+- **Manuell**: Wenn JavaScript-freie Extraktion ausreicht
+- **Browser-Bookmarks**: Als Backup-Lösung für Benutzer
