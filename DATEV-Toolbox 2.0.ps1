@@ -488,7 +488,7 @@ function Close-RunspacePool {
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         Title="DATEV-Toolbox 2 - Version v$script:AppVersion" 
-        Height="700" Width="420" 
+        Height="700" Width="480" 
         MinHeight="500" MinWidth="400"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">    <Grid>
@@ -2520,26 +2520,15 @@ function Initialize-DocumentsList {
         
         # Erstelle Links für jedes Dokument
         foreach ($doc in $documents) {
-            # Erstelle Container für jedes Dokument
-            $docContainer = New-Object System.Windows.Controls.Border
-            $docContainer.BorderBrush = "LightGray"
-            $docContainer.BorderThickness = "1"
-            $docContainer.CornerRadius = "3"
-            $docContainer.Margin = "0,3,0,3"
-            $docContainer.Padding = "8"
-            $docContainer.Background = "White"
-            
-            $docStack = New-Object System.Windows.Controls.StackPanel
-            $docStack.Orientation = "Vertical"
-            
-            # Titel als anklickbarer Link
+            # Titel als anklickbarer Link (ohne Container-Box)
             $titleLink = New-Object System.Windows.Controls.TextBlock
             $titleLink.Text = "$($doc.id) - $($doc.title)"
-            $titleLink.FontWeight = "Bold"
-            $titleLink.Foreground = "Blue"
+            $titleLink.Foreground = "Black"
             $titleLink.Cursor = "Hand"
             $titleLink.TextDecorations = "Underline"
             $titleLink.Tag = $doc.url
+            $titleLink.ToolTip = $doc.description
+            $titleLink.Margin = "0,2,0,2"
             
             # Click-Event für Titel
             $titleLink.Add_MouseLeftButtonUp({
@@ -2555,17 +2544,7 @@ function Initialize-DocumentsList {
                 }
             })
             
-            # Beschreibung
-            $descriptionText = New-Object System.Windows.Controls.TextBlock
-            $descriptionText.Text = $doc.description
-            $descriptionText.TextWrapping = "Wrap"
-            $descriptionText.Margin = "0,3,0,0"
-            $descriptionText.Foreground = "DarkGray"
-            
-            $docStack.Children.Add($titleLink)
-            $docStack.Children.Add($descriptionText)
-            $docContainer.Child = $docStack
-            $documentsPanel.Children.Add($docContainer)
+            $documentsPanel.Children.Add($titleLink)
         }
         
         Write-Log -Message "Dokumente-Liste initialisiert: $($documents.Count) Dokumente" -Level 'INFO'
