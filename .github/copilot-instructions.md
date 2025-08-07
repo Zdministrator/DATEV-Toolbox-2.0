@@ -147,7 +147,8 @@ Write-Log -Message "Fehler: $($_.Exception.Message)" -Level 'ERROR'
 - **Versionierung liegt ausschließlich beim Entwickler**
 
 ### Dokumentation und Zusammenfassungen
-- **KEINE automatischen Zusammenfassungen oder Dokumentationen erstellen**
+- **Nur die README.MD aktuell halten**
+- **KEINE weiteren automatischen Zusammenfassungen oder Dokumentationen erstellen**
 - **KEINE Release-Notes oder Changelog-Dateien** ohne ausdrückliche Bitte
 - **NUR die angeforderten Änderungen durchführen**
 - **Bei Unsicherheit nachfragen** statt anzunehmen
