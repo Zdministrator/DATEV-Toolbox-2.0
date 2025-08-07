@@ -179,6 +179,7 @@ $script:Config = @{
         'btnUpdateDownloads' = @{ Type = 'TextBlock'; FunctionName = 'Update-DATEVDownloads' }
         'btnOpenDownloadFolder' = @{ Type = 'TextBlock'; FunctionName = 'Open-DownloadFolder' }
         'btnUpdateDates' = @{ Type = 'TextBlock'; FunctionName = 'Update-UpdateDates' }
+        'btnRefreshDocuments' = @{ Type = 'TextBlock'; FunctionName = 'Refresh-DocumentsList' }
         
         # Einstellungs-Handler (jetzt auch zentral verwaltet)
         'btnCheckUpdate' = @{ Type = 'Function'; FunctionName = 'Start-UpdateCheck' }
@@ -632,15 +633,21 @@ function Close-RunspacePool {
             <TabItem Header="Dokumente">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Vertical" Margin="10">
-                        <!-- Platzhalter für zukünftige Dokumenten-Features -->
+                        <!-- DATEV Dokumente und Anleitungen -->
                         <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
-                                <TextBlock Text="Dokumente und Anleitungen" FontWeight="Bold" FontSize="12"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="DATEV Dokumente und Anleitungen" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                    <TextBlock Name="btnRefreshDocuments" Text="🔄" FontSize="14" Margin="8,0,0,0" 
+                                               ToolTip="Dokumente aktualisieren" VerticalAlignment="Center" 
+                                               Cursor="Hand" Foreground="Black"/>
+                                </StackPanel>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="8">
-                                <TextBlock Text="Dieser Bereich wird in zukünftigen Versionen erweitert." 
-                                           TextAlignment="Center" Margin="0,20,0,20" 
-                                           FontStyle="Italic" Foreground="Gray"/>
+                                <StackPanel Name="spDocumentsList" Orientation="Vertical" Margin="0,0,0,0">
+                                    <TextBlock Text="Lade Dokumente..." 
+                                               FontStyle="Italic" Foreground="Gray"/>
+                                </StackPanel>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -2394,6 +2401,201 @@ function Open-DownloadFolder {
 }
 #endregion
 
+#region Dokumente-Management
+# Funktionen für das Verwalten und Anzeigen von DATEV-Dokumenten
+
+function Get-DATEVDocuments {
+    <#
+    .SYNOPSIS
+    Lädt die DATEV-Dokumente aus der lokalen JSON-Datei oder GitHub
+    #>
+    try {
+        $documentsPath = Join-Path $script:Config.Paths.AppData "datev-dokumente.json"
+        
+        # Prüfen ob lokale Datei existiert
+        if (Test-Path $documentsPath) {
+            $jsonContent = Get-Content $documentsPath -Raw -Encoding UTF8
+            $documentsData = $jsonContent | ConvertFrom-Json
+            
+            # Konvertiere PSObject zu Hashtable für bessere Handhabung
+            $documents = @()
+            foreach ($doc in $documentsData.documents) {
+                $documents += @{
+                    title = $doc.title
+                    url = $doc.url  
+                    description = $doc.description
+                }
+            }
+            
+            Write-Log -Message "DATEV-Dokumente aus lokaler Datei geladen: $($documents.Count) Dokumente" -Level 'INFO'
+            return $documents
+        }
+        else {
+            Write-Log -Message "Lokale Dokumente-Datei nicht gefunden. Lade von GitHub..." -Level 'INFO'
+            return Update-DATEVDocuments
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Laden der DATEV-Dokumente: $($_.Exception.Message)" -Level 'ERROR'
+        return @()
+    }
+}
+
+function Update-DATEVDocuments {
+    <#
+    .SYNOPSIS
+    Aktualisiert die DATEV-Dokumente von GitHub
+    #>
+    try {
+        Write-Log -Message "Aktualisiere DATEV-Dokumente von GitHub..." -Level 'INFO'
+        
+        $documentsUrl = "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/datev-dokumente.json"
+        $documentsPath = Join-Path $script:Config.Paths.AppData "datev-dokumente.json"
+        
+        # TLS 1.2 für sichere Downloads erzwingen
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        
+        $webClient = New-Object System.Net.WebClient
+        $webClient.Encoding = [System.Text.Encoding]::UTF8
+        
+        try {
+            $documentsJson = $webClient.DownloadString($documentsUrl)
+            
+            # Speichere die Datei lokal
+            $documentsJson | Out-File -FilePath $documentsPath -Encoding UTF8 -Force
+            
+            # Parse und return der Dokumente
+            $documentsData = $documentsJson | ConvertFrom-Json
+            $documents = @()
+            foreach ($doc in $documentsData.documents) {
+                $documents += @{
+                    title = $doc.title
+                    url = $doc.url
+                    description = $doc.description
+                }
+            }
+            
+            Write-Log -Message "DATEV-Dokumente erfolgreich aktualisiert: $($documents.Count) Dokumente" -Level 'INFO'
+            return $documents
+        }
+        finally {
+            $webClient.Dispose()
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Aktualisieren der DATEV-Dokumente: $($_.Exception.Message)" -Level 'ERROR'
+        return @()
+    }
+}
+
+function Initialize-DocumentsList {
+    <#
+    .SYNOPSIS
+    Initialisiert die Dokumente-Liste im GUI
+    #>
+    try {
+        $documentsPanel = $script:MainWindow.FindName("spDocumentsList")
+        if (-not $documentsPanel) {
+            Write-Log -Message "Dokumente-Panel nicht gefunden" -Level 'WARN'
+            return
+        }
+        
+        # Panel leeren
+        $documentsPanel.Children.Clear()
+        
+        # Lade Dokumente
+        $documents = Get-DATEVDocuments
+        
+        if ($documents.Count -eq 0) {
+            $noDocsText = New-Object System.Windows.Controls.TextBlock
+            $noDocsText.Text = "Keine Dokumente verfügbar"
+            $noDocsText.FontStyle = "Italic"
+            $noDocsText.Foreground = "Gray"
+            $noDocsText.Margin = "0,10,0,10"
+            $documentsPanel.Children.Add($noDocsText)
+            return
+        }
+        
+        # Erstelle Links für jedes Dokument
+        foreach ($doc in $documents) {
+            # Erstelle Container für jedes Dokument
+            $docContainer = New-Object System.Windows.Controls.Border
+            $docContainer.BorderBrush = "LightGray"
+            $docContainer.BorderThickness = "1"
+            $docContainer.CornerRadius = "3"
+            $docContainer.Margin = "0,3,0,3"
+            $docContainer.Padding = "8"
+            $docContainer.Background = "White"
+            
+            $docStack = New-Object System.Windows.Controls.StackPanel
+            $docStack.Orientation = "Vertical"
+            
+            # Titel als anklickbarer Link
+            $titleLink = New-Object System.Windows.Controls.TextBlock
+            $titleLink.Text = $doc.title
+            $titleLink.FontWeight = "Bold"
+            $titleLink.Foreground = "Blue"
+            $titleLink.Cursor = "Hand"
+            $titleLink.TextDecorations = "Underline"
+            $titleLink.Tag = $doc.url
+            
+            # Click-Event für Titel
+            $titleLink.Add_MouseLeftButtonUp({
+                param($sender, $e)
+                try {
+                    $url = $sender.Tag
+                    Start-Process $url
+                    Write-Log -Message "DATEV-Dokument geöffnet: $($sender.Text)" -Level 'INFO'
+                }
+                catch {
+                    Write-Log -Message "Fehler beim Öffnen des Dokuments: $($_.Exception.Message)" -Level 'ERROR'
+                    [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Dokuments: $($_.Exception.Message)", "Fehler", "OK", "Error")
+                }
+            })
+            
+            # Beschreibung
+            $descriptionText = New-Object System.Windows.Controls.TextBlock
+            $descriptionText.Text = $doc.description
+            $descriptionText.TextWrapping = "Wrap"
+            $descriptionText.Margin = "0,3,0,0"
+            $descriptionText.Foreground = "DarkGray"
+            
+            $docStack.Children.Add($titleLink)
+            $docStack.Children.Add($descriptionText)
+            $docContainer.Child = $docStack
+            $documentsPanel.Children.Add($docContainer)
+        }
+        
+        Write-Log -Message "Dokumente-Liste initialisiert: $($documents.Count) Dokumente" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Initialisieren der Dokumente-Liste: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Refresh-DocumentsList {
+    <#
+    .SYNOPSIS
+    Aktualisiert die Dokumente-Liste durch Neuladen von GitHub
+    #>
+    try {
+        Write-Log -Message "Aktualisiere Dokumente-Liste..." -Level 'INFO'
+        
+        # Aktualisiere von GitHub
+        Update-DATEVDocuments | Out-Null
+        
+        # GUI neu initialisieren
+        Initialize-DocumentsList
+        
+        Write-Log -Message "Dokumente-Liste erfolgreich aktualisiert" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Aktualisieren der Dokumente-Liste: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+#endregion
+
 #region Update-Termine und Kalenderfunktionen
 # Update-Termine Hilfsfunktionen
 function ConvertFrom-ICSDate {
@@ -2677,6 +2879,9 @@ if (Test-Path $downloadsJsonPath) {
 } else {
     Write-Log -Message "Keine Downloads-JSON gefunden, ComboBox bleibt leer bis zum ersten Update" -Level 'DEBUG'
 }
+
+# Dokumente-Liste initialisieren
+Initialize-DocumentsList
 
 # Settings initialisieren
 Initialize-Settings
