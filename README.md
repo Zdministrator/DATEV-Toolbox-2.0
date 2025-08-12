@@ -2,12 +2,13 @@
 
 Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Tools.
 
-## � Anwendungsvorschau
+## Anwendungsvorschau
 
 ![DATEV-Toolbox Screenshot](images/screenshot-main.png)
+
 *Die DATEV-Toolbox 2.0 bietet eine intuitive tab-basierte Benutzeroberfläche für alle wichtigen DATEV-Tools und -Programme*
 
-## �📋 Features
+## Features
 
 - **🆕 Neuer Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV-Anleitungen und Dokumentationen (v2.1.8)
 - **🆕 Scrollbares Changelog-Fenster**: Benutzerfreundliche Anzeige der Update-Historie (v2.1.7)
