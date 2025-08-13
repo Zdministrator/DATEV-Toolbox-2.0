@@ -180,6 +180,7 @@ $script:Config = @{
         'btnOpenDownloadFolder' = @{ Type = 'TextBlock'; FunctionName = 'Open-DownloadFolder' }
         'btnUpdateDates' = @{ Type = 'TextBlock'; FunctionName = 'Update-UpdateDates' }
         'btnRefreshDocuments' = @{ Type = 'TextBlock'; FunctionName = 'Refresh-DocumentsList' }
+        'txtEmailLink' = @{ Type = 'Hyperlink'; FunctionName = 'Open-EmailClient' }
         
         # Einstellungs-Handler (jetzt auch zentral verwaltet)
         'btnCheckUpdate' = @{ Type = 'Function'; FunctionName = 'Start-UpdateCheck' }
@@ -648,6 +649,29 @@ function Close-RunspacePool {
                                     <TextBlock Text="Lade Dokumente..." 
                                                FontStyle="Italic" Foreground="Gray"/>
                                 </StackPanel>
+                                
+                                <!-- Hinweis für weitere Dokument-Vorschläge -->
+                                <Border BorderBrush="LightGray" BorderThickness="1" Background="#F5F5F5" 
+                                        Margin="0,10,0,0" Padding="8" CornerRadius="3">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0" Text="💡" FontSize="14" VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Column="1" FontSize="11" VerticalAlignment="Top" Foreground="#555555" TextWrapping="Wrap">
+                                            <Run Text="Weitere Dokument-Vorschläge können Sie gerne an "/>
+                                            <Hyperlink Name="txtEmailLink" 
+                                                       Foreground="Blue" 
+                                                       ToolTip="E-Mail senden"
+                                                       TextDecorations="Underline">
+                                                <Run Text="norman.zamponi@hees.de"/>
+                                            </Hyperlink>
+                                            <Run Text=" senden."/>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -898,6 +922,16 @@ function Register-TextBlockHandler {
     })
 }
 
+function Register-HyperlinkHandler {
+    param($Hyperlink, $FunctionName)
+    $Hyperlink.Tag = $FunctionName
+    $Hyperlink.Add_RequestNavigate({
+        $functionName = $this.Tag
+        Write-Log -Message "Hyperlink '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
+        & $functionName
+    })
+}
+
 # Zentrale Button-Handler-Registrierung
 function Register-ButtonHandlers {
     <#
@@ -988,6 +1022,16 @@ function Register-ButtonHandlers {
                         # Direkte Registrierung ohne Closure
                         Register-TextBlockHandler -TextBlock $buttonElement -FunctionName $functionName
                         Write-Log -Message "TextBlock-Handler für '$buttonName' registriert" -Level 'DEBUG'
+                    }
+                }
+                
+                'Hyperlink' {
+                    # Hyperlink-Elemente verwenden RequestNavigate Event
+                    if ($buttonConfig.ContainsKey('FunctionName')) {
+                        $functionName = $buttonConfig.FunctionName
+                        # Direkte Registrierung ohne Closure
+                        Register-HyperlinkHandler -Hyperlink $buttonElement -FunctionName $functionName
+                        Write-Log -Message "Hyperlink-Handler für '$buttonName' registriert" -Level 'DEBUG'
                     }
                 }
                 
@@ -2397,6 +2441,31 @@ function Open-DownloadFolder {
     }
     catch {
         Write-Log -Message "Fehler beim Öffnen des Download-Ordners: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Open-EmailClient {
+    <#
+    .SYNOPSIS
+    Öffnet den Standard E-Mail-Client mit vorbefüllter E-Mail für Dokument-Vorschläge
+    
+    .DESCRIPTION
+    Diese Funktion öffnet eine neue E-Mail im Standard E-Mail-Client mit der Zieladresse 
+    und einem vorausgefüllten Betreff für Dokument-Vorschläge.
+    #>
+    try {
+        $emailAddress = "norman.zamponi@hees.de"
+        $subject = "DATEV-Toolbox - Dokument-Vorschlag"
+        $body = "Hallo,%0D%0A%0D%0AIch hätte gerne folgenden Vorschlag für ein zusätzliches DATEV-Dokument in der Toolbox:%0D%0A%0D%0ATitel:%0D%0AURL:%0D%0ABeschreibung:%0D%0A%0D%0AVielen Dank!"
+        
+        $mailtoUrl = "mailto:$emailAddress?subject=$subject&body=$body"
+        
+        Start-Process $mailtoUrl
+        Write-Log -Message "E-Mail-Client für Dokument-Vorschlag geöffnet" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen des E-Mail-Clients: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show("Fehler beim Öffnen des E-Mail-Clients. Bitte senden Sie Ihre Vorschläge direkt an: norman.zamponi@hees.de", "E-Mail-Fehler", "OK", "Warning")
     }
 }
 #endregion

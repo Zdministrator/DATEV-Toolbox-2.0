@@ -2,13 +2,13 @@
 
 Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Tools.
 
-## Anwendungsvorschau
+## 📸 Anwendungsvorschau
 
 ![DATEV-Toolbox Screenshot](images/screenshot-main.png)
 
 *Die DATEV-Toolbox 2.0 bietet eine intuitive tab-basierte Benutzeroberfläche für alle wichtigen DATEV-Tools und -Programme*
 
-## Features
+## 📋 Features
 
 - **🆕 Neuer Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV-Anleitungen und Dokumentationen (v2.1.8)
 - **🆕 Scrollbares Changelog-Fenster**: Benutzerfreundliche Anzeige der Update-Historie (v2.1.7)
@@ -162,7 +162,7 @@ Aktuelle Version: **2.1.8**
 
 ### Neue Features in Version 2.1.8
 
-#### � Dokumente-Tab: Direkter Zugriff auf DATEV-Anleitungen
+#### 📋 Dokumente-Tab: Direkter Zugriff auf DATEV-Anleitungen
 - **Neuer 'Dokumente' Tab**: Zwischen Downloads und System eingefügt für bessere Navigation
 - **DATEV Help-Center Integration**: 5 wichtige Dokumentationen verfügbar
 - **Ein-Klick-Zugriff**: Windows Server-Setup, Betriebssystem-Kompatibilität, Office-Umstieg
@@ -187,14 +187,14 @@ Aktuelle Version: **2.1.8**
 
 ## 🔄 Update-Historie
 
-## 🔄 Update-Historie
-
-### Version 2.1.8 (2025-08-06)
-- **Dokumente-Tab**: Neuer Tab für direkten Zugriff auf wichtige DATEV-Dokumentationen
-- **DATEV Help-Center Integration**: 5 wichtige Anleitungen verfügbar (Server-Setup, etc.)
-- **Download-Erweiterung**: Deinstallationsnacharbeiten-Tool V. 3.11 hinzugefügt
-- **UI-Verbesserung**: Saubere Tab-Struktur für bessere Navigation
-- **Vorbereitung**: Framework für zukünftige Content-Erweiterungen geschaffen
+### Version 2.1.8 (2025-08-13)
+- **📋 Dokumente-Tab**: Neuer Tab für direkten Zugriff auf wichtige DATEV-Dokumentationen
+- **📧 E-Mail-Hinweis**: Responsiver Hinweis für weitere Dokument-Vorschläge mit automatischem Zeilenumbruch
+- **🔗 Hyperlink-Integration**: Neue Hyperlink-Event-Handler für bessere Benutzerinteraktion
+- **🎨 Grid-Layout**: Optimierte Textdarstellung für verschiedene Fenstergrößen
+- **🌐 DATEV Help-Center Integration**: 5 wichtige Anleitungen verfügbar (Server-Setup, etc.)
+- **📥 Download-Erweiterung**: Deinstallationsnacharbeiten-Tool V. 3.11 hinzugefügt
+- **🏗️ UI-Verbesserung**: Saubere Tab-Struktur für bessere Navigation
 
 ### Version 2.1.7 (2025-08-06)
 - **Scrollbares Changelog**: Von MessageBox auf großes WPF-Fenster umgestellt
@@ -204,73 +204,43 @@ Aktuelle Version: **2.1.8**
 - **Professional Look**: Deutlich benutzerfreundlichere Update-Historie
 
 ### Version 2.1.6 (2025-08-05)
-- **Performance-Optimierung**: Caching für DATEV-Pfad-Suche implementiert
-- **Memory-Management**: StringBuilder-Performance und Runspace-Pool
-- **Thread-Sicherheit**: Settings-Verwaltung mit Monitor-Locks
-- **Fehlerbehandlung**: Robuste Event-Handler und Resource-Cleanup
-
-### Version 2.1.4 (2025-07-18)
-- **UI-Optimierung**: Kompaktere GroupBox-Abstände für bessere Raumnutzung
-- **Robuste Prozess-Überwachung**: Verbesserte gpupdate-Funktion mit Progress-Dialog
-- **Memory-Leak-Fixes**: Ordnungsgemäße Ressourcen-Freigabe
-- **PowerShell 5.1 Kompatibilität**: WebClient-Funktionen angepasst
-
-### Version 2.1.3 (2025-07-04)
-- **Vollständige Feature-Implementierung**: Alle Button-Handler funktionsfähig
-- **Event-Handler-System**: URL-, DATEV-, SystemTool- und Function-Handler
-- **Performance-Optimierungen**: Caching und asynchrone Operationen
-
-## 🛠️ Technische Details
-- **Code-Formatierung**: Einrückungen und Zeilenumbrüche korrigiert
-- **Variable-Cleanup**: Ungenutzte Variablen entfernt
+- **⚡ Performance-Optimierung**: Caching für DATEV-Pfad-Suche implementiert
+- **🧠 Memory-Management**: StringBuilder-Performance und Runspace-Pool
+- **🔒 Thread-Sicherheit**: Settings-Verwaltung mit Monitor-Locks
+- **🛡️ Fehlerbehandlung**: Robuste Event-Handler und Resource-Cleanup
 
 ### Version 2.1.5 (2025-08-05)
-- **StringBuilder-Terminal-Ausgabe behoben**: Keine störenden Debug-Anzeigen mehr
-- **GPUpdate-Funktion vereinfacht**: Von 200+ auf 50 Zeilen reduziert
-- **Download-Links modernisiert**: Für neue DATEV myUpdates API-Struktur
-- **Code-Stabilisierung**: Alle kritischen Bugs behoben
-- **Performance beibehalten**: Optimierungen aus v2.1.4 erhalten
+- **🐛 StringBuilder-Terminal-Ausgabe behoben**: Keine störenden Debug-Anzeigen mehr
+- **🔄 GPUpdate-Funktion vereinfacht**: Von 200+ auf 50 Zeilen reduziert
+- **🔗 Download-Links modernisiert**: Für neue DATEV myUpdates API-Struktur
+- **🛠️ Code-Stabilisierung**: Alle kritischen Bugs behoben
+- **⚡ Performance beibehalten**: Optimierungen aus v2.1.4 erhalten
 
-#### 🎨 UI-Verbesserungen (v2.1.4)
-- **Kompakte Darstellung**: GroupBox-Abstände reduziert für bessere Raumausnutzung
-- **Progress-Dialog**: Visueller Fortschritt für Gruppenrichtlinien-Updates mit Abbruch-Funktion
-- **Benutzerfreundlichkeit**: Elapsed-Time-Anzeige und interaktive Kontrolle
+### Version 2.1.4 (2025-07-18)
+- **🎨 UI-Optimierung**: Kompaktere GroupBox-Abstände für bessere Raumnutzung
+- **🔄 Robuste Prozess-Überwachung**: Verbesserte gpupdate-Funktion mit Progress-Dialog
+- **🧠 Memory-Leak-Fixes**: Ordnungsgemäße Ressourcen-Freigabe
+- **🔧 PowerShell 5.1 Kompatibilität**: WebClient-Funktionen angepasst
 
-#### 🔧 Prozess-Überwachung (v2.1.4)
-- **Duplizierter Prozess-Check**: Verhindert mehrfache gpupdate-Ausführungen
-- **Exit-Code-Auswertung**: Korrekte Prozess-Status-Erkennung mit Output-Capture
-- **Memory-Leak-Fixes**: Ordnungsgemäße Ressourcen-Freigabe in allen kritischen Bereichen
-- **Thread-sichere Updates**: Dispatcher-basierte UI-Updates für bessere Stabilität
+### Version 2.1.3 (2025-07-04)
+- **✅ Vollständige Feature-Implementierung**: Alle Button-Handler funktionsfähig
+- **🎛️ Event-Handler-System**: URL-, DATEV-, SystemTool- und Function-Handler
+- **⚡ Performance-Optimierungen**: Caching und asynchrone Operationen
 
-#### 🔧 Aktionen-Bereich (v2.0.9)
-- **Gruppenrichtlinien-Update**: Führt `gpupdate /force` asynchron aus
-- **Asynchrone Ausführung**: GUI bleibt während der Ausführung bedienbar
-- **PID-Tracking**: Detailliertes Logging mit Prozess-IDs
-- **Timeout-Schutz**: Automatischer Timeout nach 2 Minuten
-- **Robuste Fehlerbehandlung**: Runspace-basierte Prozessüberwachung
+## 🛠️ Technische Details
 
-#### 📥 Erweiterte Downloads (v2.0.9)
-- **Aktualisierungsdatum**: Download-Liste zeigt Stand der Daten an
-- **Deutsche Datumsformatierung**: Benutzerfreundliches Format (dd.MM.yyyy)
-- **Neue Downloads**: Belegtransfer V. 5.47, LODAS V. 4.24
+### Architektur
+- **PowerShell 5.1+ kompatibel**: Vollständige Rückwärtskompatibilität
+- **WPF-basierte GUI**: Moderne tab-basierte Benutzeroberfläche
+- **Event-Handler-System**: Zentrale Verwaltung aller UI-Interaktionen
+- **Automatisches Update-System**: GitHub-Integration mit Backup-Funktionalität
 
-#### 📋 Changelog-Viewer (v2.0.9)
-- **Update-Historie**: Anzeige der letzten 3 Versionen
-- **GitHub-Integration**: Lädt aktuelle Changelog-Daten
-- **Deutsche Formatierung**: Übersichtliche Darstellung mit Emojis
-- **Offline-Sicherheit**: Fallback bei Netzwerkproblemen
-
-#### 🐛 Kritische Bugfixes (v2.0.9)
-- **Update-Prozess**: `Set-Settings` → `Save-Settings` Fehler behoben
-- **Settings-Management**: Globale Variable korrekt aktualisiert
-- **Update-Stabilität**: Vollständige Wiederherstellung des Update-Systems
-
-### Changelog (Neueste Versionen)
-- **v2.1.8**: 📋 Dokumente-Tab + DATEV Help-Center Integration + Download-Erweiterungen (Content-Update)
-- **v2.1.7**: 📊 Scrollbares Changelog-Fenster + Professionelle Update-Historie (UX-Update)
-- **v2.1.6**: ⚡ Performance-Caching + Memory-Management + Thread-Sicherheit (Performance-Update)
-- **v2.1.5**: 🐛 StringBuilder-Fixes + GPUpdate-Vereinfachung + Code-Stabilisierung (Bugfix-Update)
-- **v2.1.4**: 🎨 UI-Optimierung + Erweiterte Prozess-Überwachung + Memory-Fixes (Qualitäts-Update)
+### Systemanforderungen
+- PowerShell 5.1+ kompatibel
+- Windows mit .NET Framework 4.5+
+- WPF-Unterstützung erforderlich
+- DATEV-Installation (für DATEV-Tools, optional)
+- Internetverbindung für Updates und Downloads
 
 ## 📄 Lizenz
 
@@ -279,15 +249,3 @@ Dieses Projekt ist für den internen Gebrauch bei HEES GmbH entwickelt.
 ---
 
 **Hinweis**: Diese Anwendung verbindet sich automatisch mit GitHub für Updates und Download-Konfigurationen. Stellen Sie sicher, dass eine Internetverbindung verfügbar ist.
-
-### 🎯 Besondere Features
-- **🆕 Neuer Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV Help-Center Dokumentationen (v2.1.8)
-- **🆕 Scrollbares Changelog**: Benutzerfreundliche Update-Historie mit professionellem WPF-Fenster (v2.1.7)
-- **🆕 DATEV Help-Center Integration**: 5 wichtige Anleitungen verfügbar (Server-Setup, Office-Umstieg, etc.)
-- **🆕 Performance-Caching**: Intelligente DATEV-Pfad-Suche mit Cache-System
-- **🆕 Asynchrone Gruppenrichtlinien-Updates**: Ohne GUI-Blockierung
-- **Intelligente DATEV-Pfad-Suche**: Automatische Erkennung von DATEV-Installationen
-- **Robuste Fehlerbehandlung**: Benutzerfreundliche MessageBoxen bei Problemen
-- **Vollständiges Logging**: Alle Aktionen werden mit PID-Tracking protokolliert
-- **Backup-System**: Automatische Backups vor Updates mit Rollback-Funktion
-- **Runspace-basierte Überwachung**: Moderne asynchrone Prozessbehandlung
