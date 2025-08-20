@@ -1276,6 +1276,17 @@ function Start-DATEVProgram {
 
 # Spezielle Funktion für den Leistungsindex (jetzt mit zentraler Pfadsuche)
 function Start-Leistungsindex {
+    <#
+    .SYNOPSIS
+    Startet die Leistungsindex-Messung asynchron mit doppelter Ausführung
+    
+    .DESCRIPTION
+    Führt den DATEV Leistungsindex (irw.exe) in zwei Schritten aus:
+    1. irw.exe -ap:PerfIndex -d:IRW20011 -c
+    2. irw.exe -ap:PerfIndex -d:IRW20011
+    
+    Die Ausführung erfolgt asynchron um die GUI nicht zu blockieren.
+    #>
     try {
         Write-Log -Message "Suche nach Leistungsindex (irw.exe)..." -Level 'INFO'
         
@@ -1283,13 +1294,70 @@ function Start-Leistungsindex {
         
         if ($foundPath) {
             Write-Log -Message "Starte Leistungsindex von: $foundPath" -Level 'INFO'
-            Write-Log -Message "Erster Durchlauf: -ap:PerfIndex -d:IRW20011 -c" -Level 'INFO'
-            Start-Process -FilePath $foundPath -ArgumentList "-ap:PerfIndex -d:IRW20011 -c" -Wait
             
-            Write-Log -Message "Zweiter Durchlauf: -ap:PerfIndex -d:IRW20011" -Level 'INFO'
-            Start-Process -FilePath $foundPath -ArgumentList "-ap:PerfIndex -d:IRW20011" -Wait
+            # Asynchrone Ausführung mit Runspace um GUI nicht zu blockieren
+            $runspace = [runspacefactory]::CreateRunspace()
+            $runspace.Open()
+            $runspace.SessionStateProxy.SetVariable('foundPath', $foundPath)
+            $runspace.SessionStateProxy.SetVariable('logFunction', (Get-Command Write-Log))
             
-            Write-Log -Message "Leistungsindex-Messungen abgeschlossen" -Level 'INFO'
+            $powershell = [powershell]::Create()
+            $powershell.Runspace = $runspace
+            
+            [void]$powershell.AddScript({
+                param($executablePath, $writeLogCmd)
+                
+                # Write-Log Funktion im Runspace verfügbar machen
+                function Write-Log { 
+                    param([string]$Message, [string]$Level = 'INFO')
+                    # Vereinfachtes Logging für Runspace
+                    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+                    Write-Host "[$timestamp] [$Level] $Message"
+                }
+                
+                try {
+                    Write-Log -Message "Erster Durchlauf: irw.exe -ap:PerfIndex -d:IRW20011 -c" -Level 'INFO'
+                    
+                    # Erster Durchlauf mit -c Parameter
+                    $process1 = Start-Process -FilePath $executablePath -ArgumentList "-ap:PerfIndex", "-d:IRW20011", "-c" -Wait -PassThru -NoNewWindow
+                    
+                    if ($process1.ExitCode -eq 0) {
+                        Write-Log -Message "Erster Durchlauf erfolgreich abgeschlossen (Exit Code: $($process1.ExitCode))" -Level 'INFO'
+                        
+                        # Kurze Pause zwischen den Durchläufen
+                        Start-Sleep -Seconds 2
+                        
+                        Write-Log -Message "Zweiter Durchlauf: irw.exe -ap:PerfIndex -d:IRW20011" -Level 'INFO'
+                        
+                        # Zweiter Durchlauf ohne -c Parameter
+                        $process2 = Start-Process -FilePath $executablePath -ArgumentList "-ap:PerfIndex", "-d:IRW20011" -Wait -PassThru -NoNewWindow
+                        
+                        if ($process2.ExitCode -eq 0) {
+                            Write-Log -Message "Leistungsindex-Messungen erfolgreich abgeschlossen (Exit Code: $($process2.ExitCode))" -Level 'INFO'
+                            return @{ Success = $true; Message = "Leistungsindex-Messungen erfolgreich abgeschlossen" }
+                        } else {
+                            Write-Log -Message "Zweiter Durchlauf fehlgeschlagen (Exit Code: $($process2.ExitCode))" -Level 'ERROR'
+                            return @{ Success = $false; Message = "Zweiter Durchlauf fehlgeschlagen" }
+                        }
+                    } else {
+                        Write-Log -Message "Erster Durchlauf fehlgeschlagen (Exit Code: $($process1.ExitCode))" -Level 'ERROR'
+                        return @{ Success = $false; Message = "Erster Durchlauf fehlgeschlagen" }
+                    }
+                }
+                catch {
+                    Write-Log -Message "Fehler bei Leistungsindex-Ausführung: $($_.Exception.Message)" -Level 'ERROR'
+                    return @{ Success = $false; Message = $_.Exception.Message }
+                }
+            })
+            
+            # Parameter für das Skript hinzufügen
+            [void]$powershell.AddParameter('executablePath', $foundPath)
+            [void]$powershell.AddParameter('writeLogCmd', (Get-Command Write-Log))
+            
+            # Asynchrone Ausführung starten
+            $asyncResult = $powershell.BeginInvoke()
+            
+            Write-Log -Message "Leistungsindex-Messung asynchron gestartet - läuft im Hintergrund" -Level 'INFO'
         }
         else {
             Write-Log -Message "Leistungsindex (irw.exe) wurde nicht gefunden. Überprüfen Sie die DATEV-Installation." -Level 'WARN'
