@@ -9,72 +9,86 @@
     {
       "name": "Musterpaket DATEV Unternehmen online",
       "url": "https://download.datev.de/download/musterpaket_unternehmen_online.zip",
-      "description": "Musterpaket für DATEV Unternehmen online"
+      "description": "Musterpaket für DATEV Unternehmen online",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/2a5c8f9e-4b7d-4e2f-9c8a-6d3e7f1a9b5c"
     },
     {
       "name": "Musterpaket Zusatzmodul Auftragswesen next",
       "url": "https://download.datev.de/download/musterpaket_datev_auftragswesen_next.zip",
-      "description": "Musterpaket für das DATEV Auftragswesen next Modul"
+      "description": "Musterpaket für das DATEV Auftragswesen next Modul",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/6e9f2c4a-7b8d-4e1f-9a5c-8d3e7f2a9b6c"
     },
     {
       "name": "DATEVnet: Proxyeinstellungen V. 1.8",
       "url": "https://download.datev.de/download/proxysetter/proxysetter.exe",
-      "description": "Tool zur Konfiguration der DATEVnet Proxy-Einstellungen"
+      "description": "Tool zur Konfiguration der DATEVnet Proxy-Einstellungen",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/5a8c9f2e-6b7d-4e1f-8c9a-3d5e7f1a9b4c"
     },
     {
       "name": "DATEVnet Einzel-/Telearbeitsplatz",
       "url": "https://download.datev.de/download/datevnet/datevnet_einzel-telearbeitsplatz_compact-full.exe",
-      "description": "DATEVnet Installation für Einzel- und Telearbeitsplätze"
+      "description": "DATEVnet Installation für Einzel- und Telearbeitsplätze",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/9b4f7e2c-8a6d-4e3f-9c8a-5d7e1f3a9b6c"
     },
     {
       "name": "Herausgeberzertifikate der DATEV",
       "url": "https://download.datev.de/download/digcert/datevdigcert_7_81.exe",
-      "description": "Digitale Zertifikate der DATEV eG"
+      "description": "Digitale Zertifikate der DATEV eG",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/3c6f9e2a-5b8d-4e1f-7c9a-4d6e8f2a9b5c"
     },
     {
       "name": "DATEV SmartVerify V. 1.4",
       "url": "https://download.datev.de/download/smartverify/datev.smartverify.exe",
-      "description": "DATEV SmartVerify Authentifizierungstool"
+      "description": "DATEV SmartVerify Authentifizierungstool",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/7e2f9c4a-8b5d-4e1f-9a6c-5d8e2f4a9b7c"
     },
     {
       "name": "DATEVasp Zugangspaket V. 2.15",
       "url": "https://download.datev.de/download/asp/aspzugangspaket.exe",
-      "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze"
+      "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/9dd11aec-0b57-4f6f-9ff4-f486e30f7572"
     },
     {
       "name": "DATEV-SmartIT Connect V. 3.10",
       "url": "https://download.datev.de/download/smartit/smartitconnect.exe",
-      "description": "DATEV SmartIT Connect Verwaltungstool mit allen lokal benötigten Komponenten zur assistentengestützten Einrichtung des DATEV-SmartIT Zugangs"
+      "description": "DATEV SmartIT Connect Verwaltungstool mit allen lokal benötigten Komponenten zur assistentengestützten Einrichtung des DATEV-SmartIT Zugangs",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/fbd0d3e3-9f43-4394-9103-f65bc0202ca8"
     },
     {
       "name": "Treiber für SmartCard-Lesegeräte und den DATEV mIDentity",
       "url": "https://download.datev.de/download/sipacompact/leserins.exe",
-      "description": "Treiber für SmartCard-Lesegeräte und DATEV mIDentity"
+      "description": "Treiber für SmartCard-Lesegeräte und DATEV mIDentity",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/80f9bae5-3c13-4cf2-b9c1-90fc57297ab6"
     },
     {
       "name": "Belegtransfer V. 5.47",
       "url": "https://download.datev.de/download/bedi/belegtransfer547.exe",
-      "description": "DATEV Belegtransfer Version 5.47 für digitalen Belegaustausch"
+      "description": "DATEV Belegtransfer Version 5.47 für digitalen Belegaustausch",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/7df7b5c2-3e8c-4b2f-9f8d-2a7c8b9e5f1d"
     },
     {
       "name": "LohnViewer",
       "url": "https://download.datev.de/download/lohnview/lohnviewer_145.exe",
-      "description": "Tool zur Anzeige von Lohnabrechnungen"
+      "description": "Tool zur Anzeige von Lohnabrechnungen",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/203bc85f-d67e-49c5-afeb-3de64db168dd"
     },
     {
       "name": "Lohn Vorerfassung V. 7.1",
       "url": "https://download.datev.de/download/lohn_vorerfassung_pak00683_7.1.exe",
-      "description": "DATEV Lohn Vorerfassung Version 7.1"
+      "description": "DATEV Lohn Vorerfassung Version 7.1",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/34716f55-75ba-4e49-940d-3c3cc26e7437"
     },
     {
       "name": "DATEV Datenübernahme nach LODAS V. 4.25",
       "url": "https://download.datev.de/download/pak01429/lug2lodas_pak_4_25.exe",
-      "description": "Tool zur Datenübernahme von DATEV nach LODAS"
+      "description": "Tool zur Datenübernahme von DATEV nach LODAS",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/ec3cd922-1877-4f52-bf68-90b98f6ac760"
     },
     {
       "name": "Sicherheitspaket compact V. 8.02",
       "url": "https://download.datev.de/download/sipacompact/sipacompact.exe",
-      "description": "DATEV Sicherheitspaket compact für sichere E-Mail-Kommunikation und DATEV Unternehmen online, inklusive DATEV SmartVerify"
+      "description": "DATEV Sicherheitspaket compact für sichere E-Mail-Kommunikation und DATEV Unternehmen online, inklusive DATEV SmartVerify",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/7342fcac-a857-4bec-9799-e1aaed9159ba"
     },
     {
       "name": "DATEV Serverprep Tool",
@@ -94,7 +108,8 @@
     {
       "name": "Fernbetreuung online",
       "url": "https://download.datev.de/download/fernbetreuung/datev_fernbetreuung_online.exe",
-      "description": "DATEV Fernbetreuungstool für verschlüsselte Remote-Unterstützung durch DATEV Service-Mitarbeiter"
+      "description": "DATEV Fernbetreuungstool für verschlüsselte Remote-Unterstützung durch DATEV Service-Mitarbeiter",
+      "detailUrl": "https://apps.datev.de/myupdates/download/products/8f3e5c2d-9a7b-4e1f-8c9d-5a3b7e9f2c4a"
     }
   ]
 }
