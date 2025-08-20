@@ -607,6 +607,23 @@ function Close-RunspacePool {
                                            Cursor="Hand" Foreground="Black"/>
                             </StackPanel>
                         </GroupBox.Header>                        <StackPanel Orientation="Vertical" Margin="8">                            <ComboBox Name="cmbDirectDownloads" Margin="0,0,0,10" Height="25"/>
+                            
+                            <!-- Beschreibung für ausgewählten Download -->
+                            <Border Name="borderDownloadDescription" BorderBrush="LightGray" BorderThickness="1" 
+                                    Background="#E8F5E8" Margin="0,0,0,10" Padding="8" CornerRadius="3" 
+                                    Visibility="Collapsed">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" Text="💡" FontSize="14" VerticalAlignment="Top" Margin="0,0,8,0"/>
+                                    <TextBlock Name="txtDownloadDescription" Grid.Column="1" FontSize="11" 
+                                               VerticalAlignment="Top" Foreground="#333333" TextWrapping="Wrap"/>
+                                </Grid>
+                            </Border>
+                            
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -655,7 +672,7 @@ function Close-RunspacePool {
                                 </StackPanel>
                                 
                                 <!-- Hinweis für weitere Dokument-Vorschläge -->
-                                <Border BorderBrush="LightGray" BorderThickness="1" Background="#F5F5F5" 
+                                <Border BorderBrush="LightGray" BorderThickness="1" Background="#E8F5E8" 
                                         Margin="0,10,0,0" Padding="8" CornerRadius="3">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -664,7 +681,7 @@ function Close-RunspacePool {
                                         </Grid.ColumnDefinitions>
                                         
                                         <TextBlock Grid.Column="0" Text="💡" FontSize="14" VerticalAlignment="Top" Margin="0,0,8,0"/>
-                                        <TextBlock Grid.Column="1" FontSize="11" VerticalAlignment="Top" Foreground="#555555" TextWrapping="Wrap">
+                                        <TextBlock Grid.Column="1" FontSize="11" VerticalAlignment="Top" Foreground="#333333" TextWrapping="Wrap">
                                             <Run Text="Weitere Dokument-Vorschläge können Sie gerne an "/>
                                             <Hyperlink Name="txtEmailLink" 
                                                        Foreground="Blue" 
@@ -2978,9 +2995,28 @@ if ($null -ne $cmbDirectDownloads) {
             $btnDownload.IsEnabled = $true
             $selectedItem = $cmbDirectDownloads.SelectedItem
             Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'DEBUG'
+            
+            # Beschreibung anzeigen wenn verfügbar
+            $txtDownloadDescription = $Window.FindName('txtDownloadDescription')
+            $borderDownloadDescription = $Window.FindName('borderDownloadDescription')
+            if ($null -ne $txtDownloadDescription -and $null -ne $borderDownloadDescription) {
+                $description = $selectedItem.Tag.description
+                if (-not [string]::IsNullOrWhiteSpace($description)) {
+                    $txtDownloadDescription.Text = $description
+                    $borderDownloadDescription.Visibility = 'Visible'
+                    Write-Log -Message "Beschreibung angezeigt für: $($selectedItem.Content)" -Level 'DEBUG'
+                } else {
+                    $borderDownloadDescription.Visibility = 'Collapsed'
+                }
+            }
         }
         else {
             $btnDownload.IsEnabled = $false
+            # Beschreibung ausblenden wenn keine Auswahl
+            $borderDownloadDescription = $Window.FindName('borderDownloadDescription')
+            if ($null -ne $borderDownloadDescription) {
+                $borderDownloadDescription.Visibility = 'Collapsed'
+            }
         }
     }
     

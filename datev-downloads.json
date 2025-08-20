@@ -42,9 +42,9 @@
       "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze"
     },
     {
-      "name": "DATEV-SmartIT Connect V. 3.9",
+      "name": "DATEV-SmartIT Connect V. 3.10",
       "url": "https://download.datev.de/download/smartit/smartitconnect.exe",
-      "description": "DATEV SmartIT Connect Verwaltungstool"
+      "description": "DATEV SmartIT Connect Verwaltungstool mit allen lokal benötigten Komponenten zur assistentengestützten Einrichtung des DATEV-SmartIT Zugangs"
     },
     {
       "name": "Treiber für SmartCard-Lesegeräte und den DATEV mIDentity",
@@ -90,6 +90,11 @@
       "name": "ServerSec Tool (NTFS-Berechtigung)",
       "url": "https://download.datev.de/download/serversec.exe",
       "description": "NTFS-Berechtigungen auf Datenbank-Dateien einschränken"
+    },
+    {
+      "name": "Fernbetreuung online",
+      "url": "https://download.datev.de/download/fernbetreuung/datev_fernbetreuung_online.exe",
+      "description": "DATEV Fernbetreuungstool für verschlüsselte Remote-Unterstützung durch DATEV Service-Mitarbeiter"
     }
   ]
 }
