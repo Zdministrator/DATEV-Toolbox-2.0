@@ -37,9 +37,9 @@
       "description": "DATEV SmartVerify Authentifizierungstool"
     },
     {
-      "name": "DATEVasp Zugangspaket V. 2.14",
+      "name": "DATEVasp Zugangspaket V. 2.15",
       "url": "https://download.datev.de/download/asp/aspzugangspaket.exe",
-      "description": "Zugangspaket für DATEVasp Services"
+      "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze"
     },
     {
       "name": "DATEV-SmartIT Connect V. 3.9",
@@ -67,14 +67,14 @@
       "description": "DATEV Lohn Vorerfassung Version 7.1"
     },
     {
-      "name": "DATEV Datenübernahme nach LODAS V. 4.24",
-      "url": "https://download.datev.de/download/pak01429/lug2lodas_pak_4_24.exe",
+      "name": "DATEV Datenübernahme nach LODAS V. 4.25",
+      "url": "https://download.datev.de/download/pak01429/lug2lodas_pak_4_25.exe",
       "description": "Tool zur Datenübernahme von DATEV nach LODAS"
     },
     {
-      "name": "Sicherheitspaket compact V. 7.89",
+      "name": "Sicherheitspaket compact V. 8.02",
       "url": "https://download.datev.de/download/sipacompact/sipacompact.exe",
-      "description": "DATEV Sicherheitspaket compact Version 7.89"
+      "description": "DATEV Sicherheitspaket compact für sichere E-Mail-Kommunikation und DATEV Unternehmen online, inklusive DATEV SmartVerify"
     },
     {
       "name": "DATEV Serverprep Tool",
@@ -87,9 +87,9 @@
       "description": "DATEV Deinstallationsnacharbeitentool zur Bereinigung nach DATEV-Deinstallationen"
     },
     {
-      "name": "DATEV ServerSec Tool",
+      "name": "ServerSec Tool (NTFS-Berechtigung)",
       "url": "https://download.datev.de/download/serversec.exe",
-      "description": "DATEV ServerSec Tool zur Sicherheitskonfiguration und Härtung von DATEV-Servern"
+      "description": "NTFS-Berechtigungen auf Datenbank-Dateien einschränken"
     }
   ]
 }

@@ -28,3 +28,6 @@ Thumbs.db
 # IDE-Ordner
 .vscode/settings.json
 .vscode/launch.json
+
+# GitHub Prompts - Entwicklungs-Interna
+.github/prompts/
