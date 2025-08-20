@@ -180,6 +180,7 @@ $script:Config = @{
         # TextBlock-Handler (verwenden MouseLeftButtonDown statt Add_Click)
         'btnUpdateDownloads' = @{ Type = 'TextBlock'; FunctionName = 'Update-DATEVDownloads' }
         'btnOpenDownloadFolder' = @{ Type = 'TextBlock'; FunctionName = 'Open-DownloadFolder' }
+        'btnShowDetails' = @{ Type = 'TextBlock'; FunctionName = 'Show-DownloadDetails' }
         'btnUpdateDates' = @{ Type = 'TextBlock'; FunctionName = 'Update-UpdateDates' }
         'btnRefreshDocuments' = @{ Type = 'TextBlock'; FunctionName = 'Refresh-DocumentsList' }
         'txtEmailLink' = @{ Type = 'Hyperlink'; FunctionName = 'Open-EmailClient' }
@@ -628,10 +629,14 @@ function Close-RunspacePool {
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>                                <Button Name="btnDownload" Grid.Column="0" Content="Download starten" Height="25" 
                                         VerticalAlignment="Top" Margin="0,0,8,0" IsEnabled="False" 
                                         ToolTip="Lädt die ausgewählte DATEV-Software herunter"/>
-                                <TextBlock Name="btnOpenDownloadFolder" Grid.Column="1" Text="📁" FontSize="16" Margin="0,0,0,0" 
+                                <TextBlock Name="btnShowDetails" Grid.Column="1" Text="📋" FontSize="16" Margin="0,0,8,0" 
+                                           ToolTip="Detail-Informationen anzeigen" VerticalAlignment="Center" 
+                                           Cursor="Hand" Foreground="Blue" Visibility="Collapsed"/>
+                                <TextBlock Name="btnOpenDownloadFolder" Grid.Column="2" Text="📁" FontSize="16" Margin="0,0,0,0" 
                                            ToolTip="Download-Ordner öffnen" VerticalAlignment="Center" 
                                            Cursor="Hand" Foreground="Black"/>
                             </Grid>                        </StackPanel>
@@ -797,6 +802,7 @@ $txtLog = $window.FindName("txtLog")
 # Referenzen auf DATEV Cloud Elemente holen
 $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
 $btnDownload = $window.FindName("btnDownload")
+$btnShowDetails = $window.FindName("btnShowDetails")
 $btnUpdateDownloads = $window.FindName("btnUpdateDownloads")
 
 # Referenzen auf DATEV Tools Elemente holen
@@ -2533,6 +2539,49 @@ function Open-DownloadFolder {
     }
 }
 
+# Funktion zum Anzeigen der Detail-Informationen des ausgewählten Downloads
+function Show-DownloadDetails {
+    <#
+    .SYNOPSIS
+    Öffnet die DATEV Detail-Seite für das ausgewählte Download-Tool
+    #>
+    try {
+        $cmbDirectDownloads = $window.FindName("cmbDirectDownloads")
+        
+        if ($null -ne $cmbDirectDownloads.SelectedItem -and
+            $cmbDirectDownloads.SelectedIndex -gt 0 -and
+            $null -ne $cmbDirectDownloads.SelectedItem.Tag) {
+            
+            $selectedItem = $cmbDirectDownloads.SelectedItem
+            $detailUrl = $selectedItem.Tag.detailUrl
+            
+            if (-not [string]::IsNullOrWhiteSpace($detailUrl)) {
+                Write-Log -Message "Öffne Detail-Seite für '$($selectedItem.Content)': $detailUrl" -Level 'INFO'
+                Open-Url -Url $detailUrl
+            } else {
+                Write-Log -Message "Keine Detail-URL verfügbar für: $($selectedItem.Content)" -Level 'WARN'
+                [System.Windows.MessageBox]::Show(
+                    "Für dieses Tool sind keine Detail-Informationen verfügbar.",
+                    "Information",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Information
+                )
+            }
+        } else {
+            Write-Log -Message "Kein Download ausgewählt für Detail-Anzeige" -Level 'WARN'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen der Detail-Seite: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Öffnen der Detail-Seite:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
 function Open-EmailClient {
     <#
     .SYNOPSIS
@@ -2996,6 +3045,14 @@ if ($null -ne $cmbDirectDownloads) {
             $selectedItem = $cmbDirectDownloads.SelectedItem
             Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'DEBUG'
             
+            # Detail-Link anzeigen wenn verfügbar
+            if ($null -ne $btnShowDetails -and -not [string]::IsNullOrWhiteSpace($selectedItem.Tag.detailUrl)) {
+                $btnShowDetails.Visibility = 'Visible'
+                Write-Log -Message "Detail-Link verfügbar für: $($selectedItem.Content)" -Level 'DEBUG'
+            } else {
+                $btnShowDetails.Visibility = 'Collapsed'
+            }
+            
             # Beschreibung anzeigen wenn verfügbar
             $txtDownloadDescription = $Window.FindName('txtDownloadDescription')
             $borderDownloadDescription = $Window.FindName('borderDownloadDescription')
@@ -3012,6 +3069,10 @@ if ($null -ne $cmbDirectDownloads) {
         }
         else {
             $btnDownload.IsEnabled = $false
+            # Detail-Link ausblenden wenn keine Auswahl
+            if ($null -ne $btnShowDetails) {
+                $btnShowDetails.Visibility = 'Collapsed'
+            }
             # Beschreibung ausblenden wenn keine Auswahl
             $borderDownloadDescription = $Window.FindName('borderDownloadDescription')
             if ($null -ne $borderDownloadDescription) {
