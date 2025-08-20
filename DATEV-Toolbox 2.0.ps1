@@ -74,6 +74,7 @@ $script:Config = @{
             HelpCenter = "https://apps.datev.de/help-center/"
             ServiceKontakte = "https://apps.datev.de/servicekontakt-online/contacts"
             MyUpdates = "https://apps.datev.de/myupdates/home"
+            Community = "https://www.datev-community.de/"
             MyDATEV = "https://apps.datev.de/mydatev"
             DUO = "https://duo.datev.de/"
             LAO = "https://apps.datev.de/lao"
@@ -136,6 +137,7 @@ $script:Config = @{
         'btnHilfeCenter' = @{ Type = 'URL'; UrlKey = 'HelpCenter' }
         'btnServicekontakte' = @{ Type = 'URL'; UrlKey = 'ServiceKontakte' }
         'btnMyUpdates' = @{ Type = 'URL'; UrlKey = 'MyUpdates' }
+        'btnCommunity' = @{ Type = 'URL'; UrlKey = 'Community' }
         
         # DATEV Online Services - Cloud (URL-Handler)
         'btnMyDATEV' = @{ Type = 'URL'; UrlKey = 'MyDATEV' }
@@ -554,6 +556,8 @@ function Close-RunspacePool {
                                         ToolTip="Zeigt DATEV Servicekontakte und Support-Informationen an"/>
                                 <Button Name="btnMyUpdates" Content="DATEV myUpdates" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet das DATEV myUpdates Portal für aktuelle Informationen"/>
+                                <Button Name="btnCommunity" Content="👥 DATEV Community" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet die DATEV Community für Erfahrungsaustausch und Diskussionen"/>
                             </StackPanel>
                         </GroupBox>
                         
