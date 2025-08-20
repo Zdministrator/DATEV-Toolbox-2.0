@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-07",
+  "lastUpdated": "2025-08-20",
   "documents": [
     {
       "id": "1080019",
@@ -30,6 +30,12 @@
       "title": "Windows Server 2025, 2022, 2019 oder 2016 in der DATEV-Umgebung einrichten",
       "url": "https://apps.datev.de/help-center/documents/1070547",
       "description": "Umfassende Anleitung zur Installation und Konfiguration von Windows Server-Betriebssystemen für den Einsatz von DATEV-Programmen mit Active Directory, DNS, DHCP und Netzwerkfreigaben."
+    },
+    {
+      "id": "1012173",
+      "title": "Serverumzüge planen und durchführen",
+      "url": "https://apps.datev.de/help-center/documents/1012173",
+      "description": "In diesem Dokument erfahren Sie, wie Sie Serverumzüge planen und durchführen."
     }
   ]
 }

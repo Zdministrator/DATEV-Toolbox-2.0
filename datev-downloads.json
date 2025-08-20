@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-06",
+  "lastUpdated": "2025-08-20",
   "downloads": [
     {
       "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
@@ -65,7 +65,8 @@
       "name": "Lohn Vorerfassung V. 7.1",
       "url": "https://download.datev.de/download/lohn_vorerfassung_pak00683_7.1.exe",
       "description": "DATEV Lohn Vorerfassung Version 7.1"
-    },    {
+    },
+    {
       "name": "DATEV Datenübernahme nach LODAS V. 4.24",
       "url": "https://download.datev.de/download/pak01429/lug2lodas_pak_4_24.exe",
       "description": "Tool zur Datenübernahme von DATEV nach LODAS"
@@ -84,6 +85,11 @@
       "name": "Deinstallationsnacharbeitentool V. 3.11",
       "url": "https://download.datev.de/download/deinstallationsnacharbeiten_v311/deinstnacharbeitentool.exe",
       "description": "DATEV Deinstallationsnacharbeitentool zur Bereinigung nach DATEV-Deinstallationen"
+    },
+    {
+      "name": "DATEV ServerSec Tool",
+      "url": "https://download.datev.de/download/serversec.exe",
+      "description": "DATEV ServerSec Tool zur Sicherheitskonfiguration und Härtung von DATEV-Servern"
     }
   ]
 }
