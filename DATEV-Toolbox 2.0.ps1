@@ -52,6 +52,9 @@ $script:DATEVProgramPaths = @{
     'EOAufgabenplanung' = @(
         '%DATEVPP%\PROGRAMM\I0000085\EOControl.exe'
     )
+    'DvServerChange' = @(
+        '%DATEVPP%\PROGRAMM\B0001502\DvServerChange.exe'
+    )
     'NGENALL40' = @(
         '%DATEVPP%\Programm\B0001508\ngenall40.cmd'
     )
@@ -162,6 +165,7 @@ $script:Config = @{
         'btnKonfigDBTools' = @{ Type = 'DATEV'; ProgramName = 'KonfigDBTools'; Description = 'KonfigDB-Tools' }
         'btnEODBconfig' = @{ Type = 'DATEV'; ProgramName = 'EODBconfig'; Description = 'EODBconfig' }
         'btnEOAufgabenplanung' = @{ Type = 'DATEV'; ProgramName = 'EOAufgabenplanung'; Description = 'EO Aufgabenplanung' }
+        'btnDvServerChange' = @{ Type = 'DATEV'; ProgramName = 'DvServerChange'; Description = 'Server-Anpassungs-Assistent' }
         'btnNGENALL40' = @{ Type = 'DATEV'; ProgramName = 'NGENALL40'; Description = 'NGENALL 4.0' }
         
         # System Tools (SystemTool-Handler)
@@ -506,7 +510,7 @@ function Close-RunspacePool {
                         <!-- DATEV Programme -->
                         <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
-                                <TextBlock Text="DATEV Programme" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="DATEV Programme 🖥️" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnDATEVArbeitsplatz" Content="DATEV-Arbeitsplatz" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Startet den DATEV-Arbeitsplatz mit maximiertem Fenster"/>
@@ -520,7 +524,7 @@ function Close-RunspacePool {
                         <!-- DATEV Tools -->
                         <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
-                                <TextBlock Text="DATEV Tools" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="DATEV Tools 🔧" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnKonfigDBTools" Content="KonfigDB-Tools" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet die DATEV Konfigurations-Datenbank Tools"/>
@@ -528,12 +532,14 @@ function Close-RunspacePool {
                                         ToolTip="Startet die DATEV Enterprise Objects Datenbank-Konfiguration"/>
                                 <Button Name="btnEOAufgabenplanung" Content="EO Aufgabenplanung" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet die DATEV Enterprise Objects Aufgabenplanung"/>
+                                <Button Name="btnDvServerChange" Content="Server-Anpassungs-Assistent" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Startet den DATEV Server-Anpassungs-Assistenten"/>
                             </StackPanel>
                         </GroupBox>
                           <!-- Performance Tools -->
                         <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
-                                <TextBlock Text="Performance Tools" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="Performance Tools ⚡" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Erzwingt die Neuerstellung der .NET Native Images für bessere Performance"/>
