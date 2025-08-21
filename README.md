@@ -1,6 +1,9 @@
 # DATEV-Toolbox 2.0
 
-Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Tools.
+Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassen### Entwicklung
+
+### Version
+Aktuelle Version: **2.1.10**Tools.
 
 ## 📸 Anwendungsvorschau
 
@@ -10,20 +13,24 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 
 ## 📋 Features
 
+- **🆕 Server-Anpassungs-Assistent**: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe) (v2.1.10)
+- **🆕 Windows Updates Integration**: System-Tab unterstützt jetzt Windows Updates für Client und Server (v2.1.10)  
+- **🆕 Dokumente lastUpdated-Anzeige**: Datum der letzten Aktualisierung im Dokumente-Tab (v2.1.10)
+- **🆕 Download-Info mit Rich-Text**: Fette Schrift für Labels und strukturierte Metadaten-Anzeige (v2.1.9)
 - **🆕 Neuer Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV-Anleitungen und Dokumentationen (v2.1.8)
 - **🆕 Scrollbares Changelog-Fenster**: Benutzerfreundliche Anzeige der Update-Historie (v2.1.7)
 - **🆕 Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
 - **🆕 Kompakte UI**: Optimierte GroupBox-Abstände für platzsparende Darstellung (v2.1.4)
 - **WPF-GUI**: Moderne tab-basierte Benutzeroberfläche
 - **DATEV Programme**: Direkter Start von DATEV-Arbeitsplatz, Installationsmanager und Servicetool
-- **DATEV Tools**: Zugriff auf KonfigDB-Tools, EODBconfig und EO Aufgabenplanung
+- **DATEV Tools**: Zugriff auf KonfigDB-Tools, EODBconfig, EO Aufgabenplanung und Server-Anpassungs-Assistent
 - **Performance Tools**: NGENALL 4.0 und Leistungsindex für Systemoptimierung
-- **System Tools**: Integrierte Windows-Systemtools (Task-Manager, Ressourcenmonitor, etc.)
+- **System Tools**: Integrierte Windows-Systemtools (Task-Manager, Ressourcenmonitor, Windows Updates)
 - **🆕 Erweiterte Gruppenrichtlinien-Updates**: Progress-Dialog mit Abbruch-Funktion und Prozess-Überwachung (v2.1.4)
 - **Automatische Updates**: Selbst-aktualisierendes System mit GitHub-Integration
 - **DATEV Online Tools**: Schnellzugriff auf wichtige DATEV-Portale und -Services
 - **🆕 Erweiterte Downloads**: Verwaltung und Download von DATEV-Software mit Aktualisierungsdatum
-- **🆕 Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV Help-Center Dokumentationen
+- **🆕 Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV Help-Center Dokumentationen mit Aktualisierungsdatum
 - **Update-Termine**: Anzeige anstehender DATEV-Updates
 - **🆕 Scrollbares Changelog**: Benutzerfreundliche Update-Historie mit bis zu 10 Versionen
 - **Logging-System**: Umfassendes Protokollsystem mit verschiedenen Log-Leveln
@@ -83,7 +90,7 @@ Die Anwendung speichert alle Einstellungen und Logs im AppData-Ordner:
 ### 🛠️ DATEV
 Vollständige DATEV-Integration mit drei Kategorien:
 - **DATEV Programme**: DATEV-Arbeitsplatz, Installationsmanager, Servicetool
-- **DATEV Tools**: KonfigDB-Tools, EODBconfig, EO Aufgabenplanung
+- **DATEV Tools**: KonfigDB-Tools, EODBconfig, EO Aufgabenplanung, Server-Anpassungs-Assistent
 - **Performance Tools**: NGENALL 4.0 (Native Images), Leistungsindex
 
 ### 🌐 DATEV Online
@@ -105,11 +112,13 @@ Neuer Tab für direkten Zugriff auf wichtige DATEV-Dokumentationen:
 - **Umfassende Anleitungen**: Windows Server-Einrichtung, Betriebssystem-Kompatibilität
 - **5 wichtige Dokumente**: Server-Installation, Office-Umstieg, Deinstallation und mehr
 - **Automatische Updates**: Dokumenten-Liste wird von GitHub aktualisiert
+- **🆕 Aktualisierungsdatum-Anzeige**: Datum der letzten Aktualisierung wird prominent angezeigt
 - **Ein-Klick-Zugriff**: Öffnet Dokumente direkt im Browser
 
 ### ⚙️ System
 Integrierte Windows- und System-Tools:
 - **🆕 Aktionen**: Gruppenrichtlinien-Update (gpupdate /force) mit asynchroner Ausführung
+- **🆕 Windows Updates**: Cross-Platform Button für Windows Updates (Client & Server kompatibel)
 - **System Tools**: Task-Manager, Ressourcenmonitor, Ereignisanzeige
 - **Verwaltung**: Dienste, Systemkonfiguration, Datenträgerbereinigung
 
@@ -144,7 +153,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Version
-Aktuelle Version: **2.1.9**
+Aktuelle Version: **2.1.10**
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -159,6 +168,27 @@ Aktuelle Version: **2.1.9**
 - WPF-Unterstützung erforderlich
 - DATEV-Installation (für DATEV-Tools, optional)
 - Internetverbindung für Updates und Downloads
+
+### Neue Features in Version 2.1.10
+
+#### 🔧 Server-Anpassungs-Assistent
+- **Neuer DATEV-Tool Button**: Server-Anpassungs-Assistent im DATEV Tools Bereich hinzugefügt
+- **DvServerChange.exe Integration**: Direkter Zugriff auf DATEV Server-Konfigurationstool
+- **Intelligente Pfadsuche**: Automatische Erkennung über %DATEVPP% Umgebungsvariable
+- **Benutzerfreundlich**: Schraubenschlüssel-Icon und aussagekräftiger Tooltip
+
+#### 🔄 Windows Updates Integration
+- **System-Tab Erweiterung**: Windows Updates Button für direkten Zugriff hinzugefügt  
+- **Cross-Platform Support**: Funktioniert sowohl auf Windows Client als auch Server
+- **Intelligente Erkennung**: 4-Tier Fallback-System für optimale Kompatibilität
+- **Moderne Settings App**: Bevorzugung der neuen Windows 10/11 Update-Oberfläche
+- **Legacy Support**: Automatischer Fallback auf Control Panel für ältere Systeme
+
+#### 📋 Dokumente-Tab Verbesserungen
+- **lastUpdated Datum**: Aktualisierungsdatum wird prominent oberhalb der Liste angezeigt
+- **Deutsche Formatierung**: DD.MM.YYYY Format für bessere Lesbarkeit
+- **Echtzeitaktualisierung**: Datum wird beim Laden der Dokumenten-Liste aktualisiert
+- **Benutzerfreundlichkeit**: Kleine, graue Schrift für dezente aber wichtige Information
 
 ### Neue Features in Version 2.1.9
 
@@ -195,6 +225,11 @@ Aktuelle Version: **2.1.9**
 - **Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
 
 ## 🔄 Update-Historie
+
+### Version 2.1.10 (2025-08-21)
+- **🔧 Server-Anpassungs-Assistent**: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe)
+- **🔄 Windows Updates Integration**: System-Tab unterstützt jetzt Windows Updates für Client und Server
+- **📋 Dokumente lastUpdated-Anzeige**: Datum der letzten Aktualisierung im Dokumente-Tab
 
 ### Version 2.1.9 (2025-08-21)
 - **📥 Download-Info-Enhancement**: Fette Schrift und vollständige Metadaten für Downloads
