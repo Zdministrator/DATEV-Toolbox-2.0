@@ -524,7 +524,7 @@ function Close-RunspacePool {
                         <!-- DATEV Tools -->
                         <GroupBox Margin="3,3,3,5">
                             <GroupBox.Header>
-                                <TextBlock Text="DATEV Tools 🔧" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="DATEV Admin-Tools 🔧" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnKonfigDBTools" Content="KonfigDB-Tools" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet die DATEV Konfigurations-Datenbank Tools"/>
