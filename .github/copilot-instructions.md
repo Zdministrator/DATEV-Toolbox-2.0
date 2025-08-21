@@ -70,6 +70,22 @@ Write-Log -Message "Fehler: $($_.Exception.Message)" -Level 'ERROR'
 - **Rollback-Fähigkeit**: Wiederherstellung bei fehlgeschlagenen Updates
 - **Batch-Skript**: Verzögertes Update über externes Batch-Skript
 
+## 📥 Download-System
+
+### Rich-Text-Info-Anzeige
+- **WPF Inlines**: Verwendung von `System.Windows.Documents.Run` für formatierte Text-Anzeige
+- **Fette Labels**: FontWeight.Bold für "Erschienen:", "Dateiname:" und "Dateigröße:"
+- **Strukturierte Metadaten**: Automatische Formatierung von JSON-Daten in benutzerfreundliche Darstellung
+- **Tag-Objekt-Integration**: Vollständige Übertragung aller JSON-Felder (erschienen, dateiname, dateigroesse) in ComboBox-Items
+- **Intelligente Formatierung**: Automatische Leerzeilen-Verwaltung zwischen Beschreibung und Zusatzinformationen
+
+### Download-Metadaten
+- **Erschienen**: Veröffentlichungsdatum im Format DD.MM.YYYY
+- **Dateiname**: Vollständiger Dateiname der Download-Datei
+- **Dateigröße**: Größe mit Einheit (MB, GB) für Benutzerinformation
+- **JSON-Struktur**: Konsistente Datenstruktur in datev-downloads.json
+- **Fallback-Handling**: Graceful Degradation für Downloads ohne Zusatzinformationen
+
 ## 🎨 GUI-Entwicklung
 
 ### XAML-Struktur
@@ -77,6 +93,13 @@ Write-Log -Message "Fehler: $($_.Exception.Message)" -Level 'ERROR'
 - **GroupBox-Organisation**: Verwandte Buttons in GroupBoxes gruppieren
 - **ScrollViewer**: Für längere Inhalte ScrollViewer verwenden
 - **Responsive Design**: Margin und Padding konsistent verwenden
+
+### Rich-Text-Formatierung
+- **WPF Inlines**: TextBlock.Inlines für formatierte Darstellung verwenden
+- **Run-Objekte**: `New-Object System.Windows.Documents.Run` für Textabschnitte
+- **FontWeight**: `[System.Windows.FontWeights]::Bold` für fette Schrift
+- **LineBreaks**: `New-Object System.Windows.Documents.LineBreak` für Zeilenumbrüche
+- **Strukturierte Layouts**: Beschreibung + Metadaten mit intelligenter Leerzeilen-Verwaltung
 
 ### Button-Integration
 - **Event-Handler**: Konsistente Add_Click Pattern

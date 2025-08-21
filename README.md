@@ -144,7 +144,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Version
-Aktuelle Version: **2.1.8**
+Aktuelle Version: **2.1.9**
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -160,9 +160,18 @@ Aktuelle Version: **2.1.8**
 - DATEV-Installation (für DATEV-Tools, optional)
 - Internetverbindung für Updates und Downloads
 
-### Neue Features in Version 2.1.8
+### Neue Features in Version 2.1.9
 
-#### 📋 Dokumente-Tab: Direkter Zugriff auf DATEV-Anleitungen
+#### 📥 Download-Info-Enhancement: Fette Schrift und vollständige Metadaten
+- **Erweiterte Download-Information**: Info-Feld zeigt jetzt Zusatzinformationen (Erschienen, Dateiname, Dateigröße)
+- **Fette Formatierung**: Labels "Erschienen:", "Dateiname:" und "Dateigröße:" werden fett dargestellt
+- **Rich-Text-Implementierung**: WPF Inlines für professionelle und strukturierte Darstellung
+- **Intelligente Formatierung**: Beschreibung + strukturierte Metadaten mit automatischen Leerzeilen
+- **Vollständige JSON-Integration**: Alle Download-Felder werden korrekt gelesen und angezeigt
+- **Verbesserte Benutzerfreundlichkeit**: Konsistente Anzeige für Downloads mit und ohne Zusatzinformationen
+- **Professionelle Darstellung**: Strukturierte Metadaten-Anzeige für bessere Entscheidungsfindung
+
+#### 📋 Dokumente-Tab: Direkter Zugriff auf DATEV-Anleitungen (v2.1.8)
 - **Neuer 'Dokumente' Tab**: Zwischen Downloads und System eingefügt für bessere Navigation
 - **DATEV Help-Center Integration**: 5 wichtige Dokumentationen verfügbar
 - **Ein-Klick-Zugriff**: Windows Server-Setup, Betriebssystem-Kompatibilität, Office-Umstieg
@@ -186,6 +195,15 @@ Aktuelle Version: **2.1.8**
 - **Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
 
 ## 🔄 Update-Historie
+
+### Version 2.1.9 (2025-08-21)
+- **📥 Download-Info-Enhancement**: Fette Schrift und vollständige Metadaten für Downloads
+- **🎨 Rich-Text-Formatierung**: WPF Inlines für professionelle Info-Darstellung mit fetten Labels
+- **📊 Strukturierte Metadaten**: Erschienen, Dateiname und Dateigröße in der Download-Info
+- **🔧 JSON-Datenintegration**: Vollständige Übertragung aller Download-Felder zur UI
+- **💡 Intelligente Formatierung**: Automatische Leerzeilen zwischen Beschreibung und Zusatzinfos
+- **👥 Verbesserte UX**: Konsistente Anzeige für Downloads mit und ohne Zusatzinformationen
+- **🏗️ Code-Verbesserung**: Tag-Objekt-Erweiterung für vollständige Metadaten-Übertragung
 
 ### Version 2.1.8 (2025-08-13)
 - **📋 Dokumente-Tab**: Neuer Tab für direkten Zugriff auf wichtige DATEV-Dokumentationen

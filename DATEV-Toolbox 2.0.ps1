@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.8"
+$script:AppVersion = "2.1.9"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -620,7 +620,11 @@ function Close-RunspacePool {
                                     
                                     <TextBlock Grid.Column="0" Text="💡" FontSize="14" VerticalAlignment="Top" Margin="0,0,8,0"/>
                                     <TextBlock Name="txtDownloadDescription" Grid.Column="1" FontSize="11" 
-                                               VerticalAlignment="Top" Foreground="#333333" TextWrapping="Wrap"/>
+                                               VerticalAlignment="Top" Foreground="#333333" TextWrapping="Wrap">
+                                        <TextBlock.Inlines>
+                                            <!-- Inlines werden dynamisch hinzugefügt -->
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
                                 </Grid>
                             </Border>
                             
@@ -2341,8 +2345,11 @@ function Initialize-DownloadsComboBox {
             $item = New-Object System.Windows.Controls.ComboBoxItem
             $item.Content = $download.name
             $item.Tag = @{
-                url         = $download.url
-                description = $download.description
+                url          = $download.url
+                description  = $download.description
+                erschienen   = $download.erschienen
+                dateiname    = $download.dateiname
+                dateigroesse = $download.dateigroesse
             }
             $cmbDirectDownloads.Items.Add($item) | Out-Null
         }
@@ -2996,15 +3003,86 @@ if ($null -ne $cmbDirectDownloads) {
             $selectedItem = $cmbDirectDownloads.SelectedItem
             Write-Log -Message "Download ausgewählt: $($selectedItem.Content)" -Level 'DEBUG'
             
-            # Beschreibung anzeigen wenn verfügbar
+            # Beschreibung und Zusatzinformationen anzeigen wenn verfügbar
             $txtDownloadDescription = $Window.FindName('txtDownloadDescription')
             $borderDownloadDescription = $Window.FindName('borderDownloadDescription')
             if ($null -ne $txtDownloadDescription -and $null -ne $borderDownloadDescription) {
-                $description = $selectedItem.Tag.description
-                if (-not [string]::IsNullOrWhiteSpace($description)) {
-                    $txtDownloadDescription.Text = $description
+                $downloadData = $selectedItem.Tag
+                
+                # Inlines leeren
+                $txtDownloadDescription.Inlines.Clear()
+                
+                # Beschreibung hinzufügen
+                if (-not [string]::IsNullOrWhiteSpace($downloadData.description)) {
+                    $run = New-Object System.Windows.Documents.Run
+                    $run.Text = $downloadData.description
+                    $txtDownloadDescription.Inlines.Add($run)
+                }
+                
+                # Zusatzinformationen hinzufügen wenn verfügbar
+                $hasAdditionalInfo = $false
+                if (-not [string]::IsNullOrWhiteSpace($downloadData.erschienen) -or 
+                    -not [string]::IsNullOrWhiteSpace($downloadData.dateiname) -or 
+                    -not [string]::IsNullOrWhiteSpace($downloadData.dateigroesse)) {
+                    $hasAdditionalInfo = $true
+                }
+                
+                if ($hasAdditionalInfo) {
+                    # Leerzeilen hinzufügen wenn Beschreibung vorhanden
+                    if (-not [string]::IsNullOrWhiteSpace($downloadData.description)) {
+                        $lineBreak1 = New-Object System.Windows.Documents.LineBreak
+                        $lineBreak2 = New-Object System.Windows.Documents.LineBreak
+                        $txtDownloadDescription.Inlines.Add($lineBreak1)
+                        $txtDownloadDescription.Inlines.Add($lineBreak2)
+                    }
+                    
+                    # Erschienen
+                    if (-not [string]::IsNullOrWhiteSpace($downloadData.erschienen)) {
+                        $boldRun = New-Object System.Windows.Documents.Run
+                        $boldRun.Text = "Erschienen: "
+                        $boldRun.FontWeight = [System.Windows.FontWeights]::Bold
+                        $txtDownloadDescription.Inlines.Add($boldRun)
+                        
+                        $valueRun = New-Object System.Windows.Documents.Run
+                        $valueRun.Text = $downloadData.erschienen
+                        $txtDownloadDescription.Inlines.Add($valueRun)
+                        
+                        $lineBreak = New-Object System.Windows.Documents.LineBreak
+                        $txtDownloadDescription.Inlines.Add($lineBreak)
+                    }
+                    
+                    # Dateiname
+                    if (-not [string]::IsNullOrWhiteSpace($downloadData.dateiname)) {
+                        $boldRun = New-Object System.Windows.Documents.Run
+                        $boldRun.Text = "Dateiname: "
+                        $boldRun.FontWeight = [System.Windows.FontWeights]::Bold
+                        $txtDownloadDescription.Inlines.Add($boldRun)
+                        
+                        $valueRun = New-Object System.Windows.Documents.Run
+                        $valueRun.Text = $downloadData.dateiname
+                        $txtDownloadDescription.Inlines.Add($valueRun)
+                        
+                        $lineBreak = New-Object System.Windows.Documents.LineBreak
+                        $txtDownloadDescription.Inlines.Add($lineBreak)
+                    }
+                    
+                    # Dateigröße
+                    if (-not [string]::IsNullOrWhiteSpace($downloadData.dateigroesse)) {
+                        $boldRun = New-Object System.Windows.Documents.Run
+                        $boldRun.Text = "Dateigröße: "
+                        $boldRun.FontWeight = [System.Windows.FontWeights]::Bold
+                        $txtDownloadDescription.Inlines.Add($boldRun)
+                        
+                        $valueRun = New-Object System.Windows.Documents.Run
+                        $valueRun.Text = $downloadData.dateigroesse
+                        $txtDownloadDescription.Inlines.Add($valueRun)
+                    }
+                }
+                
+                # Border anzeigen wenn Inhalt vorhanden
+                if ($txtDownloadDescription.Inlines.Count -gt 0) {
                     $borderDownloadDescription.Visibility = 'Visible'
-                    Write-Log -Message "Beschreibung angezeigt für: $($selectedItem.Content)" -Level 'DEBUG'
+                    Write-Log -Message "Beschreibung und Zusatzinformationen angezeigt für: $($selectedItem.Content)" -Level 'DEBUG'
                 } else {
                     $borderDownloadDescription.Visibility = 'Collapsed'
                 }
