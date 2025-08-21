@@ -541,10 +541,10 @@ function Close-RunspacePool {
                             <GroupBox.Header>
                                 <TextBlock Text="Performance Tools ⚡" FontWeight="Bold" FontSize="12"/>
                             </GroupBox.Header>                            <StackPanel Orientation="Vertical" Margin="8">
-                                <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3" 
-                                        ToolTip="Erzwingt die Neuerstellung der .NET Native Images für bessere Performance"/>
                                 <Button Name="btnLeistungsindex" Content="Leistungsindex ermitteln" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Führt eine Leistungsanalyse der DATEV-Installation durch (2 Durchläufe)"/>
+                                <Button Name="btnNGENALL40" Content="Native Images erzwingen" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Erzwingt die Neuerstellung der .NET Native Images für bessere Performance"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
