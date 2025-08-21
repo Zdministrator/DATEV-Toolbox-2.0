@@ -176,6 +176,7 @@ $script:Config = @{
         # Funktions-Handler (Function-Handler)
         'btnLeistungsindex' = @{ Type = 'Function'; FunctionName = 'Start-Leistungsindex' }
         'btnGpupdate' = @{ Type = 'Function'; FunctionName = 'Start-Gpupdate' }
+        'btnWindowsUpdates' = @{ Type = 'Function'; FunctionName = 'Start-WindowsUpdates' }
         
         # TextBlock-Handler (verwenden MouseLeftButtonDown statt Add_Click)
         'btnUpdateDownloads' = @{ Type = 'TextBlock'; FunctionName = 'Update-DATEVDownloads' }
@@ -670,6 +671,16 @@ function Close-RunspacePool {
                                 </StackPanel>
                             </GroupBox.Header>
                             <StackPanel Orientation="Vertical" Margin="8">
+                                <!-- Aktualisierungsdatum -->
+                                <Border BorderBrush="LightBlue" BorderThickness="1" Background="#E8F4FD" 
+                                        Margin="0,0,0,10" Padding="6" CornerRadius="3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="📅" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Letzte Aktualisierung: " FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Name="txtDocumentsLastUpdated" Text="Wird geladen..." FontSize="10" VerticalAlignment="Center" Foreground="#666"/>
+                                    </StackPanel>
+                                </Border>
+                                
                                 <StackPanel Name="spDocumentsList" Orientation="Vertical" Margin="0,0,0,0">
                                     <TextBlock Text="Lade Dokumente..." 
                                                FontStyle="Italic" Foreground="Gray"/>
@@ -714,6 +725,8 @@ function Close-RunspacePool {
                             <StackPanel Orientation="Vertical" Margin="8">
                                 <Button Name="btnGpupdate" Content="🔄 Gruppenrichtlinien aktualisieren" Height="25" Margin="0,3,0,3"
                                         ToolTip="Führt gpupdate /force aus um Gruppenrichtlinien sofort zu aktualisieren"/>
+                                <Button Name="btnWindowsUpdates" Content="🔄 Windows Updates" Height="25" Margin="0,3,0,3"
+                                        ToolTip="Öffnet die Windows Update-Einstellungen für verfügbare System-Updates"/>
                             </StackPanel>
                         </GroupBox>
                         
@@ -1489,6 +1502,106 @@ function Start-Gpupdate {
         Write-Log -Message "Fehler beim Starten des Gruppenrichtlinien-Updates: $($_.Exception.Message)" -Level 'ERROR'
         [System.Windows.MessageBox]::Show(
             "Fehler beim Starten des Gruppenrichtlinien-Updates:`n$($_.Exception.Message)",
+            "Fehler",
+            [System.Windows.MessageBoxButton]::OK,
+            [System.Windows.MessageBoxImage]::Error
+        )
+    }
+}
+
+# Funktion zum Öffnen der Windows Updates
+function Start-WindowsUpdates {
+    <#
+    .SYNOPSIS
+    Öffnet Windows Updates - funktioniert sowohl auf Client- als auch Server-Versionen
+    .DESCRIPTION
+    Versucht verschiedene Methoden, um Windows Updates zu öffnen:
+    1. Moderne Settings-App (Windows 10/11 Client)
+    2. Legacy Control Panel (Windows Server, ältere Versionen)
+    3. PowerShell-Module als Fallback
+    #>
+    try {
+        Write-Log -Message "Öffne Windows Updates..." -Level 'INFO'
+        
+        # Betriebssystem-Info abrufen
+        $os = Get-WmiObject -Class Win32_OperatingSystem
+        $isServer = $os.ProductType -ne 1  # 1 = Workstation, 2 = Domain Controller, 3 = Server
+        $osVersion = [Environment]::OSVersion.Version
+        
+        $success = $false
+        
+        # Methode 1: Moderne Settings-App (bevorzugt für Windows 10/11 Client)
+        if (-not $isServer -and $osVersion.Major -ge 10) {
+            try {
+                Write-Log -Message "Versuche moderne Settings-App (ms-settings:windowsupdate)..." -Level 'DEBUG'
+                Start-Process "ms-settings:windowsupdate"
+                $success = $true
+                Write-Log -Message "Windows Updates über Settings-App geöffnet" -Level 'INFO'
+            }
+            catch {
+                Write-Log -Message "Settings-App nicht verfügbar: $($_.Exception.Message)" -Level 'DEBUG'
+            }
+        }
+        
+        # Methode 2: Legacy Control Panel (Windows Server, ältere Versionen)
+        if (-not $success) {
+            try {
+                Write-Log -Message "Versuche Control Panel (wuapp.exe)..." -Level 'DEBUG'
+                if (Get-Command "wuapp.exe" -ErrorAction SilentlyContinue) {
+                    Start-Process "wuapp.exe"
+                    $success = $true
+                    Write-Log -Message "Windows Updates über wuapp.exe geöffnet" -Level 'INFO'
+                }
+            }
+            catch {
+                Write-Log -Message "wuapp.exe nicht verfügbar: $($_.Exception.Message)" -Level 'DEBUG'
+            }
+        }
+        
+        # Methode 3: Control Panel Applet (Universal-Fallback)
+        if (-not $success) {
+            try {
+                Write-Log -Message "Versuche Control Panel Applet..." -Level 'DEBUG'
+                Start-Process "control.exe" -ArgumentList "/name Microsoft.WindowsUpdate"
+                $success = $true
+                Write-Log -Message "Windows Updates über Control Panel geöffnet" -Level 'INFO'
+            }
+            catch {
+                Write-Log -Message "Control Panel Applet nicht verfügbar: $($_.Exception.Message)" -Level 'DEBUG'
+            }
+        }
+        
+        # Methode 4: PowerShell-Module Hinweis (letzte Option)
+        if (-not $success) {
+            $message = if ($isServer) {
+                "Windows Updates konnten nicht automatisch geöffnet werden.`n`n" +
+                "Auf Windows Server können Sie Windows Updates folgendermaßen verwalten:`n" +
+                "• Server Manager → Tools → Windows Update`n" +
+                "• PowerShell: Get-WindowsUpdate, Install-WindowsUpdate`n" +
+                "• WSUS/SCCM falls konfiguriert`n`n" +
+                "Oder öffnen Sie die Systemsteuerung manuell und suchen nach 'Windows Update'."
+            } else {
+                "Windows Updates konnten nicht automatisch geöffnet werden.`n`n" +
+                "Bitte öffnen Sie Windows Updates manuell über:`n" +
+                "• Einstellungen → Update und Sicherheit → Windows Update`n" +
+                "• Systemsteuerung → Windows Update`n" +
+                "• Suche: 'Windows Update' in der Taskleiste"
+            }
+            
+            [System.Windows.MessageBox]::Show(
+                $message,
+                "Windows Updates",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Information
+            )
+            Write-Log -Message "Windows Updates konnten nicht automatisch geöffnet werden - Benutzer informiert" -Level 'WARN'
+        }
+        
+    }
+    catch {
+        Write-Log -Message "Fehler beim Öffnen von Windows Updates: $($_.Exception.Message)" -Level 'ERROR'
+        [System.Windows.MessageBox]::Show(
+            "Fehler beim Öffnen von Windows Updates:`n$($_.Exception.Message)`n`nBitte öffnen Sie Windows Updates manuell über die Systemsteuerung.",
             "Fehler",
             [System.Windows.MessageBoxButton]::OK,
             [System.Windows.MessageBoxImage]::Error
@@ -2593,8 +2706,14 @@ function Get-DATEVDocuments {
                 }
             }
             
+            # Rückgabe-Objekt mit Dokumenten und lastUpdated
+            $result = @{
+                documents = $documents
+                lastUpdated = $documentsData.lastUpdated
+            }
+            
             Write-Log -Message "DATEV-Dokumente aus lokaler Datei geladen: $($documents.Count) Dokumente" -Level 'INFO'
-            return $documents
+            return $result
         }
         else {
             Write-Log -Message "Lokale Dokumente-Datei nicht gefunden. Lade von GitHub..." -Level 'INFO'
@@ -2603,7 +2722,10 @@ function Get-DATEVDocuments {
     }
     catch {
         Write-Log -Message "Fehler beim Laden der DATEV-Dokumente: $($_.Exception.Message)" -Level 'ERROR'
-        return @()
+        return @{
+            documents = @()
+            lastUpdated = "Unbekannt"
+        }
     }
 }
 
@@ -2642,8 +2764,14 @@ function Update-DATEVDocuments {
                 }
             }
             
+            # Rückgabe-Objekt mit Dokumenten und lastUpdated
+            $result = @{
+                documents = $documents
+                lastUpdated = $documentsData.lastUpdated
+            }
+            
             Write-Log -Message "DATEV-Dokumente erfolgreich aktualisiert: $($documents.Count) Dokumente" -Level 'INFO'
-            return $documents
+            return $result
         }
         finally {
             $webClient.Dispose()
@@ -2651,7 +2779,10 @@ function Update-DATEVDocuments {
     }
     catch {
         Write-Log -Message "Fehler beim Aktualisieren der DATEV-Dokumente: $($_.Exception.Message)" -Level 'ERROR'
-        return @()
+        return @{
+            documents = @()
+            lastUpdated = "Unbekannt"
+        }
     }
 }
 
@@ -2671,7 +2802,27 @@ function Initialize-DocumentsList {
         $documentsPanel.Children.Clear()
         
         # Lade Dokumente
-        $documents = Get-DATEVDocuments
+        $documentsResult = Get-DATEVDocuments
+        $documents = $documentsResult.documents
+        $lastUpdated = $documentsResult.lastUpdated
+        
+        # Aktualisiere lastUpdated-Anzeige
+        $lastUpdatedText = $window.FindName("txtDocumentsLastUpdated")
+        if ($lastUpdatedText) {
+            if ($lastUpdated -and $lastUpdated -ne "Unbekannt") {
+                try {
+                    # Formatiere das Datum schöner
+                    $date = [DateTime]::ParseExact($lastUpdated, "yyyy-MM-dd", $null)
+                    $lastUpdatedText.Text = $date.ToString("dd.MM.yyyy")
+                }
+                catch {
+                    $lastUpdatedText.Text = $lastUpdated
+                }
+            }
+            else {
+                $lastUpdatedText.Text = "Unbekannt"
+            }
+        }
         
         if ($documents.Count -eq 0) {
             $noDocsText = New-Object System.Windows.Controls.TextBlock
