@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-20",
+  "lastUpdated": "2025-08-21",
   "downloads": [
     {
       "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
@@ -10,85 +10,110 @@
       "name": "Musterpaket DATEV Unternehmen online",
       "url": "https://download.datev.de/download/musterpaket_unternehmen_online.zip",
       "description": "Musterpaket für DATEV Unternehmen online",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/2a5c8f9e-4b7d-4e2f-9c8a-6d3e7f1a9b5c"
+      "erschienen": "11.03.2025",
+      "dateiname": "musterpaket_unternehmen_online.zip",
+      "dateigroesse": "24,6 MB"
     },
     {
       "name": "Musterpaket Zusatzmodul Auftragswesen next",
       "url": "https://download.datev.de/download/musterpaket_datev_auftragswesen_next.zip",
       "description": "Musterpaket für das DATEV Auftragswesen next Modul",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/6e9f2c4a-7b8d-4e1f-9a5c-8d3e7f2a9b6c"
+      "erschienen": "11.03.2025",
+      "dateiname": "musterpaket_datev_auftragswesen_next.zip",
+      "dateigroesse": "0,27 MB"
     },
     {
       "name": "DATEVnet: Proxyeinstellungen V. 1.8",
       "url": "https://download.datev.de/download/proxysetter/proxysetter.exe",
       "description": "Tool zur Konfiguration der DATEVnet Proxy-Einstellungen",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/5a8c9f2e-6b7d-4e1f-8c9a-3d5e7f1a9b4c"
+      "erschienen": "25.02.2025",
+      "dateiname": "proxysetter.exe",
+      "dateigroesse": "4,32 MB"
     },
     {
       "name": "DATEVnet Einzel-/Telearbeitsplatz",
       "url": "https://download.datev.de/download/datevnet/datevnet_einzel-telearbeitsplatz_compact-full.exe",
       "description": "DATEVnet Installation für Einzel- und Telearbeitsplätze",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/9b4f7e2c-8a6d-4e3f-9c8a-5d7e1f3a9b6c"
+      "erschienen": "30.01.2025",
+      "dateiname": "datevnet_einzel-telearbeitsplatz_compact-full.exe",
+      "dateigroesse": "52,8 MB"
     },
     {
       "name": "Herausgeberzertifikate der DATEV",
       "url": "https://download.datev.de/download/digcert/datevdigcert_7_81.exe",
       "description": "Digitale Zertifikate der DATEV eG",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/3c6f9e2a-5b8d-4e1f-7c9a-4d6e8f2a9b5c"
+      "erschienen": "07.08.2025",
+      "dateiname": "datevdigcert_7_81.exe",
+      "dateigroesse": "12,5 MB"
     },
     {
       "name": "DATEV SmartVerify V. 1.4",
       "url": "https://download.datev.de/download/smartverify/datev.smartverify.exe",
-      "description": "DATEV SmartVerify Authentifizierungstool",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/7e2f9c4a-8b5d-4e1f-9a6c-5d8e2f4a9b7c"
+      "description": "DATEV SmartVerify Authentifizierungstool"
     },
     {
       "name": "DATEVasp Zugangspaket V. 2.15",
       "url": "https://download.datev.de/download/asp/aspzugangspaket.exe",
       "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/9dd11aec-0b57-4f6f-9ff4-f486e30f7572"
+      "erschienen": "15.08.2025",
+      "dateiname": "aspzugangspaket.exe",
+      "dateigroesse": "638,05 MB"
     },
     {
       "name": "DATEV-SmartIT Connect V. 3.10",
       "url": "https://download.datev.de/download/smartit/smartitconnect.exe",
       "description": "DATEV SmartIT Connect Verwaltungstool mit allen lokal benötigten Komponenten zur assistentengestützten Einrichtung des DATEV-SmartIT Zugangs",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/fbd0d3e3-9f43-4394-9103-f65bc0202ca8"
+      "erschienen": "15.08.2025",
+      "dateiname": "smartitconnect.exe",
+      "dateigroesse": "601,25 MB"
     },
     {
       "name": "Treiber für SmartCard-Lesegeräte und den DATEV mIDentity",
       "url": "https://download.datev.de/download/sipacompact/leserins.exe",
       "description": "Treiber für SmartCard-Lesegeräte und DATEV mIDentity",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/80f9bae5-3c13-4cf2-b9c1-90fc57297ab6"
+      "erschienen": "21.08.2024",
+      "dateiname": "leserins.exe",
+      "dateigroesse": "8,95 MB"
     },
     {
       "name": "Belegtransfer V. 5.47",
       "url": "https://download.datev.de/download/bedi/belegtransfer547.exe",
       "description": "DATEV Belegtransfer Version 5.47 für digitalen Belegaustausch",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/7df7b5c2-3e8c-4b2f-9f8d-2a7c8b9e5f1d"
+      "erschienen": "24.06.2025",
+      "dateiname": "belegtransfer547.exe",
+      "dateigroesse": "6,98 MB"
     },
     {
       "name": "LohnViewer",
-      "url": "https://download.datev.de/download/lohnview/lohnviewer_145.exe",
+      "url": "https://download.datev.de/download/lohnview/lohnviewer_1503.exe",
       "description": "Tool zur Anzeige von Lohnabrechnungen",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/203bc85f-d67e-49c5-afeb-3de64db168dd"
+      "erschienen": "07.08.2025",
+      "dateiname": "lohnviewer_1503.exe",
+      "dateigroesse": "0,95 MB"
     },
     {
       "name": "Lohn Vorerfassung V. 7.1",
       "url": "https://download.datev.de/download/lohn_vorerfassung_pak00683_7.1.exe",
       "description": "DATEV Lohn Vorerfassung Version 7.1",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/34716f55-75ba-4e49-940d-3c3cc26e7437"
+      "erschienen": "30.12.2024",
+      "dateiname": "lohn_vorerfassung_pak00683_7.1.exe",
+      "dateigroesse": "4,18 MB"
     },
     {
       "name": "DATEV Datenübernahme nach LODAS V. 4.25",
       "url": "https://download.datev.de/download/pak01429/lug2lodas_pak_4_25.exe",
       "description": "Tool zur Datenübernahme von DATEV nach LODAS",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/ec3cd922-1877-4f52-bf68-90b98f6ac760"
+      "erschienen": "19.08.2025",
+      "dateiname": "lug2lodas_pak_4_25.exe",
+      "dateigroesse": "461,06 MB"
     },
     {
       "name": "Sicherheitspaket compact V. 8.02",
       "url": "https://download.datev.de/download/sipacompact/sipacompact.exe",
       "description": "DATEV Sicherheitspaket compact für sichere E-Mail-Kommunikation und DATEV Unternehmen online, inklusive DATEV SmartVerify",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/7342fcac-a857-4bec-9799-e1aaed9159ba"
+      "erschienen": "07.08.2025",
+      "dateiname": "sipacompact.exe",
+      "dateigroesse": "198,15 MB"
     },
     {
       "name": "DATEV Serverprep Tool",
@@ -109,7 +134,57 @@
       "name": "Fernbetreuung online",
       "url": "https://download.datev.de/download/fernbetreuung/datev_fernbetreuung_online.exe",
       "description": "DATEV Fernbetreuungstool für verschlüsselte Remote-Unterstützung durch DATEV Service-Mitarbeiter",
-      "detailUrl": "https://apps.datev.de/myupdates/download/products/8f3e5c2d-9a7b-4e1f-8c9d-5a3b7e9f2c4a"
+      "erschienen": "17.02.2025",
+      "dateiname": "datev_fernbetreuung_online.exe",
+      "dateigroesse": "12,8 MB"
+    },
+    {
+      "name": "DÜ Formulare Rechnungswesen V. 3.61",
+      "url": "https://download.datev.de/download/due_formulare_rechnungswesen_sr_pak07230_3.61.exe",
+      "description": "Datenübernahme Formulare für das betriebliche Rechnungswesen",
+      "erschienen": "22.02.2024",
+      "dateiname": "due_formulare_rechnungswesen_sr_pak07230_3.61.exe",
+      "dateigroesse": "3,31 MB"
+    },
+    {
+      "name": "DATEV DMS classic Arbeitsstation V. 13.14",
+      "url": "https://download.datev.de/download/dms/datev_dms_classic_arbeitsstation.exe",
+      "description": "DATEV DMS classic Arbeitsstation für Dokumentenmanagement",
+      "erschienen": "20.04.2023",
+      "dateiname": "datev_dms_classic_arbeitsstation.exe",
+      "dateigroesse": "125,4 MB"
+    },
+    {
+      "name": "DATEV DMS classic Server V. 13.14", 
+      "url": "https://download.datev.de/download/dms/datev_dms_classic_server.exe",
+      "description": "DATEV DMS classic Server für Dokumentenmanagement",
+      "erschienen": "20.04.2023",
+      "dateiname": "datev_dms_classic_server.exe",
+      "dateigroesse": "156,8 MB"
+    },
+    {
+      "name": "Mandanten-Fernbetreuung Kunden-Modul (für Windows)",
+      "url": "https://download.datev.de/download/fernbetreuung/mandanten_fernbetreuung_kunden_windows.exe",
+      "description": "Mandanten-Fernbetreuung Kunden-Modul für Windows",
+      "erschienen": "05.10.2022",
+      "dateiname": "mandanten_fernbetreuung_kunden_windows.exe",
+      "dateigroesse": "18,2 MB"
+    },
+    {
+      "name": "Mandanten-Fernbetreuung Berater-Modul",
+      "url": "https://download.datev.de/download/fernbetreuung/mandanten_fernbetreuung_berater.exe", 
+      "description": "Mandanten-Fernbetreuung Berater-Modul",
+      "erschienen": "05.10.2022",
+      "dateiname": "mandanten_fernbetreuung_berater.exe",
+      "dateigroesse": "18,1 MB"
+    },
+    {
+      "name": "Mandanten-Fernbetreuung Kunden-Modul (für macOS)",
+      "url": "https://download.datev.de/download/fernbetreuung/mandanten_fernbetreuung_kunden_macos.dmg",
+      "description": "Mandanten-Fernbetreuung Kunden-Modul für macOS",
+      "erschienen": "05.10.2022",
+      "dateiname": "mandanten_fernbetreuung_kunden_macos.dmg",
+      "dateigroesse": "15,3 MB"
     }
   ]
 }
