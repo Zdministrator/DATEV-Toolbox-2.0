@@ -1,9 +1,6 @@
 # DATEV-Toolbox 2.0
 
-Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassen### Entwicklung
-
-### Version
-Aktuelle Version: **2.1.10**Tools.
+Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automatischen Updates, direkten Downloads und umfassenden Tools.
 
 ## 📸 Anwendungsvorschau
 
@@ -24,7 +21,7 @@ Aktuelle Version: **2.1.10**Tools.
 - **WPF-GUI**: Moderne tab-basierte Benutzeroberfläche
 - **DATEV Programme**: Direkter Start von DATEV-Arbeitsplatz, Installationsmanager und Servicetool
 - **DATEV Tools**: Zugriff auf KonfigDB-Tools, EODBconfig, EO Aufgabenplanung und Server-Anpassungs-Assistent
-- **Performance Tools**: NGENALL 4.0 und Leistungsindex für Systemoptimierung
+- **Performance Tools**: Leistungsindex und NGENALL 4.0 für Systemoptimierung
 - **System Tools**: Integrierte Windows-Systemtools (Task-Manager, Ressourcenmonitor, Windows Updates)
 - **🆕 Erweiterte Gruppenrichtlinien-Updates**: Progress-Dialog mit Abbruch-Funktion und Prozess-Überwachung (v2.1.4)
 - **Automatische Updates**: Selbst-aktualisierendes System mit GitHub-Integration
@@ -91,7 +88,7 @@ Die Anwendung speichert alle Einstellungen und Logs im AppData-Ordner:
 Vollständige DATEV-Integration mit drei Kategorien:
 - **DATEV Programme**: DATEV-Arbeitsplatz, Installationsmanager, Servicetool
 - **DATEV Tools**: KonfigDB-Tools, EODBconfig, EO Aufgabenplanung, Server-Anpassungs-Assistent
-- **Performance Tools**: NGENALL 4.0 (Native Images), Leistungsindex
+- **Performance Tools**: Leistungsindex, NGENALL 4.0 (Native Images)
 
 ### 🌐 DATEV Online
 Schnellzugriff auf wichtige DATEV-Online-Services:
@@ -101,7 +98,7 @@ Schnellzugriff auf wichtige DATEV-Online-Services:
 
 ### 📥 Downloads
 - **🆕 Erweiterte Direkt-Downloads**: Verwaltung und Download von DATEV-Software
-- **Aktualisierungsdatum**: Downloads zeigen jetzt das Datum der letzten Aktualisierung
+- **Aktualisierungsdatum**: Downloads zeigen das Datum der letzten Aktualisierung
 - **Neueste Downloads**: Deinstallationsnacharbeiten-Tool V. 3.11 hinzugefügt
 - **Automatische Updates**: Downloads werden von GitHub aktualisiert
 - **Download-Ordner**: Direkter Zugriff auf heruntergeladene Dateien
@@ -118,7 +115,7 @@ Neuer Tab für direkten Zugriff auf wichtige DATEV-Dokumentationen:
 ### ⚙️ System
 Integrierte Windows- und System-Tools:
 - **🆕 Aktionen**: Gruppenrichtlinien-Update (gpupdate /force) mit asynchroner Ausführung
-- **🆕 Windows Updates**: Cross-Platform Button für Windows Updates (Client & Server kompatibel)
+- **🆕 Windows Updates**: Cross-Platform-Button für Windows Updates (Client & Server kompatibel)
 - **System Tools**: Task-Manager, Ressourcenmonitor, Ereignisanzeige
 - **Verwaltung**: Dienste, Systemkonfiguration, Datenträgerbereinigung
 
@@ -178,16 +175,16 @@ Aktuelle Version: **2.1.10**
 - **Benutzerfreundlich**: Schraubenschlüssel-Icon und aussagekräftiger Tooltip
 
 #### 🔄 Windows Updates Integration
-- **System-Tab Erweiterung**: Windows Updates Button für direkten Zugriff hinzugefügt  
-- **Cross-Platform Support**: Funktioniert sowohl auf Windows Client als auch Server
-- **Intelligente Erkennung**: 4-Tier Fallback-System für optimale Kompatibilität
+- **System-Tab-Erweiterung**: Windows Updates Button für direkten Zugriff hinzugefügt  
+- **Cross-Platform-Support**: Funktioniert sowohl auf Windows Client als auch Server
+- **Intelligente Erkennung**: 4-Tier-Fallback-System für optimale Kompatibilität
 - **Moderne Settings App**: Bevorzugung der neuen Windows 10/11 Update-Oberfläche
-- **Legacy Support**: Automatischer Fallback auf Control Panel für ältere Systeme
+- **Legacy-Support**: Automatischer Fallback auf Control Panel für ältere Systeme
 
-#### 📋 Dokumente-Tab Verbesserungen
-- **lastUpdated Datum**: Aktualisierungsdatum wird prominent oberhalb der Liste angezeigt
-- **Deutsche Formatierung**: DD.MM.YYYY Format für bessere Lesbarkeit
-- **Echtzeitaktualisierung**: Datum wird beim Laden der Dokumenten-Liste aktualisiert
+#### 📋 Dokumente-Tab-Verbesserungen
+- **lastUpdated-Datum**: Aktualisierungsdatum wird prominent oberhalb der Liste angezeigt
+- **Deutsche Formatierung**: DD.MM.YYYY-Format für bessere Lesbarkeit
+- **Echtzeit-Aktualisierung**: Datum wird beim Laden der Dokumenten-Liste aktualisiert
 - **Benutzerfreundlichkeit**: Kleine, graue Schrift für dezente aber wichtige Information
 
 ### Neue Features in Version 2.1.9
@@ -253,7 +250,7 @@ Aktuelle Version: **2.1.10**
 - **Scrollbares Changelog**: Von MessageBox auf großes WPF-Fenster umgestellt
 - **Größenverstellbares Fenster**: 800x600 Standard, mindestens 600x400
 - **Bessere Lesbarkeit**: Monospace-Font und bis zu 10 Versionen anzeigbar
-- **Memory Management**: WebClient ordnungsgemäß disposed
+- **Memory-Management**: WebClient ordnungsgemäß disposed
 - **Professional Look**: Deutlich benutzerfreundlichere Update-Historie
 
 ### Version 2.1.6 (2025-08-05)
