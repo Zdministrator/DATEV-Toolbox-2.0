@@ -31,3 +31,6 @@ Thumbs.db
 
 # GitHub Prompts - Entwicklungs-Interna
 .github/prompts/
+
+# Playwright MCP Downloads (Testdateien)
+.playwright-mcp/

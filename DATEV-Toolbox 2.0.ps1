@@ -34,166 +34,166 @@ $script:ScriptDownloadUrl = "https://github.com/$script:GitHubRepo/raw/main/DATE
 #region Zentrale Konfiguration
 # DATEV-Pfad-Definitionen (müssen vor ButtonMappings definiert werden)
 $script:DATEVProgramPaths = @{
-    'DATEVArbeitsplatz' = @(
+    'DATEVArbeitsplatz'    = @(
         '%DATEVPP%\PROGRAMM\K0005000\Arbeitsplatz.exe'
     )
     'Installationsmanager' = @(
         '%DATEVPP%\PROGRAMM\INSTALL\DvInesInstMan.exe'
     )
-    'Servicetool' = @(
+    'Servicetool'          = @(
         '%DATEVPP%\PROGRAMM\SRVTOOL\Srvtool.exe'
     )
-    'KonfigDBTools' = @(
+    'KonfigDBTools'        = @(
         '%DATEVPP%\PROGRAMM\B0001502\cdbtool.exe'
     )
-    'EODBconfig' = @(
+    'EODBconfig'           = @(
         '%DATEVPP%\PROGRAMM\EODB\EODBConfig.exe'
     )
-    'EOAufgabenplanung' = @(
+    'EOAufgabenplanung'    = @(
         '%DATEVPP%\PROGRAMM\I0000085\EOControl.exe'
     )
-    'DvServerChange' = @(
+    'DvServerChange'       = @(
         '%DATEVPP%\PROGRAMM\B0001502\DvServerChange.exe'
     )
-    'NGENALL40' = @(
+    'NGENALL40'            = @(
         '%DATEVPP%\Programm\B0001508\ngenall40.cmd'
     )
-    'Leistungsindex' = @(
+    'Leistungsindex'       = @(
         '%DATEVPP%\PROGRAMM\RWAPPLIC\irw.exe'
     )
 }
 
 # Alle URLs, Pfade und Konfigurationswerte zentral verwaltet
 $script:Config = @{
-    URLs = @{
+    URLs           = @{
         GitHub = @{
-            Repository = "https://github.com/$script:GitHubRepo"
-            VersionCheck = $script:UpdateCheckUrl
-            ScriptDownload = $script:ScriptDownloadUrl
+            Repository      = "https://github.com/$script:GitHubRepo"
+            VersionCheck    = $script:UpdateCheckUrl
+            ScriptDownload  = $script:ScriptDownloadUrl
             DownloadsConfig = "https://github.com/$script:GitHubRepo/raw/refs/heads/main/datev-downloads.json"
         }
-        DATEV = @{
+        DATEV  = @{
             # Online-Services
-            HelpCenter = "https://apps.datev.de/help-center/"
-            ServiceKontakte = "https://apps.datev.de/servicekontakt-online/contacts"
-            MyUpdates = "https://apps.datev.de/myupdates/home"
-            Community = "https://www.datev-community.de/"
-            MyDATEV = "https://apps.datev.de/mydatev"
-            DUO = "https://duo.datev.de/"
-            LAO = "https://apps.datev.de/lao"
-            Lizenzverwaltung = "https://apps.datev.de/lizenzverwaltung"
-            Rechteraum = "https://apps.datev.de/rechteraum"
-            RVO = "https://apps.datev.de/rvo-administration"
-            SmartLogin = "https://go.datev.de/smartlogin-administration"
+            HelpCenter         = "https://apps.datev.de/help-center/"
+            ServiceKontakte    = "https://apps.datev.de/servicekontakt-online/contacts"
+            MyUpdates          = "https://apps.datev.de/myupdates/home"
+            Community          = "https://www.datev-community.de/"
+            MyDATEV            = "https://apps.datev.de/mydatev"
+            DUO                = "https://duo.datev.de/"
+            LAO                = "https://apps.datev.de/lao"
+            Lizenzverwaltung   = "https://apps.datev.de/lizenzverwaltung"
+            Rechteraum         = "https://apps.datev.de/rechteraum"
+            RVO                = "https://apps.datev.de/rvo-administration"
+            SmartLogin         = "https://go.datev.de/smartlogin-administration"
             Bestandsmanagement = "https://apps.datev.de/mydata/"
-            WeitereApps = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
+            WeitereApps        = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
             
             # Download-Bereiche
-            Downloadbereich = "https://apps.datev.de/myupdates/download-v2/lists/products/"
-            SmartDocs = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
+            Downloadbereich    = "https://apps.datev.de/myupdates/download-v2/lists/products/"
+            SmartDocs          = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
             DatentraegerPortal = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
             
             # Update-Termine
-            Jahresplanung = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
+            Jahresplanung      = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
         }
     }
     
-    Timeouts = @{
-        UpdateCheck = 10
-        DownloadJSON = 15
-        FileDownload = 30
-        ICSDownload = 15
-        UpdateInterval = 24  # Stunden
+    Timeouts       = @{
+        UpdateCheck     = 10
+        DownloadJSON    = 15
+        FileDownload    = 30
+        ICSDownload     = 15
+        UpdateInterval  = 24  # Stunden
         GpupdateTimeout = 2  # Minuten
     }
     
-    Paths = @{
-        AppData = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
-        Downloads = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
-        Updates = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Updates'
-        SettingsFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'settings.json'
-        ErrorLog = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Error-Log.txt'
+    Paths          = @{
+        AppData       = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
+        Downloads     = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
+        Updates       = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Updates'
+        SettingsFile  = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'settings.json'
+        ErrorLog      = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Error-Log.txt'
         DownloadsJSON = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'datev-downloads.json'
-        ICSFile = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
+        ICSFile       = Join-Path (Join-Path $env:APPDATA 'DATEV-Toolbox 2.0') 'Jahresplanung_2025.ics'
     }
     
-    Limits = @{
-        MaxBackups = 5
-        MinFileSize = 1000  # Bytes für Download-Validierung
+    Limits         = @{
+        MaxBackups       = 5
+        MinFileSize      = 1000  # Bytes für Download-Validierung
         MaxUpdateRetries = 3
     }
     
-    SystemTools = @{
-        TaskManager = @{ Command = 'taskmgr.exe'; Description = 'Task-Manager' }
+    SystemTools    = @{
+        TaskManager     = @{ Command = 'taskmgr.exe'; Description = 'Task-Manager' }
         ResourceMonitor = @{ Command = 'resmon.exe'; Description = 'Ressourcenmonitor' }
-        EventViewer = @{ Command = 'eventvwr.msc'; Description = 'Ereignisanzeige' }
-        Services = @{ Command = 'services.msc'; Description = 'Dienste' }
-        MSConfig = @{ Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
-        DiskCleanup = @{ Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
-        TaskScheduler = @{ Command = 'taskschd.msc'; Description = 'Aufgabenplanung' }
-        Gpupdate = @{ Command = 'gpupdate.exe'; Arguments = '/force'; Description = 'Gruppenrichtlinien-Update' }
+        EventViewer     = @{ Command = 'eventvwr.msc'; Description = 'Ereignisanzeige' }
+        Services        = @{ Command = 'services.msc'; Description = 'Dienste' }
+        MSConfig        = @{ Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
+        DiskCleanup     = @{ Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
+        TaskScheduler   = @{ Command = 'taskschd.msc'; Description = 'Aufgabenplanung' }
+        Gpupdate        = @{ Command = 'gpupdate.exe'; Arguments = '/force'; Description = 'Gruppenrichtlinien-Update' }
     }
     
     # Button-zu-Aktion-Mapping für vereinfachte Event-Handler-Registrierung
     ButtonMappings = @{
         # DATEV Online Services - Hilfe und Support (URL-Handler)
-        'btnHilfeCenter' = @{ Type = 'URL'; UrlKey = 'HelpCenter' }
-        'btnServicekontakte' = @{ Type = 'URL'; UrlKey = 'ServiceKontakte' }
-        'btnMyUpdates' = @{ Type = 'URL'; UrlKey = 'MyUpdates' }
-        'btnCommunity' = @{ Type = 'URL'; UrlKey = 'Community' }
+        'btnHilfeCenter'          = @{ Type = 'URL'; UrlKey = 'HelpCenter' }
+        'btnServicekontakte'      = @{ Type = 'URL'; UrlKey = 'ServiceKontakte' }
+        'btnMyUpdates'            = @{ Type = 'URL'; UrlKey = 'MyUpdates' }
+        'btnCommunity'            = @{ Type = 'URL'; UrlKey = 'Community' }
         
         # DATEV Online Services - Cloud (URL-Handler)
-        'btnMyDATEV' = @{ Type = 'URL'; UrlKey = 'MyDATEV' }
-        'btnDUO' = @{ Type = 'URL'; UrlKey = 'DUO' }
-        'btnLAO' = @{ Type = 'URL'; UrlKey = 'LAO' }
-        'btnLizenzverwaltung' = @{ Type = 'URL'; UrlKey = 'Lizenzverwaltung' }
-        'btnRechteraum' = @{ Type = 'URL'; UrlKey = 'Rechteraum' }
-        'btnRVO' = @{ Type = 'URL'; UrlKey = 'RVO' }
-        'btnSmartLogin' = @{ Type = 'URL'; UrlKey = 'SmartLogin' }
-        'btnBestandsmanagement' = @{ Type = 'URL'; UrlKey = 'Bestandsmanagement' }
-        'btnWeitereApps' = @{ Type = 'URL'; UrlKey = 'WeitereApps' }
+        'btnMyDATEV'              = @{ Type = 'URL'; UrlKey = 'MyDATEV' }
+        'btnDUO'                  = @{ Type = 'URL'; UrlKey = 'DUO' }
+        'btnLAO'                  = @{ Type = 'URL'; UrlKey = 'LAO' }
+        'btnLizenzverwaltung'     = @{ Type = 'URL'; UrlKey = 'Lizenzverwaltung' }
+        'btnRechteraum'           = @{ Type = 'URL'; UrlKey = 'Rechteraum' }
+        'btnRVO'                  = @{ Type = 'URL'; UrlKey = 'RVO' }
+        'btnSmartLogin'           = @{ Type = 'URL'; UrlKey = 'SmartLogin' }
+        'btnBestandsmanagement'   = @{ Type = 'URL'; UrlKey = 'Bestandsmanagement' }
+        'btnWeitereApps'          = @{ Type = 'URL'; UrlKey = 'WeitereApps' }
         
         # DATEV Online Downloads (URL-Handler)
         'btnDATEVDownloadbereich' = @{ Type = 'URL'; UrlKey = 'Downloadbereich' }
-        'btnDATEVSmartDocs' = @{ Type = 'URL'; UrlKey = 'SmartDocs' }
-        'btnDatentraegerPortal' = @{ Type = 'URL'; UrlKey = 'DatentraegerPortal' }
+        'btnDATEVSmartDocs'       = @{ Type = 'URL'; UrlKey = 'SmartDocs' }
+        'btnDatentraegerPortal'   = @{ Type = 'URL'; UrlKey = 'DatentraegerPortal' }
         
         # DATEV Programme (DATEV-Handler)
-        'btnDATEVArbeitsplatz' = @{ Type = 'DATEV'; ProgramName = 'DATEVArbeitsplatz'; Description = 'DATEV-Arbeitsplatz' }
+        'btnDATEVArbeitsplatz'    = @{ Type = 'DATEV'; ProgramName = 'DATEVArbeitsplatz'; Description = 'DATEV-Arbeitsplatz' }
         'btnInstallationsmanager' = @{ Type = 'DATEV'; ProgramName = 'Installationsmanager'; Description = 'Installationsmanager' }
-        'btnServicetool' = @{ Type = 'DATEV'; ProgramName = 'Servicetool'; Description = 'Servicetool' }
-        'btnKonfigDBTools' = @{ Type = 'DATEV'; ProgramName = 'KonfigDBTools'; Description = 'KonfigDB-Tools' }
-        'btnEODBconfig' = @{ Type = 'DATEV'; ProgramName = 'EODBconfig'; Description = 'EODBconfig' }
-        'btnEOAufgabenplanung' = @{ Type = 'DATEV'; ProgramName = 'EOAufgabenplanung'; Description = 'EO Aufgabenplanung' }
-        'btnDvServerChange' = @{ Type = 'DATEV'; ProgramName = 'DvServerChange'; Description = 'Server-Anpassungs-Assistent' }
-        'btnNGENALL40' = @{ Type = 'DATEV'; ProgramName = 'NGENALL40'; Description = 'NGENALL 4.0' }
+        'btnServicetool'          = @{ Type = 'DATEV'; ProgramName = 'Servicetool'; Description = 'Servicetool' }
+        'btnKonfigDBTools'        = @{ Type = 'DATEV'; ProgramName = 'KonfigDBTools'; Description = 'KonfigDB-Tools' }
+        'btnEODBconfig'           = @{ Type = 'DATEV'; ProgramName = 'EODBconfig'; Description = 'EODBconfig' }
+        'btnEOAufgabenplanung'    = @{ Type = 'DATEV'; ProgramName = 'EOAufgabenplanung'; Description = 'EO Aufgabenplanung' }
+        'btnDvServerChange'       = @{ Type = 'DATEV'; ProgramName = 'DvServerChange'; Description = 'Server-Anpassungs-Assistent' }
+        'btnNGENALL40'            = @{ Type = 'DATEV'; ProgramName = 'NGENALL40'; Description = 'NGENALL 4.0' }
         
         # System Tools (SystemTool-Handler)
-        'btnTaskManager' = @{ Type = 'SystemTool'; Command = 'taskmgr.exe'; Description = 'Task-Manager' }
-        'btnResourceMonitor' = @{ Type = 'SystemTool'; Command = 'resmon.exe'; Description = 'Ressourcenmonitor' }
-        'btnEventViewer' = @{ Type = 'SystemTool'; Command = 'eventvwr.msc'; Description = 'Ereignisanzeige' }
-        'btnServices' = @{ Type = 'SystemTool'; Command = 'services.msc'; Description = 'Dienste' }
-        'btnMsconfig' = @{ Type = 'SystemTool'; Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
-        'btnDiskCleanup' = @{ Type = 'SystemTool'; Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
-        'btnTaskScheduler' = @{ Type = 'SystemTool'; Command = 'taskschd.msc'; Description = 'Aufgabenplanung' }
+        'btnTaskManager'          = @{ Type = 'SystemTool'; Command = 'taskmgr.exe'; Description = 'Task-Manager' }
+        'btnResourceMonitor'      = @{ Type = 'SystemTool'; Command = 'resmon.exe'; Description = 'Ressourcenmonitor' }
+        'btnEventViewer'          = @{ Type = 'SystemTool'; Command = 'eventvwr.msc'; Description = 'Ereignisanzeige' }
+        'btnServices'             = @{ Type = 'SystemTool'; Command = 'services.msc'; Description = 'Dienste' }
+        'btnMsconfig'             = @{ Type = 'SystemTool'; Command = 'msconfig.exe'; Description = 'Systemkonfiguration' }
+        'btnDiskCleanup'          = @{ Type = 'SystemTool'; Command = 'cleanmgr.exe'; Description = 'Datenträgerbereinigung' }
+        'btnTaskScheduler'        = @{ Type = 'SystemTool'; Command = 'taskschd.msc'; Description = 'Aufgabenplanung' }
         
         # Funktions-Handler (Function-Handler)
-        'btnLeistungsindex' = @{ Type = 'Function'; FunctionName = 'Start-Leistungsindex' }
-        'btnGpupdate' = @{ Type = 'Function'; FunctionName = 'Start-Gpupdate' }
-        'btnWindowsUpdates' = @{ Type = 'Function'; FunctionName = 'Start-WindowsUpdates' }
+        'btnLeistungsindex'       = @{ Type = 'Function'; FunctionName = 'Start-Leistungsindex' }
+        'btnGpupdate'             = @{ Type = 'Function'; FunctionName = 'Start-Gpupdate' }
+        'btnWindowsUpdates'       = @{ Type = 'Function'; FunctionName = 'Start-WindowsUpdates' }
         
         # TextBlock-Handler (verwenden MouseLeftButtonDown statt Add_Click)
-        'btnUpdateDownloads' = @{ Type = 'TextBlock'; FunctionName = 'Update-DATEVDownloads' }
-        'btnOpenDownloadFolder' = @{ Type = 'TextBlock'; FunctionName = 'Open-DownloadFolder' }
-        'btnUpdateDates' = @{ Type = 'TextBlock'; FunctionName = 'Update-UpdateDates' }
-        'btnRefreshDocuments' = @{ Type = 'TextBlock'; FunctionName = 'Refresh-DocumentsList' }
-        'txtEmailLink' = @{ Type = 'Hyperlink'; FunctionName = 'Open-EmailClient' }
+        'btnUpdateDownloads'      = @{ Type = 'TextBlock'; FunctionName = 'Update-DATEVDownloads' }
+        'btnOpenDownloadFolder'   = @{ Type = 'TextBlock'; FunctionName = 'Open-DownloadFolder' }
+        'btnUpdateDates'          = @{ Type = 'TextBlock'; FunctionName = 'Update-UpdateDates' }
+        'btnRefreshDocuments'     = @{ Type = 'TextBlock'; FunctionName = 'Refresh-DocumentsList' }
+        'txtEmailLink'            = @{ Type = 'Hyperlink'; FunctionName = 'Open-EmailClient' }
         
         # Einstellungs-Handler (jetzt auch zentral verwaltet)
-        'btnCheckUpdate' = @{ Type = 'Function'; FunctionName = 'Start-UpdateCheck' }
-        'btnDownload' = @{ Type = 'Function'; FunctionName = 'Start-DirectDownload' }
-        'btnOpenFolder' = @{ Type = 'Function'; FunctionName = 'Open-AppDataFolder' }
-        'btnShowChangelog' = @{ Type = 'Function'; FunctionName = 'Show-ChangelogDialog' }
+        'btnCheckUpdate'          = @{ Type = 'Function'; FunctionName = 'Start-UpdateCheck' }
+        'btnDownload'             = @{ Type = 'Function'; FunctionName = 'Start-DirectDownload' }
+        'btnOpenFolder'           = @{ Type = 'Function'; FunctionName = 'Open-AppDataFolder' }
+        'btnShowChangelog'        = @{ Type = 'Function'; FunctionName = 'Show-ChangelogDialog' }
     }
 }
 #endregion
@@ -273,7 +273,8 @@ function Initialize-Settings {
                 $script:Settings[$_.Name] = $_.Value
             }
             Write-Log -Message "Einstellungen erfolgreich geladen" -Level 'DEBUG'
-        } else {
+        }
+        else {
             Write-Log -Message "Keine settings.json gefunden, verwende Standard-Einstellungen" -Level 'INFO'
             $script:Settings = Get-DefaultSettings
             Save-Settings
@@ -284,7 +285,8 @@ function Initialize-Settings {
         $script:SettingsNeedSave = $false
         
         Write-Log -Message "Einstellungen initialisiert (Debug: $script:IsDebugEnabled)" -Level 'INFO'
-    } catch {
+    }
+    catch {
         Write-Log -Message "Fehler beim Laden der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
         $script:Settings = Get-DefaultSettings
         $script:IsDebugEnabled = $false
@@ -297,13 +299,13 @@ function Get-DefaultSettings {
     Liefert die Standard-Einstellungen zurück
     #>
     return @{
-        DownloadPath = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
-        AutoUpdate = $true
-        ShowDebugLogs = $false
-        LogLevel = "INFO"
-        WindowPosition = @{
+        DownloadPath    = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
+        AutoUpdate      = $true
+        ShowDebugLogs   = $false
+        LogLevel        = "INFO"
+        WindowPosition  = @{
             Left = 100
-            Top = 100
+            Top  = 100
         }
         LastUpdateCheck = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
     }
@@ -327,7 +329,8 @@ function Save-Settings {
         $script:Settings | ConvertTo-Json -Depth 3 | Set-Content $settingsPath -Encoding UTF8
         $script:SettingsNeedSave = $false
         Write-Log -Message "Einstellungen gespeichert: $settingsPath" -Level 'DEBUG'
-    } catch {
+    }
+    catch {
         Write-Log -Message "Fehler beim Speichern der Einstellungen: $($_.Exception.Message)" -Level 'ERROR'
         throw
     }
@@ -395,25 +398,26 @@ function Set-Setting {
             $script:SettingsSaveTimer = New-Object System.Windows.Threading.DispatcherTimer
             $script:SettingsSaveTimer.Interval = [TimeSpan]::FromSeconds(2)
             $script:SettingsSaveTimer.Add_Tick({
-                # Timer-Tick-Handler ist auch thread-sicher
-                [System.Threading.Monitor]::Enter($script:SettingsLock)
-                try {
-                    if ($script:SettingsNeedSave) {
-                        Save-Settings
+                    # Timer-Tick-Handler ist auch thread-sicher
+                    [System.Threading.Monitor]::Enter($script:SettingsLock)
+                    try {
+                        if ($script:SettingsNeedSave) {
+                            Save-Settings
+                        }
+                        $script:SettingsSaveTimer.Stop()
+                        $script:SettingsSaveTimer = $null
                     }
-                    $script:SettingsSaveTimer.Stop()
-                    $script:SettingsSaveTimer = $null
-                }
-                catch {
-                    Write-Log -Message "Fehler beim Settings-Timer-Tick: $($_.Exception.Message)" -Level 'ERROR'
-                }
-                finally {
-                    [System.Threading.Monitor]::Exit($script:SettingsLock)
-                }
-            })
+                    catch {
+                        Write-Log -Message "Fehler beim Settings-Timer-Tick: $($_.Exception.Message)" -Level 'ERROR'
+                    }
+                    finally {
+                        [System.Threading.Monitor]::Exit($script:SettingsLock)
+                    }
+                })
             $script:SettingsSaveTimer.Start()
             Write-Log -Message "Settings-Timer erstellt und gestartet (thread-sicher)" -Level 'DEBUG'
-        } else {
+        }
+        else {
             # Timer bereits aktiv, nur neu starten
             $script:SettingsSaveTimer.Stop()
             $script:SettingsSaveTimer.Start()
@@ -913,67 +917,67 @@ function Register-UrlHandler {
     param($Button, $Url)
     $Button.Tag = $Url
     $Button.Add_Click({
-        $url = $this.Tag
-        Write-Log -Message "URL-Button '$($this.Name)' geklickt - öffne: $url" -Level 'INFO'
-        Open-Url -Url $url
-    })
+            $url = $this.Tag
+            Write-Log -Message "URL-Button '$($this.Name)' geklickt - öffne: $url" -Level 'INFO'
+            Open-Url -Url $url
+        })
 }
 
 function Register-DATEVHandler {
     param($Button, $ProgramName, $PossiblePaths, $Description)
     $Button.Tag = @{
-        ProgramName = $ProgramName
+        ProgramName   = $ProgramName
         PossiblePaths = $PossiblePaths
-        Description = $Description
+        Description   = $Description
     }
     $Button.Add_Click({
-        $config = $this.Tag
-        Write-Log -Message "DATEV-Button '$($this.Name)' geklickt - starte: $($config.ProgramName)" -Level 'INFO'
-        Start-DATEVProgram -ProgramName $config.ProgramName -PossiblePaths $config.PossiblePaths -Description $config.Description
-    })
+            $config = $this.Tag
+            Write-Log -Message "DATEV-Button '$($this.Name)' geklickt - starte: $($config.ProgramName)" -Level 'INFO'
+            Start-DATEVProgram -ProgramName $config.ProgramName -PossiblePaths $config.PossiblePaths -Description $config.Description
+        })
 }
 
 function Register-SystemToolHandler {
     param($Button, $Command, $Description)
     $Button.Tag = @{
-        Command = $Command
+        Command     = $Command
         Description = $Description
     }
     $Button.Add_Click({
-        $config = $this.Tag
-        Write-Log -Message "SystemTool-Button '$($this.Name)' geklickt - starte: $($config.Command)" -Level 'INFO'
-        Start-SystemTool -Command $config.Command -Description $config.Description
-    })
+            $config = $this.Tag
+            Write-Log -Message "SystemTool-Button '$($this.Name)' geklickt - starte: $($config.Command)" -Level 'INFO'
+            Start-SystemTool -Command $config.Command -Description $config.Description
+        })
 }
 
 function Register-FunctionHandler {
     param($Button, $FunctionName)
     $Button.Tag = $FunctionName
     $Button.Add_Click({
-        $functionName = $this.Tag
-        Write-Log -Message "Function-Button '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
-        & $functionName
-    })
+            $functionName = $this.Tag
+            Write-Log -Message "Function-Button '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
+            & $functionName
+        })
 }
 
 function Register-TextBlockHandler {
     param($TextBlock, $FunctionName)
     $TextBlock.Tag = $FunctionName
     $TextBlock.Add_MouseLeftButtonDown({
-        $functionName = $this.Tag
-        Write-Log -Message "TextBlock '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
-        & $functionName
-    })
+            $functionName = $this.Tag
+            Write-Log -Message "TextBlock '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
+            & $functionName
+        })
 }
 
 function Register-HyperlinkHandler {
     param($Hyperlink, $FunctionName)
     $Hyperlink.Tag = $FunctionName
     $Hyperlink.Add_RequestNavigate({
-        $functionName = $this.Tag
-        Write-Log -Message "Hyperlink '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
-        & $functionName
-    })
+            $functionName = $this.Tag
+            Write-Log -Message "Hyperlink '$($this.Name)' geklickt - rufe auf: $functionName" -Level 'INFO'
+            & $functionName
+        })
 }
 
 # Zentrale Button-Handler-Registrierung
@@ -1002,7 +1006,8 @@ function Register-ButtonHandlers {
             if ($null -eq $buttonElement) {
                 Write-Log -Message "Button '$buttonName' nicht gefunden im GUI - überspringe (Typ: $($buttonConfig.Type))" -Level 'WARN'
                 continue
-            } else {
+            }
+            else {
                 Write-Log -Message "Button '$buttonName' gefunden: $($buttonElement.GetType().Name)" -Level 'DEBUG'
             }
             
@@ -1016,7 +1021,8 @@ function Register-ButtonHandlers {
                             # Direkte Registrierung ohne Closure
                             Register-UrlHandler -Button $buttonElement -Url $url
                             Write-Log -Message "URL-Handler für '$buttonName' registriert (URL: $url)" -Level 'DEBUG'
-                        } else {
+                        }
+                        else {
                             Write-Log -Message "URL für '$urlKey' nicht gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
                         }
                     }
@@ -1034,7 +1040,8 @@ function Register-ButtonHandlers {
                             # Direkte Registrierung ohne Closure
                             Register-DATEVHandler -Button $buttonElement -ProgramName $programName -PossiblePaths $possiblePaths -Description $description
                             Write-Log -Message "DATEV-Handler für '$buttonName' registriert" -Level 'DEBUG'
-                        } else {
+                        }
+                        else {
                             Write-Log -Message "Keine DATEV-Pfade für '$programName' gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
                         }
                     }
@@ -1208,13 +1215,15 @@ function Get-DATEVExecutablePath {
             if (Test-Path $pathToValidate) {
                 Write-Log -Message "DATEV-Pfad aus Cache: $ProgramName -> $pathToValidate" -Level 'DEBUG'
                 return $pathToValidate  # Immer String zurückgeben
-            } else {
+            }
+            else {
                 # Cache-Eintrag ist ungültig, entfernen
                 $script:CachedDATEVPaths.Remove($ProgramName)
                 $script:PathCacheExpiry.Remove($ProgramName)
                 Write-Log -Message "Cache-Eintrag für $ProgramName ungültig geworden, entfernt" -Level 'DEBUG'
             }
-        } else {
+        }
+        else {
             # Cache abgelaufen, entfernen
             $script:CachedDATEVPaths.Remove($ProgramName)
             $script:PathCacheExpiry.Remove($ProgramName)
@@ -1238,9 +1247,9 @@ function Get-DATEVExecutablePath {
             if (Test-Path $expandedPath) {
                 # Erfolgreichen Pfad cachen
                 $script:CachedDATEVPaths[$ProgramName] = @{
-                    Path = $expandedPath
+                    Path   = $expandedPath
                     Source = 'DATEVPP-Environment'
-                    Found = Get-Date
+                    Found  = Get-Date
                 }
                 $script:PathCacheExpiry[$ProgramName] = (Get-Date).AddMinutes(5)
                 Write-Log -Message "DATEV-Programm gefunden (DATEVPP): $expandedPath" -Level 'DEBUG'
@@ -1264,9 +1273,9 @@ function Get-DATEVExecutablePath {
             if (Test-Path $testPath) {
                 # Erfolgreichen Pfad cachen (immer als String)
                 $script:CachedDATEVPaths[$ProgramName] = @{
-                    Path = $testPath
+                    Path   = $testPath
                     Source = "StandardPath-$basePath"
-                    Found = Get-Date
+                    Found  = Get-Date
                 }
                 $script:PathCacheExpiry[$ProgramName] = (Get-Date).AddMinutes(5)
                 Write-Log -Message "DATEV-Programm gefunden (Standard): $testPath" -Level 'DEBUG'
@@ -1349,50 +1358,52 @@ function Start-Leistungsindex {
             $powershell.Runspace = $runspace
             
             [void]$powershell.AddScript({
-                param($executablePath, $writeLogCmd)
+                    param($executablePath, $writeLogCmd)
                 
-                # Write-Log Funktion im Runspace verfügbar machen
-                function Write-Log { 
-                    param([string]$Message, [string]$Level = 'INFO')
-                    # Vereinfachtes Logging für Runspace
-                    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-                    Write-Host "[$timestamp] [$Level] $Message"
-                }
-                
-                try {
-                    Write-Log -Message "Erster Durchlauf: irw.exe -ap:PerfIndex -d:IRW20011 -c" -Level 'INFO'
-                    
-                    # Erster Durchlauf mit -c Parameter
-                    $process1 = Start-Process -FilePath $executablePath -ArgumentList "-ap:PerfIndex", "-d:IRW20011", "-c" -Wait -PassThru -NoNewWindow
-                    
-                    if ($process1.ExitCode -eq 0) {
-                        Write-Log -Message "Erster Durchlauf erfolgreich abgeschlossen (Exit Code: $($process1.ExitCode))" -Level 'INFO'
-                        
-                        # Kurze Pause zwischen den Durchläufen
-                        Start-Sleep -Seconds 2
-                        
-                        Write-Log -Message "Zweiter Durchlauf: irw.exe -ap:PerfIndex -d:IRW20011" -Level 'INFO'
-                        
-                        # Zweiter Durchlauf ohne -c Parameter
-                        $process2 = Start-Process -FilePath $executablePath -ArgumentList "-ap:PerfIndex", "-d:IRW20011" -Wait -PassThru -NoNewWindow
-                        
-                        if ($process2.ExitCode -eq 0) {
-                            Write-Log -Message "Leistungsindex-Messungen erfolgreich abgeschlossen (Exit Code: $($process2.ExitCode))" -Level 'INFO'
-                            return @{ Success = $true; Message = "Leistungsindex-Messungen erfolgreich abgeschlossen" }
-                        } else {
-                            Write-Log -Message "Zweiter Durchlauf fehlgeschlagen (Exit Code: $($process2.ExitCode))" -Level 'ERROR'
-                            return @{ Success = $false; Message = "Zweiter Durchlauf fehlgeschlagen" }
-                        }
-                    } else {
-                        Write-Log -Message "Erster Durchlauf fehlgeschlagen (Exit Code: $($process1.ExitCode))" -Level 'ERROR'
-                        return @{ Success = $false; Message = "Erster Durchlauf fehlgeschlagen" }
+                    # Write-Log Funktion im Runspace verfügbar machen
+                    function Write-Log { 
+                        param([string]$Message, [string]$Level = 'INFO')
+                        # Vereinfachtes Logging für Runspace
+                        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+                        Write-Host "[$timestamp] [$Level] $Message"
                     }
-                }
-                catch {
-                    Write-Log -Message "Fehler bei Leistungsindex-Ausführung: $($_.Exception.Message)" -Level 'ERROR'
-                    return @{ Success = $false; Message = $_.Exception.Message }
-                }
-            })
+                
+                    try {
+                        Write-Log -Message "Erster Durchlauf: irw.exe -ap:PerfIndex -d:IRW20011 -c" -Level 'INFO'
+                    
+                        # Erster Durchlauf mit -c Parameter
+                        $process1 = Start-Process -FilePath $executablePath -ArgumentList "-ap:PerfIndex", "-d:IRW20011", "-c" -Wait -PassThru -NoNewWindow
+                    
+                        if ($process1.ExitCode -eq 0) {
+                            Write-Log -Message "Erster Durchlauf erfolgreich abgeschlossen (Exit Code: $($process1.ExitCode))" -Level 'INFO'
+                        
+                            # Kurze Pause zwischen den Durchläufen
+                            Start-Sleep -Seconds 2
+                        
+                            Write-Log -Message "Zweiter Durchlauf: irw.exe -ap:PerfIndex -d:IRW20011" -Level 'INFO'
+                        
+                            # Zweiter Durchlauf ohne -c Parameter
+                            $process2 = Start-Process -FilePath $executablePath -ArgumentList "-ap:PerfIndex", "-d:IRW20011" -Wait -PassThru -NoNewWindow
+                        
+                            if ($process2.ExitCode -eq 0) {
+                                Write-Log -Message "Leistungsindex-Messungen erfolgreich abgeschlossen (Exit Code: $($process2.ExitCode))" -Level 'INFO'
+                                return @{ Success = $true; Message = "Leistungsindex-Messungen erfolgreich abgeschlossen" }
+                            }
+                            else {
+                                Write-Log -Message "Zweiter Durchlauf fehlgeschlagen (Exit Code: $($process2.ExitCode))" -Level 'ERROR'
+                                return @{ Success = $false; Message = "Zweiter Durchlauf fehlgeschlagen" }
+                            }
+                        }
+                        else {
+                            Write-Log -Message "Erster Durchlauf fehlgeschlagen (Exit Code: $($process1.ExitCode))" -Level 'ERROR'
+                            return @{ Success = $false; Message = "Erster Durchlauf fehlgeschlagen" }
+                        }
+                    }
+                    catch {
+                        Write-Log -Message "Fehler bei Leistungsindex-Ausführung: $($_.Exception.Message)" -Level 'ERROR'
+                        return @{ Success = $false; Message = $_.Exception.Message }
+                    }
+                })
             
             # Parameter für das Skript hinzufügen
             [void]$powershell.AddParameter('executablePath', $foundPath)
@@ -1586,7 +1597,8 @@ function Start-WindowsUpdates {
                 "• PowerShell: Get-WindowsUpdate, Install-WindowsUpdate`n" +
                 "• WSUS/SCCM falls konfiguriert`n`n" +
                 "Oder öffnen Sie die Systemsteuerung manuell und suchen nach 'Windows Update'."
-            } else {
+            }
+            else {
                 "Windows Updates konnten nicht automatisch geöffnet werden.`n`n" +
                 "Bitte öffnen Sie Windows Updates manuell über:`n" +
                 "• Einstellungen → Update und Sicherheit → Windows Update`n" +
@@ -1717,8 +1729,8 @@ function Show-ChangelogDialog {
         $closeButton.HorizontalAlignment = "Right"
         $closeButton.VerticalAlignment = "Top"
         $closeButton.Add_Click({
-            $changelogWindow.Close()
-        })
+                $changelogWindow.Close()
+            })
         
         [System.Windows.Controls.Grid]::SetRow($closeButton, 1)
         $grid.Children.Add($closeButton)
@@ -1861,9 +1873,9 @@ function Test-ForUpdates {
             }
             return @{
                 UpdateAvailable = $true
-                CurrentVersion = $currentVersion
-                NewVersion = $remoteVersion
-                VersionInfo = $versionInfo
+                CurrentVersion  = $currentVersion
+                NewVersion      = $remoteVersion
+                VersionInfo     = $versionInfo
             }
         }
         else {
@@ -1872,9 +1884,9 @@ function Test-ForUpdates {
             }
             return @{
                 UpdateAvailable = $false
-                CurrentVersion = $currentVersion
-                NewVersion = $remoteVersion
-                VersionInfo = $versionInfo
+                CurrentVersion  = $currentVersion
+                NewVersion      = $remoteVersion
+                VersionInfo     = $versionInfo
             }
         }
     }
@@ -1882,7 +1894,7 @@ function Test-ForUpdates {
         Write-Log -Message "Fehler beim Prüfen auf Updates: $($_.Exception.Message)" -Level 'ERROR'
         return @{
             UpdateAvailable = $false
-            Error = $_.Exception.Message
+            Error           = $_.Exception.Message
         }
     }
 }
@@ -1896,14 +1908,15 @@ function Show-UpdateDialog {
     try {
         $changelog = if ($UpdateInfo.VersionInfo.changelog) { 
             "`n`nÄnderungen:`n" + ($UpdateInfo.VersionInfo.changelog -join "`n• ")
-        } else { "" }
+        }
+        else { "" }
         
         $message = "Ein Update ist verfügbar!`n`n" +
-                  "Aktuelle Version: $($UpdateInfo.CurrentVersion)`n" +
-                  "Neue Version: $($UpdateInfo.NewVersion)`n" +
-                  "Erscheinungsdatum: $($UpdateInfo.VersionInfo.releaseDate)" +
-                  $changelog +
-                  "`n`nMöchten Sie jetzt aktualisieren?"
+        "Aktuelle Version: $($UpdateInfo.CurrentVersion)`n" +
+        "Neue Version: $($UpdateInfo.NewVersion)`n" +
+        "Erscheinungsdatum: $($UpdateInfo.VersionInfo.releaseDate)" +
+        $changelog +
+        "`n`nMöchten Sie jetzt aktualisieren?"
         
         $result = [System.Windows.MessageBox]::Show(
             $message,
@@ -1940,11 +1953,11 @@ function New-UpdatePaths {
     
     $timestamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
     return @{
-        UpdateDir = $updateDir
-        BackupPath = Join-Path $updateDir "DATEV-Toolbox-$timestamp.backup"
-        TempUpdatePath = Join-Path $updateDir "DATEV-Toolbox-$($UpdateInfo.NewVersion).download"
+        UpdateDir       = $updateDir
+        BackupPath      = Join-Path $updateDir "DATEV-Toolbox-$timestamp.backup"
+        TempUpdatePath  = Join-Path $updateDir "DATEV-Toolbox-$($UpdateInfo.NewVersion).download"
         UpdateBatchPath = Join-Path $updateDir "Update-$timestamp.bat"
-        Timestamp = $timestamp
+        Timestamp       = $timestamp
     }
 }
 
@@ -2067,7 +2080,8 @@ function Update-SettingsForUpdate {
         foreach ($property in $script:Settings.PSObject.Properties) {
             $settingsHash[$property.Name] = $property.Value
         }
-    } else {
+    }
+    else {
         $settingsHash = $script:Settings
     }
     
@@ -2081,8 +2095,8 @@ function Update-SettingsForUpdate {
     
     # Neuen Eintrag zur Update-History hinzufügen
     $newHistoryEntry = @{
-        version = $UpdateInfo.NewVersion
-        date = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
+        version    = $UpdateInfo.NewVersion
+        date       = (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         backupPath = $BackupPath
     }
     
@@ -2090,7 +2104,8 @@ function Update-SettingsForUpdate {
     $currentHistory = $settingsHash.updateHistory
     if ($currentHistory -is [array]) {
         $settingsHash.updateHistory = $currentHistory + $newHistoryEntry
-    } else {
+    }
+    else {
         $settingsHash.updateHistory = @($currentHistory, $newHistoryEntry)
     }
     
@@ -2210,7 +2225,7 @@ function Initialize-UpdateCheck {
             Initialize-Settings
         }
         $checkInterval = $script:Config.Timeouts.UpdateInterval # Stunden
-          # Letzten Check-Zeitpunkt prüfen
+        # Letzten Check-Zeitpunkt prüfen
         $lastCheck = $null
         if ($script:Settings.lastUpdateCheck) {
             try {
@@ -2230,15 +2245,16 @@ function Initialize-UpdateCheck {
             $shouldCheck = $true
             Write-Log -Message "Update-Check-Intervall erreicht (alle $checkInterval Stunden)" -Level 'DEBUG'
         }
-          if ($shouldCheck) {            # Stillen Update-Check durchführen
-              $updateInfo = Test-ForUpdates -Silent
+        if ($shouldCheck) {
+            # Stillen Update-Check durchführen
+            $updateInfo = Test-ForUpdates -Silent
               
-              # PowerShell 5.1 Kompatibilität: Array zu Hashtable konvertieren
-              if ($updateInfo -is [Array] -and $updateInfo.Count -gt 0) {
-                  $updateInfo = $updateInfo[0]
-              }
+            # PowerShell 5.1 Kompatibilität: Array zu Hashtable konvertieren
+            if ($updateInfo -is [Array] -and $updateInfo.Count -gt 0) {
+                $updateInfo = $updateInfo[0]
+            }
               
-              if ($updateInfo.UpdateAvailable) {
+            if ($updateInfo.UpdateAvailable) {
                 Write-Log -Message "Update verfügbar: Version $($updateInfo.NewVersion)" -Level 'INFO'
                 
                 # Update-Dialog anzeigen
@@ -2249,8 +2265,9 @@ function Initialize-UpdateCheck {
                 }
                 else {
                     Write-Log -Message "Benutzer hat Update abgelehnt" -Level 'INFO'
-                }            }
-              # Letzten Check-Zeitpunkt aktualisieren
+                }            
+            }
+            # Letzten Check-Zeitpunkt aktualisieren
             Set-Setting -Key "lastUpdateCheck" -Value (Get-Date).ToString('yyyy-MM-ddTHH:mm:ss')
         }
         else {
@@ -2283,7 +2300,8 @@ function Start-ManualUpdateCheck {
             
             if ($null -ne $correctElement) {
                 $updateInfo = $correctElement
-            } else {
+            }
+            else {
                 Write-Log -Message "Kein korrektes Hashtable-Element im Array gefunden" -Level 'ERROR'
                 $updateInfo = $updateInfo[0]
             }
@@ -2354,14 +2372,14 @@ function Get-DATEVDownloads {
             
             # Rückgabe als Hashtable mit Downloads und lastUpdated
             return @{
-                downloads = $downloadsData.downloads
+                downloads   = $downloadsData.downloads
                 lastUpdated = $downloadsData.lastUpdated
             }
         }
         else {
             Write-Log -Message "Keine datev-downloads.json im AppData-Ordner gefunden. Bitte erst aktualisieren." -Level 'WARN'
             return @{
-                downloads = @()
+                downloads   = @()
                 lastUpdated = $null
             }
         }
@@ -2369,7 +2387,7 @@ function Get-DATEVDownloads {
     catch {
         Write-Log -Message "Fehler beim Laden der DATEV Downloads: $($_.Exception.Message)" -Level 'ERROR'
         return @{
-            downloads = @()
+            downloads   = @()
             lastUpdated = $null
         }
     }
@@ -2542,64 +2560,64 @@ function Start-BackgroundDownload {
         
         # Event-Handler für Download-Completion (mit verbessertem Disposal)
         $webClient.add_DownloadFileCompleted({
-            param($webClientSender, $downloadEventArgs)
+                param($webClientSender, $downloadEventArgs)
             
-            try {
-                # Dateiname aus UserState extrahieren
-                $currentFileName = if ($downloadEventArgs.UserState) { $downloadEventArgs.UserState } else { "unbekannte Datei" }
+                try {
+                    # Dateiname aus UserState extrahieren
+                    $currentFileName = if ($downloadEventArgs.UserState) { $downloadEventArgs.UserState } else { "unbekannte Datei" }
                 
-                if ($null -eq $downloadEventArgs.Error -and -not $downloadEventArgs.Cancelled) {
-                    Write-Log -Message "Download erfolgreich abgeschlossen: $currentFileName" -Level 'INFO'
+                    if ($null -eq $downloadEventArgs.Error -and -not $downloadEventArgs.Cancelled) {
+                        Write-Log -Message "Download erfolgreich abgeschlossen: $currentFileName" -Level 'INFO'
                     
-                    # Optional: Download-Ordner öffnen bei erfolgreichem Download
-                    $result = [System.Windows.MessageBox]::Show(
-                        "Download erfolgreich abgeschlossen: $currentFileName`n`nMöchten Sie den Download-Ordner öffnen?",
-                        "Download abgeschlossen",
-                        [System.Windows.MessageBoxButton]::YesNo,
-                        [System.Windows.MessageBoxImage]::Information
-                    )
+                        # Optional: Download-Ordner öffnen bei erfolgreichem Download
+                        $result = [System.Windows.MessageBox]::Show(
+                            "Download erfolgreich abgeschlossen: $currentFileName`n`nMöchten Sie den Download-Ordner öffnen?",
+                            "Download abgeschlossen",
+                            [System.Windows.MessageBoxButton]::YesNo,
+                            [System.Windows.MessageBoxImage]::Information
+                        )
                     
-                    if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
-                        Open-DownloadFolder
+                        if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+                            Open-DownloadFolder
+                        }
                     }
-                }
-                elseif ($downloadEventArgs.Cancelled) {
-                    Write-Log -Message "Download abgebrochen: $currentFileName" -Level 'WARN'
-                }
-                else {
-                    Write-Log -Message "Download fehlgeschlagen: $($downloadEventArgs.Error.Message)" -Level 'ERROR'
-                    [System.Windows.MessageBox]::Show(
-                        "Download fehlgeschlagen: $currentFileName`n`nFehler: $($downloadEventArgs.Error.Message)",
-                        "Download-Fehler",
-                        [System.Windows.MessageBoxButton]::OK,
-                        [System.Windows.MessageBoxImage]::Error
-                    )
-                }
-            }
-            catch {
-                Write-Log -Message "Fehler im Download-Completion-Handler: $($_.Exception.Message)" -Level 'ERROR'
-            }
-            finally {
-                # UI zurücksetzen (immer ausführen)
-                try {
-                    $btnDownload.IsEnabled = $true
-                }
-                catch {
-                    Write-Log -Message "Fehler beim Zurücksetzen der UI: $($_.Exception.Message)" -Level 'WARN'
-                }
-                
-                # WebClient sicher entsorgen (immer ausführen)
-                try {
-                    if ($null -ne $webClientSender -and $webClientSender -is [System.Net.WebClient]) {
-                        $webClientSender.Dispose()
-                        Write-Log -Message "WebClient ordnungsgemäß disposed" -Level 'DEBUG'
+                    elseif ($downloadEventArgs.Cancelled) {
+                        Write-Log -Message "Download abgebrochen: $currentFileName" -Level 'WARN'
+                    }
+                    else {
+                        Write-Log -Message "Download fehlgeschlagen: $($downloadEventArgs.Error.Message)" -Level 'ERROR'
+                        [System.Windows.MessageBox]::Show(
+                            "Download fehlgeschlagen: $currentFileName`n`nFehler: $($downloadEventArgs.Error.Message)",
+                            "Download-Fehler",
+                            [System.Windows.MessageBoxButton]::OK,
+                            [System.Windows.MessageBoxImage]::Error
+                        )
                     }
                 }
                 catch {
-                    Write-Log -Message "Fehler beim Entsorgen des WebClients: $($_.Exception.Message)" -Level 'WARN'
+                    Write-Log -Message "Fehler im Download-Completion-Handler: $($_.Exception.Message)" -Level 'ERROR'
                 }
-            }
-        })
+                finally {
+                    # UI zurücksetzen (immer ausführen)
+                    try {
+                        $btnDownload.IsEnabled = $true
+                    }
+                    catch {
+                        Write-Log -Message "Fehler beim Zurücksetzen der UI: $($_.Exception.Message)" -Level 'WARN'
+                    }
+                
+                    # WebClient sicher entsorgen (immer ausführen)
+                    try {
+                        if ($null -ne $webClientSender -and $webClientSender -is [System.Net.WebClient]) {
+                            $webClientSender.Dispose()
+                            Write-Log -Message "WebClient ordnungsgemäß disposed" -Level 'DEBUG'
+                        }
+                    }
+                    catch {
+                        Write-Log -Message "Fehler beim Entsorgen des WebClients: $($_.Exception.Message)" -Level 'WARN'
+                    }
+                }
+            })
         
         # Asynchronen Download starten mit Dateiname als UserState
         $webClient.DownloadFileAsync($Url, $filePath, $FileName)
@@ -2705,16 +2723,16 @@ function Get-DATEVDocuments {
             $documents = @()
             foreach ($doc in $documentsData.documents) {
                 $documents += @{
-                    id = $doc.id
-                    title = $doc.title
-                    url = $doc.url  
+                    id          = $doc.id
+                    title       = $doc.title
+                    url         = $doc.url  
                     description = $doc.description
                 }
             }
             
             # Rückgabe-Objekt mit Dokumenten und lastUpdated
             $result = @{
-                documents = $documents
+                documents   = $documents
                 lastUpdated = $documentsData.lastUpdated
             }
             
@@ -2729,7 +2747,7 @@ function Get-DATEVDocuments {
     catch {
         Write-Log -Message "Fehler beim Laden der DATEV-Dokumente: $($_.Exception.Message)" -Level 'ERROR'
         return @{
-            documents = @()
+            documents   = @()
             lastUpdated = "Unbekannt"
         }
     }
@@ -2763,16 +2781,16 @@ function Update-DATEVDocuments {
             $documents = @()
             foreach ($doc in $documentsData.documents) {
                 $documents += @{
-                    id = $doc.id
-                    title = $doc.title
-                    url = $doc.url
+                    id          = $doc.id
+                    title       = $doc.title
+                    url         = $doc.url
                     description = $doc.description
                 }
             }
             
             # Rückgabe-Objekt mit Dokumenten und lastUpdated
             $result = @{
-                documents = $documents
+                documents   = $documents
                 lastUpdated = $documentsData.lastUpdated
             }
             
@@ -2786,7 +2804,7 @@ function Update-DATEVDocuments {
     catch {
         Write-Log -Message "Fehler beim Aktualisieren der DATEV-Dokumente: $($_.Exception.Message)" -Level 'ERROR'
         return @{
-            documents = @()
+            documents   = @()
             lastUpdated = "Unbekannt"
         }
     }
@@ -2854,17 +2872,17 @@ function Initialize-DocumentsList {
             
             # Click-Event für Titel
             $titleLink.Add_MouseLeftButtonUp({
-                param($sender, $e)
-                try {
-                    $url = $sender.Tag
-                    Start-Process $url
-                    Write-Log -Message "DATEV-Dokument geöffnet: $($sender.Text)" -Level 'INFO'
-                }
-                catch {
-                    Write-Log -Message "Fehler beim Öffnen des Dokuments: $($_.Exception.Message)" -Level 'ERROR'
-                    [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Dokuments: $($_.Exception.Message)", "Fehler", "OK", "Error")
-                }
-            })
+                    param($sender, $e)
+                    try {
+                        $url = $sender.Tag
+                        Start-Process $url
+                        Write-Log -Message "DATEV-Dokument geöffnet: $($sender.Text)" -Level 'INFO'
+                    }
+                    catch {
+                        Write-Log -Message "Fehler beim Öffnen des Dokuments: $($_.Exception.Message)" -Level 'ERROR'
+                        [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Dokuments: $($_.Exception.Message)", "Fehler", "OK", "Error")
+                    }
+                })
             
             $documentsPanel.Children.Add($titleLink)
         }
@@ -3240,7 +3258,8 @@ if ($null -ne $cmbDirectDownloads) {
                 if ($txtDownloadDescription.Inlines.Count -gt 0) {
                     $borderDownloadDescription.Visibility = 'Visible'
                     Write-Log -Message "Beschreibung und Zusatzinformationen angezeigt für: $($selectedItem.Content)" -Level 'DEBUG'
-                } else {
+                }
+                else {
                     $borderDownloadDescription.Visibility = 'Collapsed'
                 }
             }
@@ -3269,7 +3288,8 @@ $downloadsJsonPath = $script:Config.Paths.DownloadsJSON
 if (Test-Path $downloadsJsonPath) {
     Initialize-DownloadsComboBox
     Write-Log -Message "Downloads-ComboBox mit vorhandenen Daten initialisiert" -Level 'DEBUG'
-} else {
+}
+else {
     Write-Log -Message "Keine Downloads-JSON gefunden, ComboBox bleibt leer bis zum ersten Update" -Level 'DEBUG'
 }
 
@@ -3283,10 +3303,10 @@ Initialize-Settings
 if ($null -ne $chkShowDebugLogs) {
     $chkShowDebugLogs.IsChecked = (Get-Setting -Key 'ShowDebugLogs' -DefaultValue $false)
     $chkShowDebugLogs.Add_Click({
-        $isChecked = $this.IsChecked
-        Set-Setting -Key 'ShowDebugLogs' -Value $isChecked
-        Write-Log -Message "Debug-Meldungen werden jetzt $(if ($isChecked) { 'angezeigt' } else { 'ausgeblendet' })" -Level 'INFO'
-    })
+            $isChecked = $this.IsChecked
+            Set-Setting -Key 'ShowDebugLogs' -Value $isChecked
+            Write-Log -Message "Debug-Meldungen werden jetzt $(if ($isChecked) { 'angezeigt' } else { 'ausgeblendet' })" -Level 'INFO'
+        })
 }
 
 # Update-Termine beim Start laden (falls vorhanden)
@@ -3300,45 +3320,45 @@ Initialize-RunspacePool
 
 # Window-Closing Event für ordnungsgemäße Bereinigung
 $window.Add_Closing({
-    Write-Log -Message "Anwendung wird beendet, bereinige Ressourcen..." -Level 'INFO'
+        Write-Log -Message "Anwendung wird beendet, bereinige Ressourcen..." -Level 'INFO'
     
-    # Settings sofort speichern falls noch ausstehend
-    if ($script:SettingsNeedSave) {
-        Save-Settings
-    }
+        # Settings sofort speichern falls noch ausstehend
+        if ($script:SettingsNeedSave) {
+            Save-Settings
+        }
     
-    # Event-Handler bereinigen (Memory Leak Prevention)
-    if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler -and $null -ne $cmbDirectDownloads) {
+        # Event-Handler bereinigen (Memory Leak Prevention)
+        if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler -and $null -ne $cmbDirectDownloads) {
+            try {
+                $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+                Write-Log -Message "ComboBox Event-Handler beim Cleanup entfernt" -Level 'DEBUG'
+            }
+            catch {
+                Write-Log -Message "Fehler beim Entfernen des ComboBox Event-Handlers: $($_.Exception.Message)" -Level 'WARN'
+            }
+        }
+    
+        # Runspace-Pool schließen
+        Close-RunspacePool
+    
+        # Thread-sichere Timer-Bereinigung
+        [System.Threading.Monitor]::Enter($script:SettingsLock)
         try {
-            $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
-            Write-Log -Message "ComboBox Event-Handler beim Cleanup entfernt" -Level 'DEBUG'
+            if ($null -ne $script:SettingsSaveTimer) {
+                $script:SettingsSaveTimer.Stop()
+                $script:SettingsSaveTimer = $null
+                Write-Log -Message "Settings-Timer thread-sicher gestoppt" -Level 'DEBUG'
+            }
         }
         catch {
-            Write-Log -Message "Fehler beim Entfernen des ComboBox Event-Handlers: $($_.Exception.Message)" -Level 'WARN'
+            Write-Log -Message "Fehler beim Thread-sicheren Timer-Stopp: $($_.Exception.Message)" -Level 'WARN'
         }
-    }
-    
-    # Runspace-Pool schließen
-    Close-RunspacePool
-    
-    # Thread-sichere Timer-Bereinigung
-    [System.Threading.Monitor]::Enter($script:SettingsLock)
-    try {
-        if ($null -ne $script:SettingsSaveTimer) {
-            $script:SettingsSaveTimer.Stop()
-            $script:SettingsSaveTimer = $null
-            Write-Log -Message "Settings-Timer thread-sicher gestoppt" -Level 'DEBUG'
+        finally {
+            [System.Threading.Monitor]::Exit($script:SettingsLock)
         }
-    }
-    catch {
-        Write-Log -Message "Fehler beim Thread-sicheren Timer-Stopp: $($_.Exception.Message)" -Level 'WARN'
-    }
-    finally {
-        [System.Threading.Monitor]::Exit($script:SettingsLock)
-    }
     
-    Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
-})
+        Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
+    })
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet (Performance-optimiert)" -Level 'INFO'
