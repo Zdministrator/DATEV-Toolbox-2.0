@@ -158,7 +158,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Version
-Aktuelle Version: **2.1.10**
+Aktuelle Version: **2.2.0** (02.10.2025)
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -166,68 +166,35 @@ Aktuelle Version: **2.1.10**
 ### Repository
 - **GitHub**: [Zdministrator/DATEV-Toolbox-2.0](https://github.com/Zdministrator/DATEV-Toolbox-2.0)
 - **Updates**: Automatisch von GitHub main branch
+- **Lizenz**: Proprietär
+
+### Technologie-Stack
+- **Sprache**: PowerShell 5.1+
+- **GUI-Framework**: Windows Presentation Foundation (WPF)
+- **Mindest-.NET**: .NET Framework 4.5+
+- **Zielplattform**: Windows (Client & Server)
+- **Architektur**: Event-driven, modular mit zentraler Konfiguration
 
 ### Systemanforderungen
-- PowerShell 5.1+ kompatibel
-- Windows mit .NET Framework 4.5+
-- WPF-Unterstützung erforderlich
-- DATEV-Installation (für DATEV-Tools, optional)
-- Internetverbindung für Updates und Downloads
+- **PowerShell**: Version 5.1 oder höher (Windows PowerShell oder PowerShell Core)
+- **Betriebssystem**: Windows 10/11 oder Windows Server 2016+
+- **.NET Framework**: 4.5 oder höher (für WPF-Unterstützung)
+- **DATEV-Installation**: Optional (für DATEV-Tool-Integration)
+- **Internetverbindung**: Empfohlen (für automatische Updates und Downloads)
+- **Berechtigungen**: Standard-Benutzerrechte (Admin nur für spezielle Tools)
 
-### Neue Features in Version 2.1.10
+### Code-Qualität & Features
+- ✅ **Enterprise-Grade**: Log-Rotation, Memory-Management, Thread-Safety
+- ✅ **PowerShell 5.1 Kompatibel**: Keine GetNewClosure-Abhängigkeiten
+- ✅ **Fehlerbehandlung**: Try-Catch mit umfassendem Logging
+- ✅ **Performance**: Caching, StringBuilder, asynchrone Downloads
+- ✅ **Wartbarkeit**: Zentrale Konfiguration, modulare Handler-Architektur
+- ✅ **Sicherheit**: TLS 1.2, Input-Validation, sichere URL-Verwaltung
 
-#### 🔧 Server-Anpassungs-Assistent
-- **Neuer DATEV-Tool Button**: Server-Anpassungs-Assistent im DATEV Tools Bereich hinzugefügt
-- **DvServerChange.exe Integration**: Direkter Zugriff auf DATEV Server-Konfigurationstool
-- **Intelligente Pfadsuche**: Automatische Erkennung über %DATEVPP% Umgebungsvariable
-- **Benutzerfreundlich**: Schraubenschlüssel-Icon und aussagekräftiger Tooltip
-
-#### 🔄 Windows Updates Integration
-- **System-Tab-Erweiterung**: Windows Updates Button für direkten Zugriff hinzugefügt  
-- **Cross-Platform-Support**: Funktioniert sowohl auf Windows Client als auch Server
-- **Intelligente Erkennung**: 4-Tier-Fallback-System für optimale Kompatibilität
-- **Moderne Settings App**: Bevorzugung der neuen Windows 10/11 Update-Oberfläche
-- **Legacy-Support**: Automatischer Fallback auf Control Panel für ältere Systeme
-
-#### 📋 Dokumente-Tab-Verbesserungen
-- **lastUpdated-Datum**: Aktualisierungsdatum wird prominent oberhalb der Liste angezeigt
-- **Deutsche Formatierung**: DD.MM.YYYY-Format für bessere Lesbarkeit
-- **Echtzeit-Aktualisierung**: Datum wird beim Laden der Dokumenten-Liste aktualisiert
-- **Benutzerfreundlichkeit**: Kleine, graue Schrift für dezente aber wichtige Information
-
-### Neue Features in Version 2.1.9
-
-#### 📥 Download-Info-Enhancement: Fette Schrift und vollständige Metadaten
-- **Erweiterte Download-Information**: Info-Feld zeigt jetzt Zusatzinformationen (Erschienen, Dateiname, Dateigröße)
-- **Fette Formatierung**: Labels "Erschienen:", "Dateiname:" und "Dateigröße:" werden fett dargestellt
-- **Rich-Text-Implementierung**: WPF Inlines für professionelle und strukturierte Darstellung
-- **Intelligente Formatierung**: Beschreibung + strukturierte Metadaten mit automatischen Leerzeilen
-- **Vollständige JSON-Integration**: Alle Download-Felder werden korrekt gelesen und angezeigt
-- **Verbesserte Benutzerfreundlichkeit**: Konsistente Anzeige für Downloads mit und ohne Zusatzinformationen
-- **Professionelle Darstellung**: Strukturierte Metadaten-Anzeige für bessere Entscheidungsfindung
-
-#### 📋 Dokumente-Tab: Direkter Zugriff auf DATEV-Anleitungen (v2.1.8)
-- **Neuer 'Dokumente' Tab**: Zwischen Downloads und System eingefügt für bessere Navigation
-- **DATEV Help-Center Integration**: 5 wichtige Dokumentationen verfügbar
-- **Ein-Klick-Zugriff**: Windows Server-Setup, Betriebssystem-Kompatibilität, Office-Umstieg
-- **Automatische Updates**: Dokumenten-Liste wird zentral von GitHub verwaltet
-- **Benutzerfreundlich**: Saubere UI mit ScrollViewer und konsistenter GroupBox-Struktur
-
-#### 📥 Download-Erweiterungen
-- **Deinstallationsnacharbeiten-Tool V. 3.11**: Neue Download-Option hinzugefügt
-- **Erweiterte Tool-Abdeckung**: Vollständige DATEV-Tool-Integration
-- **Update-Links**: Modernisierte Download-URLs für neue DATEV-Strukturen
-
-#### 🎨 UI/UX-Verbesserungen aus v2.1.7
-- **Scrollbares Changelog-Fenster**: Von MessageBox auf WPF-Fenster umgestellt
-- **Größenverstellbar**: 800x600 Pixel Standardgröße, mindestens 600x400
-- **Bessere Lesbarkeit**: Monospace-Font (Consolas) für strukturierte Darstellung
-- **Performance-optimiert**: Maximale Anzeige von 10 Versionen
-- **Professional Look**: Deutlich benutzerfreundlichere Changelog-Anzeige
-
-#### 📈 Verbesserungen aus vorherigen Versionen
-- **Kompakte UI**: Optimierte GroupBox-Abstände für platzsparendere Darstellung (v2.1.4)
-- **Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
+### Beiträge & Feedback
+Für Feature-Requests, Bug-Reports oder Verbesserungsvorschläge:
+- **E-Mail**: norman.zamponi@hees.de
+- **GitHub Issues**: [Issues öffnen](https://github.com/Zdministrator/DATEV-Toolbox-2.0/issues)
 
 ## 🔄 Update-Historie
 
