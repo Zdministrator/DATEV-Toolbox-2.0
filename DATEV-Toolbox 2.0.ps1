@@ -74,27 +74,28 @@ $script:Config = @{
         }
         DATEV  = @{
             # Online-Services
-            HelpCenter         = "https://apps.datev.de/help-center/"
-            ServiceKontakte    = "https://apps.datev.de/servicekontakt-online/contacts"
-            MyUpdates          = "https://apps.datev.de/myupdates/home"
-            Community          = "https://www.datev-community.de/"
-            MyDATEV            = "https://apps.datev.de/mydatev"
-            DUO                = "https://duo.datev.de/"
-            LAO                = "https://apps.datev.de/lao"
-            Lizenzverwaltung   = "https://apps.datev.de/lizenzverwaltung"
-            Rechteraum         = "https://apps.datev.de/rechteraum"
-            RVO                = "https://apps.datev.de/rvo-administration"
-            SmartLogin         = "https://go.datev.de/smartlogin-administration"
-            Bestandsmanagement = "https://apps.datev.de/mydata/"
-            WeitereApps        = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
+            HelpCenter           = "https://apps.datev.de/help-center/"
+            ServiceKontakte      = "https://apps.datev.de/servicekontakt-online/contacts"
+            MyUpdates            = "https://apps.datev.de/myupdates/home"
+            Community            = "https://www.datev-community.de/"
+            MyDATEV              = "https://apps.datev.de/mydatev"
+            DUO                  = "https://duo.datev.de/"
+            LAO                  = "https://apps.datev.de/lao"
+            Lizenzverwaltung     = "https://apps.datev.de/lizenzverwaltung"
+            Rechteraum           = "https://apps.datev.de/rechteraum"
+            RVO                  = "https://apps.datev.de/rvo-administration"
+            SmartLogin           = "https://go.datev.de/smartlogin-administration"
+            Bestandsmanagement   = "https://apps.datev.de/mydata/"
+            Vertragsuebersichten = "https://apps.datev.de/vertragsuebersichten-online"
+            WeitereApps          = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
             
             # Download-Bereiche
-            Downloadbereich    = "https://apps.datev.de/myupdates/download-v2/lists/products/"
-            SmartDocs          = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
-            DatentraegerPortal = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
+            Downloadbereich      = "https://apps.datev.de/myupdates/download-v2/lists/products/"
+            SmartDocs            = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
+            DatentraegerPortal   = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
             
             # Update-Termine
-            Jahresplanung      = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
+            Jahresplanung        = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
         }
     }
     
@@ -151,6 +152,7 @@ $script:Config = @{
         'btnRVO'                  = @{ Type = 'URL'; UrlKey = 'RVO' }
         'btnSmartLogin'           = @{ Type = 'URL'; UrlKey = 'SmartLogin' }
         'btnBestandsmanagement'   = @{ Type = 'URL'; UrlKey = 'Bestandsmanagement' }
+        'btnVertragsuebersichten' = @{ Type = 'URL'; UrlKey = 'Vertragsuebersichten' }
         'btnWeitereApps'          = @{ Type = 'URL'; UrlKey = 'WeitereApps' }
         
         # DATEV Online Downloads (URL-Handler)
@@ -601,6 +603,8 @@ function Close-RunspacePool {
                                         ToolTip="Verwaltet DATEV SmartLogin Einstellungen und Benutzer"/>
                                 <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet das myDATEV Bestandsmanagement für Kundenverwaltung"/>
+                                <Button Name="btnVertragsuebersichten" Content="Vertragsübersichten Online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet die DATEV Vertragsübersichten Online für Verwaltung von Verträgen und Lizenzen"/>
                                 <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Zeigt weitere verfügbare DATEV Cloud-Anwendungen"/>
                             </StackPanel>
