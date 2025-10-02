@@ -1,20 +1,39 @@
 {
-  "version": "2.1.10",
-  "releaseDate": "2025-08-21",
+  "version": "2.2.0",
+  "releaseDate": "2025-10-02",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "System-Erweiterungen und DATEV-Tools-Integration",
-    "• Server-Anpassungs-Assistent: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe)",
-    "• Windows Updates Integration: Cross-Platform Button im System-Tab für Client und Server",
-    "• Dokumente lastUpdated-Anzeige: Aktualisierungsdatum im Dokumente-Tab",
-    "• Intelligente Windows Update-Erkennung: 4-Tier Fallback-System für optimale Kompatibilität",
-    "• Server-Anpassungs-Assistent mit Schraubenschlüssel-Icon und aussagekräftigem Tooltip",
-    "• DATEV-Pfadkonfiguration erweitert: DvServerChange.exe in B0001502-Ordner",
-    "• Cross-Platform Support: Modern Settings App mit Legacy Control Panel Fallback",
-    "• Deutsche Datumsformatierung: DD.MM.YYYY Format im Dokumente-Tab",
-    "Erweiterte System-Integration mit verbesserter DATEV-Tool-Abdeckung"
+    "Enterprise-Grade Erweiterungen: Log-Rotation, FSLogix-Integration und modulares Download-System",
+    "• Log-Rotation System: Automatische Archivierung großer Log-Dateien (>5 MB, hält 5 Archive)",
+    "• FSLogix Download-Integration: Microsoft FSLogix nutzt professionelle Download-Funktion",
+    "• Sonstige nützliche Downloads: Neuer Bereich für Microsoft-Tools (FSLogix Apps Latest)",
+    "• Vertragsübersichten Online: DATEV-Online Tab mit direktem Zugriff auf Vertragsübersichten-Portal",
+    "• Modularer Download-Handler: Register-DownloadHandler für einfache Download-Integration",
+    "• Download-Konfiguration: Zentrale Downloads-Sektion in Config für URL, FileName und Description",
+    "• Performance-Optimierung: Log-Rotation-Check nur bei jedem 10. Schreibvorgang",
+    "• Startup-Rotation: Große Logs werden automatisch beim Programmstart archiviert",
+    "• Archive-Management: Automatische Cleanup-Funktion behält nur die letzten 5 Archive",
+    "• Konsistentes Download-System: FSLogix verwendet gleiche Funktion wie DATEV Direkt-Downloads",
+    "• PowerShell 5.1 Kompatibilität: Alle neuen Features ohne GetNewClosure implementiert",
+    "Professionelles Log-Management und einheitliches Download-System für alle Dateitypen"
   ],
   "previousVersions": [
+    {
+      "version": "2.1.10",
+      "releaseDate": "2025-08-21",
+      "changelog": [
+        "System-Erweiterungen und DATEV-Tools-Integration",
+        "• Server-Anpassungs-Assistent: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe)",
+        "• Windows Updates Integration: Cross-Platform Button im System-Tab für Client und Server",
+        "• Dokumente lastUpdated-Anzeige: Aktualisierungsdatum im Dokumente-Tab",
+        "• Intelligente Windows Update-Erkennung: 4-Tier Fallback-System für optimale Kompatibilität",
+        "• Server-Anpassungs-Assistent mit Schraubenschlüssel-Icon und aussagekräftigem Tooltip",
+        "• DATEV-Pfadkonfiguration erweitert: DvServerChange.exe in B0001502-Ordner",
+        "• Cross-Platform Support: Modern Settings App mit Legacy Control Panel Fallback",
+        "• Deutsche Datumsformatierung: DD.MM.YYYY Format im Dokumente-Tab",
+        "Erweiterte System-Integration mit verbesserter DATEV-Tool-Abdeckung"
+      ]
+    },
     {
       "version": "2.1.9",
       "releaseDate": "2025-08-21",

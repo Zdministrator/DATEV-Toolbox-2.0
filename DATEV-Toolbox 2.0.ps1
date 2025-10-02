@@ -11,7 +11,7 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.1.10
+    Version:        2.2.0
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.1.10"
+$script:AppVersion = "2.2.0"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -108,6 +108,14 @@ $script:Config = @{
         GpupdateTimeout = 2  # Minuten
     }
     
+    Downloads      = @{
+        FSLogix = @{
+            Url         = "https://aka.ms/fslogix-latest"
+            FileName    = "FSLogix_Apps_Latest.zip"
+            Description = "Microsoft FSLogix Apps - Profile Container, Office Container und weitere Tools für virtuelle Umgebungen"
+        }
+    }
+    
     Paths          = @{
         AppData       = Join-Path $env:APPDATA 'DATEV-Toolbox 2.0'
         Downloads     = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
@@ -159,6 +167,9 @@ $script:Config = @{
         'btnDATEVDownloadbereich' = @{ Type = 'URL'; UrlKey = 'Downloadbereich' }
         'btnDATEVSmartDocs'       = @{ Type = 'URL'; UrlKey = 'SmartDocs' }
         'btnDatentraegerPortal'   = @{ Type = 'URL'; UrlKey = 'DatentraegerPortal' }
+        
+        # Sonstige nützliche Downloads (Download-Handler)
+        'btnFSLogix'              = @{ Type = 'Download'; DownloadKey = 'FSLogix' }
         
         # DATEV Programme (DATEV-Handler)
         'btnDATEVArbeitsplatz'    = @{ Type = 'DATEV'; ProgramName = 'DATEVArbeitsplatz'; Description = 'DATEV-Arbeitsplatz' }
@@ -616,7 +627,7 @@ function Close-RunspacePool {
                     <GroupBox Margin="0,0,0,5">
                         <GroupBox.Header>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Direkt Downloads" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="DATEV Direkt Downloads" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
                                 <TextBlock Name="btnUpdateDownloads" Text="🔄" FontSize="14" Margin="8,0,0,0" 
                                            ToolTip="Direkt-Downloads aktualisieren" VerticalAlignment="Center" 
                                            Cursor="Hand" Foreground="Black"/>
@@ -667,6 +678,17 @@ function Close-RunspacePool {
                                     ToolTip="Zugang zu DATEV Smart Docs für Dokumentation und Anleitungen"/>
                             <Button Name="btnDatentraegerPortal" Content="Datenträger Download Portal" Height="25" Margin="0,3,0,3"
                                     ToolTip="Portal für DVD/CD-ROM Downloads und Datenträger-Bestellungen"/>
+                        </StackPanel>
+                    </GroupBox>
+                    
+                    <!-- Sonstige nützliche Downloads -->
+                    <GroupBox Margin="0,0,0,5">
+                        <GroupBox.Header>
+                            <TextBlock Text="Sonstige nützliche Downloads" FontWeight="Bold" FontSize="12"/>
+                        </GroupBox.Header>
+                        <StackPanel Orientation="Vertical" Margin="8">
+                            <Button Name="btnFSLogix" Content="📥 FSLogix (latest)" Height="25" Margin="0,3,0,3"
+                                    ToolTip="Lädt die neueste Version von Microsoft FSLogix herunter (Profile Container, Office Container)"/>
                         </StackPanel>
                     </GroupBox>                </StackPanel>
             </TabItem>
@@ -838,7 +860,58 @@ $chkShowDebugLogs = $window.FindName("chkShowDebugLogs")
 #endregion
 
 #region Hilfsfunktionen und Utilities
-# Logging-System (Performance-optimiert)
+# Log-Rotation (automatische Archivierung großer Log-Dateien)
+function Rotate-LogFile {
+    <#
+    .SYNOPSIS
+    Rotiert Log-Dateien wenn sie eine bestimmte Größe überschreiten
+    .DESCRIPTION
+    Archiviert große Log-Dateien mit Zeitstempel, behält die letzten 5 Archive
+    #>
+    param(
+        [Parameter(Mandatory = $true)][string]$LogFilePath,
+        [int]$MaxSizeInMB = 5,
+        [int]$MaxArchives = 5
+    )
+    
+    try {
+        if (-not (Test-Path $LogFilePath)) {
+            return
+        }
+        
+        $logFile = Get-Item $LogFilePath -ErrorAction SilentlyContinue
+        if ($null -eq $logFile) {
+            return
+        }
+        
+        $maxSizeBytes = $MaxSizeInMB * 1MB
+        
+        if ($logFile.Length -gt $maxSizeBytes) {
+            $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+            $archivePath = "$LogFilePath.$timestamp.old"
+            
+            # Log-Datei archivieren
+            Move-Item -Path $LogFilePath -Destination $archivePath -Force
+            
+            # Alte Archive aufräumen (nur die letzten X behalten)
+            $logDir = Split-Path $LogFilePath -Parent
+            $logName = Split-Path $LogFilePath -Leaf
+            $archives = Get-ChildItem -Path $logDir -Filter "$logName.*.old" | 
+                        Sort-Object LastWriteTime -Descending
+            
+            if ($archives.Count -gt $MaxArchives) {
+                $archives | Select-Object -Skip $MaxArchives | Remove-Item -Force
+            }
+            
+            Write-Host "[Log-Rotation] $logName archiviert ($([math]::Round($logFile.Length / 1MB, 2)) MB)" -ForegroundColor Cyan
+        }
+    }
+    catch {
+        Write-Host "[Log-Rotation] Fehler: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+}
+
+# Logging-System (Performance-optimiert mit automatischer Rotation)
 function Write-Log {
     <#
     .SYNOPSIS
@@ -882,6 +955,15 @@ function Write-Log {
             if (-not (Test-Path $logDir)) {
                 New-Item -Path $logDir -ItemType Directory -Force | Out-Null
             }
+            
+            # Log-Rotation prüfen (nur bei jedem 10. Schreibvorgang für Performance)
+            if (-not $script:LogRotationCounter) { $script:LogRotationCounter = 0 }
+            $script:LogRotationCounter++
+            if ($script:LogRotationCounter -ge 10) {
+                Rotate-LogFile -LogFilePath $logFile -MaxSizeInMB 5 -MaxArchives 5
+                $script:LogRotationCounter = 0
+            }
+            
             Add-Content -Path $logFile -Value $logEntry -Encoding UTF8
         }
     }
@@ -984,6 +1066,16 @@ function Register-HyperlinkHandler {
         })
 }
 
+function Register-DownloadHandler {
+    param($Button, $DownloadInfo)
+    $Button.Tag = $DownloadInfo
+    $Button.Add_Click({
+            $downloadInfo = $this.Tag
+            Write-Log -Message "Download-Button '$($this.Name)' geklickt - starte Download: $($downloadInfo.FileName)" -Level 'INFO'
+            Start-BackgroundDownload -Url $downloadInfo.Url -FileName $downloadInfo.FileName
+        })
+}
+
 # Zentrale Button-Handler-Registrierung
 function Register-ButtonHandlers {
     <#
@@ -1067,6 +1159,21 @@ function Register-ButtonHandlers {
                         # Direkte Registrierung ohne Closure
                         Register-FunctionHandler -Button $buttonElement -FunctionName $functionName
                         Write-Log -Message "Function-Handler für '$buttonName' registriert" -Level 'DEBUG'
+                    }
+                }
+                
+                'Download' {
+                    if ($buttonConfig.ContainsKey('DownloadKey')) {
+                        $downloadKey = $buttonConfig.DownloadKey
+                        $downloadInfo = $script:Config.Downloads[$downloadKey]
+                        if ($null -ne $downloadInfo) {
+                            # Direkte Registrierung ohne Closure
+                            Register-DownloadHandler -Button $buttonElement -DownloadInfo $downloadInfo
+                            Write-Log -Message "Download-Handler für '$buttonName' registriert (Datei: $($downloadInfo.FileName))" -Level 'DEBUG'
+                        }
+                        else {
+                            Write-Log -Message "Download-Info für '$downloadKey' nicht gefunden - Button '$buttonName' übersprungen" -Level 'WARN'
+                        }
                     }
                 }
                 
@@ -3363,6 +3470,9 @@ $window.Add_Closing({
     
         Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
     })
+
+# Log-Rotation beim Start durchführen (falls Error-Log zu groß ist)
+Rotate-LogFile -LogFilePath $script:Config.Paths.ErrorLog -MaxSizeInMB 5 -MaxArchives 5
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet (Performance-optimiert)" -Level 'INFO'

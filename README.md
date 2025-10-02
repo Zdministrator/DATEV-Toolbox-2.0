@@ -10,6 +10,11 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 
 ## 📋 Features
 
+- **🆕 Log-Rotation System**: Automatische Archivierung großer Log-Dateien (>5 MB) mit konfigurierbarer Archive-Verwaltung (v2.2.0)
+- **🆕 FSLogix Download-Integration**: Microsoft FSLogix nutzt jetzt die gleiche Download-Funktion wie DATEV-Downloads (v2.2.0)
+- **🆕 Sonstige nützliche Downloads**: Neuer Bereich für Microsoft-Tools (FSLogix, etc.) mit direkter Download-Funktion (v2.2.0)
+- **🆕 Vertragsübersichten Online**: Direkter Zugriff auf DATEV Vertragsübersichten-Portal im DATEV-Online Tab (v2.2.0)
+- **🆕 Erweiterbares Download-System**: Modularer Download-Handler für einfache Integration weiterer Downloads (v2.2.0)
 - **🆕 Server-Anpassungs-Assistent**: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe) (v2.1.10)
 - **🆕 Windows Updates Integration**: System-Tab unterstützt jetzt Windows Updates für Client und Server (v2.1.10)  
 - **🆕 Dokumente lastUpdated-Anzeige**: Datum der letzten Aktualisierung im Dokumente-Tab (v2.1.10)
@@ -94,14 +99,17 @@ Vollständige DATEV-Integration mit drei Kategorien:
 Schnellzugriff auf wichtige DATEV-Online-Services:
 - **Hilfe und Support**: DATEV Hilfe Center, Servicekontakte, myUpdates
 - **Cloud**: myDATEV Portal, DUO, LAO, Lizenzverwaltung, Rechteraum, RVO
-- **Verwaltung**: SmartLogin Administration, Bestandsmanagement
+- **Verwaltung**: SmartLogin Administration, Bestandsmanagement, **🆕 Vertragsübersichten Online (v2.2.0)**
 
 ### 📥 Downloads
-- **🆕 Erweiterte Direkt-Downloads**: Verwaltung und Download von DATEV-Software
+- **🆕 Sonstige nützliche Downloads**: Neuer Bereich für Microsoft-Tools (FSLogix, etc.) (v2.2.0)
+- **🆕 FSLogix-Integration**: Microsoft FSLogix mit professioneller Download-Funktion (v2.2.0)
+- **🆕 Modulares Download-System**: Einheitlicher Download-Handler für alle Dateitypen (v2.2.0)
+- **Erweiterte Direkt-Downloads**: Verwaltung und Download von DATEV-Software
 - **Aktualisierungsdatum**: Downloads zeigen das Datum der letzten Aktualisierung
 - **Neueste Downloads**: Deinstallationsnacharbeiten-Tool V. 3.11 hinzugefügt
 - **Automatische Updates**: Downloads werden von GitHub aktualisiert
-- **Download-Ordner**: Direkter Zugriff auf heruntergeladene Dateien
+- **Download-Ordner**: Direkter Zugriff auf heruntergeladene Dateien (~/Downloads/DATEV-Toolbox)
 
 ### 📋 Dokumente
 Neuer Tab für direkten Zugriff auf wichtige DATEV-Dokumentationen:
@@ -222,6 +230,31 @@ Aktuelle Version: **2.1.10**
 - **Zentrale Konfiguration**: Alle URLs, Pfade und Einstellungen konfigurierbar (v2.1.0)
 
 ## 🔄 Update-Historie
+
+### Version 2.2.0 (2025-10-02) - Enterprise-Grade Erweiterungen
+- **📝 Log-Rotation System**: Automatische Archivierung großer Log-Dateien (>5 MB)
+  - Konfigurierbar: MaxSize (5 MB), MaxArchives (5)
+  - Performance-optimiert: Check nur bei jedem 10. Schreibvorgang
+  - Startup-Rotation: Große Logs werden beim Programmstart archiviert
+  - Archive-Management: Automatische Cleanup-Funktion behält nur die letzten 5 Archive
+- **📦 FSLogix Download-Integration**: Microsoft FSLogix nutzt professionelle Download-Funktion
+  - Einheitlicher Download-Ordner: ~/Downloads/DATEV-Toolbox
+  - Fortschritts-Tracking und Fehlerbehandlung
+  - Überschreib-Prüfung mit Benutzer-Bestätigung
+  - Konsistent mit DATEV Direkt-Downloads
+- **🔧 Sonstige nützliche Downloads**: Neuer Bereich für Microsoft-Tools
+  - Microsoft FSLogix Apps (Latest)
+  - Einfach erweiterbar für weitere Tools (Edge, Teams, OneDrive, etc.)
+  - Professionelles Download-System mit Background-Processing
+- **📋 Vertragsübersichten Online**: DATEV-Online Tab erweitert
+  - Direkter Zugriff auf https://apps.datev.de/vertragsuebersichten-online
+  - Button im Bereich "Verwaltung und Technik"
+  - Zentrale Verwaltung von DATEV-Verträgen und Lizenzen
+- **🏗️ Modularer Download-Handler**: Erweiterbares Download-System
+  - Register-DownloadHandler Funktion für einfache Integration
+  - Zentrale Downloads-Sektion in Konfiguration
+  - PowerShell 5.1 kompatibel (ohne GetNewClosure)
+  - Type-basiertes Handler-System für maximale Flexibilität
 
 ### Version 2.1.10 (2025-08-21)
 - **🔧 Server-Anpassungs-Assistent**: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe)
