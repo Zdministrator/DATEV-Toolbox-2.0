@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-09-23",
+  "lastUpdated": "2025-10-14",
   "downloads": [
     {
       "name": "DATEV Mittelstand 2025 - Service-Release für V. 13.3",
@@ -54,18 +54,18 @@
     {
       "name": "DATEVasp Zugangspaket V. 2.15",
       "url": "https://download.datev.de/download/asp/aspzugangspaket.exe",
-      "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze - September 2025 Update",
-      "erschienen": "15.09.2025",
+      "description": "Zugangspaket für DATEVasp Services mit allen Komponenten für Kanzlei- und mobile Arbeitsplätze - Oktober 2025 Update",
+      "erschienen": "02.10.2025",
       "dateiname": "aspzugangspaket.exe",
-      "dateigroesse": "641,77 MB"
+      "dateigroesse": "642 MB"
     },
     {
       "name": "DATEV-SmartIT Connect V. 3.10",
       "url": "https://download.datev.de/download/smartit/smartitconnect.exe",
-      "description": "DATEV SmartIT Connect Verwaltungstool mit allen lokal benötigten Komponenten zur assistentengestützten Einrichtung des DATEV-SmartIT Zugangs - September 2025 Update",
-      "erschienen": "15.09.2025",
+      "description": "DATEV SmartIT Connect Verwaltungstool mit allen lokal benötigten Komponenten zur assistentengestützten Einrichtung des DATEV-SmartIT Zugangs - Oktober 2025 Update",
+      "erschienen": "02.10.2025",
       "dateiname": "smartitconnect.exe",
-      "dateigroesse": "601,25 MB"
+      "dateigroesse": "601,5 MB"
     },
     {
       "name": "Treiber für SmartCard-Lesegeräte und den DATEV mIDentity",
@@ -100,20 +100,20 @@
       "dateigroesse": "4,18 MB"
     },
     {
-      "name": "DATEV Datenübernahme nach LODAS V. 4.25",
-      "url": "https://download.datev.de/download/lug2lodas/lug2lodas_pak_4_25.exe",
-      "description": "Datenübernahme-Tool für die Übertragung von Personal-Stammdaten, Mandanten-Stammdaten und Lohnkontowerten aus DATEV Lohn und Gehalt nach LODAS (für LODAS ab Version 15.05) - August 2025 Update",
-      "erschienen": "19.08.2025",
-      "dateiname": "lug2lodas_pak_4_25.exe",
-      "dateigroesse": "461,06 MB"
+      "name": "DATEV Datenübernahme nach LODAS V. 4.26",
+      "url": "https://download.datev.de/download/lug2lodas/lug2lodas_pak_4_26.exe",
+      "description": "Datenübernahme-Tool für die Übertragung von Personal-Stammdaten, Mandanten-Stammdaten und Lohnkontowerten aus DATEV Lohn und Gehalt nach LODAS (für LODAS ab Version 15.05) - Oktober 2025 Update",
+      "erschienen": "02.10.2025",
+      "dateiname": "lug2lodas_pak_4_26.exe",
+      "dateigroesse": "462,5 MB"
     },
     {
-      "name": "Sicherheitspaket compact V. 8.03",
+      "name": "Sicherheitspaket compact V. 8.04",
       "url": "https://download.datev.de/download/sipacompact/sipacompact.exe",
-      "description": "DATEV Sicherheitspaket compact für sichere E-Mail-Kommunikation und DATEV Unternehmen online, inklusive DATEV SmartVerify - September 2025 Update",
-      "erschienen": "04.09.2025",
+      "description": "DATEV Sicherheitspaket compact für sichere E-Mail-Kommunikation und DATEV Unternehmen online, inklusive DATEV SmartVerify - Oktober 2025 Update",
+      "erschienen": "02.10.2025",
       "dateiname": "sipacompact.exe",
-      "dateigroesse": "198,08 MB"
+      "dateigroesse": "198,5 MB"
     },
     {
       "name": "DATEV Serverprep Tool",
