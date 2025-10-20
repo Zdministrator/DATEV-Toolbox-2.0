@@ -240,8 +240,10 @@ if ($consolePtr -ne [System.IntPtr]::Zero) {
     [Console.Window]::ShowWindow($consolePtr, 0) | Out-Null
 }
 
-# Benötigte .NET-Assembly für WPF-GUI laden
+# Benötigte .NET-Assemblies für WPF-GUI und System-Tray laden
 Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 #endregion
 
 #region Einstellungs-Management
@@ -312,15 +314,17 @@ function Get-DefaultSettings {
     Liefert die Standard-Einstellungen zurück
     #>
     return @{
-        DownloadPath    = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
-        AutoUpdate      = $true
-        ShowDebugLogs   = $false
-        LogLevel        = "INFO"
-        WindowPosition  = @{
+        DownloadPath      = Join-Path $env:USERPROFILE "Downloads\DATEV-Toolbox"
+        AutoUpdate        = $true
+        ShowDebugLogs     = $false
+        LogLevel          = "INFO"
+        MinimizeToTray    = $true
+        ShowNotifications = $true
+        WindowPosition    = @{
             Left = 100
             Top  = 100
         }
-        LastUpdateCheck = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
+        LastUpdateCheck   = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
     }
 }
 
@@ -1045,6 +1049,248 @@ function Register-FunctionHandler {
             & $functionName
         })
 }
+
+#region Tray-Icon System
+# System-Tray-Integration mit Benachrichtigungen
+
+# Globale Variable für Tray-Icon
+$script:TrayIcon = $null
+
+function Initialize-TrayIcon {
+    <#
+    .SYNOPSIS
+    Initialisiert das System-Tray-Icon mit Kontextmenü und Benachrichtigungen
+    
+    .DESCRIPTION
+    Erstellt ein NotifyIcon im System-Tray mit Kontextmenü für Quick-Actions.
+    Das Icon wird aus dem Skript extrahiert oder verwendet ein Standard-Windows-Icon als Fallback.
+    
+    .EXAMPLE
+    Initialize-TrayIcon
+    #>
+    try {
+        Write-Log -Message "Initialisiere System-Tray-Icon..." -Level 'DEBUG'
+        
+        # NotifyIcon erstellen
+        $script:TrayIcon = New-Object System.Windows.Forms.NotifyIcon
+        
+        # Icon-Pfad ermitteln (versuche verschiedene Quellen)
+        $iconPath = $null
+        
+        # 1. Versuche Icon aus aktuellem Skript zu extrahieren
+        if ($PSCommandPath) {
+            try {
+                $script:TrayIcon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($PSCommandPath)
+                $iconPath = "Extracted from script"
+                Write-Log -Message "Icon aus Skript extrahiert" -Level 'DEBUG'
+            }
+            catch {
+                Write-Log -Message "Konnte Icon nicht aus Skript extrahieren: $($_.Exception.Message)" -Level 'DEBUG'
+            }
+        }
+        
+        # 2. Fallback: Verwende Standard-Windows-Icon
+        if ($null -eq $script:TrayIcon.Icon) {
+            try {
+                $script:TrayIcon.Icon = [System.Drawing.SystemIcons]::Application
+                $iconPath = "Windows Application Icon"
+                Write-Log -Message "Verwende Standard-Windows-Icon" -Level 'DEBUG'
+            }
+            catch {
+                Write-Log -Message "Konnte Standard-Icon nicht laden: $($_.Exception.Message)" -Level 'WARN'
+            }
+        }
+        
+        $script:TrayIcon.Text = "DATEV-Toolbox 2.0"
+        $script:TrayIcon.Visible = $true
+        
+        # Kontextmenü erstellen
+        $contextMenu = New-Object System.Windows.Forms.ContextMenuStrip
+        
+        # Menü-Einträge
+        $menuShow = $contextMenu.Items.Add("Fenster anzeigen")
+        $menuShow.Add_Click({
+            Show-MainWindow
+        })
+        
+        $contextMenu.Items.Add([System.Windows.Forms.ToolStripSeparator]::new())
+        
+        $menuDATEV = $contextMenu.Items.Add("DATEV-Arbeitsplatz")
+        $menuDATEV.Add_Click({
+            Start-DATEVProgram -ProgramName 'DATEVArbeitsplatz' -PossiblePaths $script:DATEVProgramPaths['DATEVArbeitsplatz'] -Description 'DATEV-Arbeitsplatz'
+        })
+        
+        $menuDownloads = $contextMenu.Items.Add("Download-Ordner öffnen")
+        $menuDownloads.Add_Click({
+            Open-DownloadFolder
+        })
+        
+        $contextMenu.Items.Add([System.Windows.Forms.ToolStripSeparator]::new())
+        
+        $menuExit = $contextMenu.Items.Add("Beenden")
+        $menuExit.Add_Click({
+            Close-Application
+        })
+        
+        $script:TrayIcon.ContextMenuStrip = $contextMenu
+        
+        # Double-Click Event für Fenster anzeigen
+        $script:TrayIcon.Add_DoubleClick({
+            Show-MainWindow
+        })
+        
+        Write-Log -Message "System-Tray-Icon erfolgreich initialisiert (Icon: $iconPath)" -Level 'INFO'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Initialisieren des Tray-Icons: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Show-TrayNotification {
+    <#
+    .SYNOPSIS
+    Zeigt eine Balloon-Benachrichtigung im System-Tray an
+    
+    .DESCRIPTION
+    Zeigt eine temporäre Benachrichtigung über dem Tray-Icon an.
+    Die Benachrichtigung verschwindet automatisch nach der angegebenen Dauer.
+    
+    .PARAMETER Title
+    Titel der Benachrichtigung
+    
+    .PARAMETER Message
+    Nachrichtentext der Benachrichtigung
+    
+    .PARAMETER Icon
+    Icon-Typ: None, Info, Warning oder Error
+    
+    .PARAMETER Duration
+    Anzeigedauer in Millisekunden (Standard: 5000)
+    
+    .EXAMPLE
+    Show-TrayNotification -Title "Update" -Message "Neue Version verfügbar" -Icon 'Info'
+    
+    .EXAMPLE
+    Show-TrayNotification -Title "Fehler" -Message "Verbindung fehlgeschlagen" -Icon 'Error' -Duration 3000
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Title,
+        
+        [Parameter(Mandatory = $true)]
+        [string]$Message,
+        
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('None', 'Info', 'Warning', 'Error')]
+        [string]$Icon = 'Info',
+        
+        [Parameter(Mandatory = $false)]
+        [int]$Duration = 5000  # Millisekunden
+    )
+    
+    try {
+        if ($null -eq $script:TrayIcon) {
+            Write-Log -Message "Tray-Icon nicht initialisiert, Benachrichtigung wird übersprungen" -Level 'WARN'
+            return
+        }
+        
+        # Icon-Typ konvertieren
+        $iconType = switch ($Icon) {
+            'None' { [System.Windows.Forms.ToolTipIcon]::None }
+            'Info' { [System.Windows.Forms.ToolTipIcon]::Info }
+            'Warning' { [System.Windows.Forms.ToolTipIcon]::Warning }
+            'Error' { [System.Windows.Forms.ToolTipIcon]::Error }
+            default { [System.Windows.Forms.ToolTipIcon]::Info }
+        }
+        
+        $script:TrayIcon.BalloonTipTitle = $Title
+        $script:TrayIcon.BalloonTipText = $Message
+        $script:TrayIcon.BalloonTipIcon = $iconType
+        $script:TrayIcon.ShowBalloonTip($Duration)
+        
+        Write-Log -Message "Tray-Benachrichtigung angezeigt: $Title - $Message" -Level 'DEBUG'
+    }
+    catch {
+        Write-Log -Message "Fehler beim Anzeigen der Tray-Benachrichtigung: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Show-MainWindow {
+    <#
+    .SYNOPSIS
+    Zeigt das Hauptfenster an und aktiviert es
+    
+    .DESCRIPTION
+    Stellt das minimierte oder versteckte Hauptfenster wieder her und bringt es in den Vordergrund.
+    
+    .EXAMPLE
+    Show-MainWindow
+    #>
+    try {
+        if ($null -ne $window) {
+            $window.Show()
+            $window.WindowState = [System.Windows.WindowState]::Normal
+            $window.ShowInTaskbar = $true
+            $window.Activate()
+            Write-Log -Message "Hauptfenster angezeigt und aktiviert" -Level 'DEBUG'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Anzeigen des Hauptfensters: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Close-Application {
+    <#
+    .SYNOPSIS
+    Schließt die Anwendung ordnungsgemäß
+    
+    .DESCRIPTION
+    Beendet die Anwendung, bereinigt das Tray-Icon und schließt das Hauptfenster.
+    
+    .EXAMPLE
+    Close-Application
+    #>
+    try {
+        Write-Log -Message "Anwendung wird über Tray-Icon beendet..." -Level 'INFO'
+        
+        # Tray-Icon bereinigen
+        Close-TrayIcon
+        
+        # Fenster schließen
+        if ($null -ne $window) {
+            $window.Close()
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Beenden der Anwendung: $($_.Exception.Message)" -Level 'ERROR'
+    }
+}
+
+function Close-TrayIcon {
+    <#
+    .SYNOPSIS
+    Entfernt das Tray-Icon ordnungsgemäß
+    
+    .DESCRIPTION
+    Macht das Tray-Icon unsichtbar, gibt Ressourcen frei und setzt die Variable zurück.
+    
+    .EXAMPLE
+    Close-TrayIcon
+    #>
+    try {
+        if ($null -ne $script:TrayIcon) {
+            $script:TrayIcon.Visible = $false
+            $script:TrayIcon.Dispose()
+            $script:TrayIcon = $null
+            Write-Log -Message "Tray-Icon ordnungsgemäß entfernt" -Level 'DEBUG'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Entfernen des Tray-Icons: $($_.Exception.Message)" -Level 'WARN'
+    }
+}
+#endregion
 
 function Register-TextBlockHandler {
     param($TextBlock, $FunctionName)
@@ -3433,6 +3679,9 @@ Initialize-RunspacePool
 $window.Add_Closing({
         Write-Log -Message "Anwendung wird beendet, bereinige Ressourcen..." -Level 'INFO'
     
+        # Tray-Icon bereinigen
+        Close-TrayIcon
+    
         # Settings sofort speichern falls noch ausstehend
         if ($script:SettingsNeedSave) {
             Save-Settings
@@ -3471,12 +3720,39 @@ $window.Add_Closing({
         Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
     })
 
+# Window StateChanged Event für Minimize-to-Tray
+$window.Add_StateChanged({
+    if ($window.WindowState -eq [System.Windows.WindowState]::Minimized) {
+        $window.Hide()
+        $window.ShowInTaskbar = $false
+        
+        # Benachrichtigung anzeigen
+        Show-TrayNotification -Title "DATEV-Toolbox" `
+            -Message "In den Systembereich minimiert. Doppelklick zum Anzeigen." `
+            -Icon 'Info' `
+            -Duration 3000
+        
+        Write-Log -Message "Fenster in System-Tray minimiert" -Level 'DEBUG'
+    }
+})
+
 # Log-Rotation beim Start durchführen (falls Error-Log zu groß ist)
 Rotate-LogFile -LogFilePath $script:Config.Paths.ErrorLog -MaxSizeInMB 5 -MaxArchives 5
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet (Performance-optimiert)" -Level 'INFO'
 
+# Tray-Icon initialisieren (VOR ShowDialog!)
+Initialize-TrayIcon
+
 # GUI anzeigen und auf Benutzerinteraktion warten
-$window.ShowDialog() | Out-Null
+# Verwende Show() + Application.Run() statt ShowDialog() für Tray-Icon-Kompatibilität
+$window.Show()
+
+# WPF-Application-Loop für Tray-Icon-Support
+$app = [System.Windows.Application]::Current
+if ($null -eq $app) {
+    $app = New-Object System.Windows.Application
+}
+$app.Run($window) | Out-Null
 #endregion
