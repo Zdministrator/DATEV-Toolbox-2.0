@@ -1057,6 +1057,84 @@ function Register-FunctionHandler {
 # Globale Variable für Tray-Icon
 $script:TrayIcon = $null
 
+function Get-TrayIconPath {
+    <#
+    .SYNOPSIS
+    Lädt das Tray-Icon aus AppData oder von GitHub herunter
+    
+    .DESCRIPTION
+    Zentrale Funktion zum Laden/Herunterladen des Icons.
+    Gibt den Pfad zur Icon-Datei zurück oder $null bei Fehler.
+    
+    .EXAMPLE
+    $iconPath = Get-TrayIconPath
+    #>
+    $iconPath = $script:Config.Paths.TrayIcon
+    
+    # Icon existiert bereits in AppData
+    if (Test-Path $iconPath) {
+        Write-Log -Message "Icon gefunden in AppData: $iconPath" -Level 'DEBUG'
+        return $iconPath
+    }
+    
+    # Icon nicht vorhanden: Von GitHub herunterladen
+    try {
+        Write-Log -Message "Lade tray-icon.ico von GitHub herunter..." -Level 'DEBUG'
+        $iconUrl = "https://github.com/$script:GitHubRepo/raw/main/images/tray-icon.ico"
+        
+        # AppData-Ordner sicherstellen
+        $appDataDir = Split-Path -Parent $iconPath
+        if (-not (Test-Path $appDataDir)) {
+            New-Item -ItemType Directory -Path $appDataDir -Force | Out-Null
+        }
+        
+        # TLS 1.2 erzwingen für sichere Downloads
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        
+        $webClient = New-Object System.Net.WebClient
+        try {
+            $webClient.DownloadFile($iconUrl, $iconPath)
+            Write-Log -Message "Icon erfolgreich von GitHub heruntergeladen nach: $iconPath" -Level 'INFO'
+            return $iconPath
+        }
+        finally {
+            $webClient.Dispose()
+        }
+    }
+    catch {
+        Write-Log -Message "Konnte Icon nicht von GitHub herunterladen: $($_.Exception.Message)" -Level 'DEBUG'
+        return $null
+    }
+}
+
+function Set-WindowIcon {
+    <#
+    .SYNOPSIS
+    Setzt das Window-Icon für Titelleiste und Taskbar
+    
+    .DESCRIPTION
+    Lädt das Icon aus AppData oder von GitHub und setzt es als Window-Icon.
+    Verwendet die zentrale Get-TrayIconPath Funktion.
+    
+    .EXAMPLE
+    Set-WindowIcon
+    #>
+    try {
+        $iconPath = Get-TrayIconPath
+        
+        if ($iconPath) {
+            $window.Icon = $iconPath
+            Write-Log -Message "Window-Icon gesetzt: $iconPath" -Level 'DEBUG'
+        }
+        else {
+            Write-Log -Message "Konnte Icon nicht laden - verwende Standard-Icon" -Level 'DEBUG'
+        }
+    }
+    catch {
+        Write-Log -Message "Fehler beim Setzen des Window-Icons: $($_.Exception.Message)" -Level 'DEBUG'
+    }
+}
+
 function Initialize-TrayIcon {
     <#
     .SYNOPSIS
@@ -1075,56 +1153,23 @@ function Initialize-TrayIcon {
         # NotifyIcon erstellen
         $script:TrayIcon = New-Object System.Windows.Forms.NotifyIcon
         
-        # Icon-Pfad ermitteln (nur AppData + GitHub Download)
+        # Icon laden (zentrale Funktion mit AppData + GitHub Download)
         $iconLoaded = $false
-        $appDataIconPath = $script:Config.Paths.TrayIcon  # %APPDATA%\DATEV-Toolbox 2.0\tray-icon.ico
+        $iconPath = Get-TrayIconPath
         
-        # 1. Versuche Icon aus AppData-Ordner zu laden
-        if (Test-Path $appDataIconPath) {
+        # 1. Versuche Icon aus AppData zu laden (bereits heruntergeladen von Get-TrayIconPath)
+        if ($iconPath) {
             try {
-                $script:TrayIcon.Icon = New-Object System.Drawing.Icon($appDataIconPath)
-                Write-Log -Message "Icon aus AppData geladen: $appDataIconPath" -Level 'DEBUG'
+                $script:TrayIcon.Icon = New-Object System.Drawing.Icon($iconPath)
+                Write-Log -Message "Tray-Icon geladen: $iconPath" -Level 'DEBUG'
                 $iconLoaded = $true
             }
             catch {
-                Write-Log -Message "Konnte Icon aus AppData nicht laden: $($_.Exception.Message)" -Level 'DEBUG'
+                Write-Log -Message "Konnte Icon nicht laden: $($_.Exception.Message)" -Level 'DEBUG'
             }
         }
         
-        # 2. Icon nicht in AppData: Von GitHub herunterladen
-        if (-not $iconLoaded) {
-            try {
-                Write-Log -Message "Lade tray-icon.ico von GitHub herunter..." -Level 'DEBUG'
-                $iconUrl = "https://github.com/$script:GitHubRepo/raw/main/images/tray-icon.ico"
-                
-                # AppData-Ordner sicherstellen
-                $appDataDir = Split-Path -Parent $appDataIconPath
-                if (-not (Test-Path $appDataDir)) {
-                    New-Item -ItemType Directory -Path $appDataDir -Force | Out-Null
-                }
-                
-                # TLS 1.2 erzwingen für sichere Downloads
-                [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-                
-                $webClient = New-Object System.Net.WebClient
-                try {
-                    $webClient.DownloadFile($iconUrl, $appDataIconPath)
-                    Write-Log -Message "Icon erfolgreich von GitHub heruntergeladen nach: $appDataIconPath" -Level 'INFO'
-                    
-                    # Heruntergeladenes Icon laden
-                    $script:TrayIcon.Icon = New-Object System.Drawing.Icon($appDataIconPath)
-                    $iconLoaded = $true
-                }
-                finally {
-                    $webClient.Dispose()
-                }
-            }
-            catch {
-                Write-Log -Message "Konnte Icon nicht von GitHub herunterladen: $($_.Exception.Message)" -Level 'DEBUG'
-            }
-        }
-        
-        # 3. Fallback: Icon aus aktuellem Skript extrahieren
+        # 2. Fallback: Icon aus aktuellem Skript extrahieren
         if (-not $iconLoaded -and $PSCommandPath) {
             try {
                 $script:TrayIcon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($PSCommandPath)
@@ -1136,7 +1181,7 @@ function Initialize-TrayIcon {
             }
         }
         
-        # 4. Letzter Fallback: Standard-Windows-Icon
+        # 3. Letzter Fallback: Standard-Windows-Icon
         if (-not $iconLoaded) {
             try {
                 $script:TrayIcon.Icon = [System.Drawing.SystemIcons]::Application
@@ -3788,6 +3833,9 @@ Rotate-LogFile -LogFilePath $script:Config.Paths.ErrorLog -MaxSizeInMB 5 -MaxArc
 
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet (Performance-optimiert)" -Level 'INFO'
+
+# Window-Icon setzen (Titelleiste + Taskbar)
+Set-WindowIcon
 
 # GUI anzeigen und auf Benutzerinteraktion warten
 # Tray-Icon wird VOR ShowDialog initialisiert, damit es existiert bevor das Fenster modal wird
