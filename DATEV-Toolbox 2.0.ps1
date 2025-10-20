@@ -1074,68 +1074,35 @@ function Initialize-TrayIcon {
         # NotifyIcon erstellen
         $script:TrayIcon = New-Object System.Windows.Forms.NotifyIcon
         
-        # Icon-Pfad für Custom Icon
-        $customIconPath = Join-Path (Split-Path $PSCommandPath -Parent) "images\tray-icon.ico"
-        $iconSource = $null
+        # Icon-Pfad ermitteln (versuche verschiedene Quellen)
+        $iconPath = $null
         
-        # Icon-Loading mit 3-stufigem Fallback-System
-        # 1. Versuche Custom Icon lokal zu laden
-        if (Test-Path $customIconPath) {
+        # 1. Versuche Icon aus aktuellem Skript zu extrahieren
+        if ($PSCommandPath) {
             try {
-                $script:TrayIcon.Icon = New-Object System.Drawing.Icon($customIconPath)
-                $iconSource = "Custom Icon (lokal: images/tray-icon.ico)"
-                Write-Log -Message "Custom Tray-Icon erfolgreich geladen: $customIconPath" -Level 'INFO'
+                $script:TrayIcon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($PSCommandPath)
+                $iconPath = "Extracted from script"
+                Write-Log -Message "Icon aus Skript extrahiert" -Level 'DEBUG'
             }
             catch {
-                Write-Log -Message "Fehler beim Laden des Custom Icons: $($_.Exception.Message)" -Level 'WARN'
-                # Fallback zu Application Icon
-                $script:TrayIcon.Icon = [System.Drawing.SystemIcons]::Application
-                $iconSource = "Application Icon (Fallback nach Custom-Fehler)"
+                Write-Log -Message "Konnte Icon nicht aus Skript extrahieren: $($_.Exception.Message)" -Level 'DEBUG'
             }
         }
-        # 2. Versuche Icon von GitHub herunterzuladen (falls lokal nicht vorhanden)
-        else {
-            Write-Log -Message "Lokales Tray-Icon nicht gefunden, versuche Download von GitHub..." -Level 'DEBUG'
-            
+        
+        # 2. Fallback: Verwende Standard-Windows-Icon
+        if ($null -eq $script:TrayIcon.Icon) {
             try {
-                # GitHub-URL für Tray-Icon
-                $iconUrl = "https://github.com/$script:GitHubRepo/raw/main/images/tray-icon.ico"
-                
-                # Stelle sicher, dass images-Ordner existiert
-                $imagesFolder = Split-Path $customIconPath -Parent
-                if (-not (Test-Path $imagesFolder)) {
-                    New-Item -ItemType Directory -Path $imagesFolder -Force | Out-Null
-                    Write-Log -Message "Images-Ordner erstellt: $imagesFolder" -Level 'DEBUG'
-                }
-                
-                # TLS 1.2 erzwingen für sicheren Download
-                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-                
-                # Icon herunterladen
-                $webClient = New-Object System.Net.WebClient
-                $webClient.DownloadFile($iconUrl, $customIconPath)
-                $webClient.Dispose()
-                
-                Write-Log -Message "Tray-Icon erfolgreich von GitHub heruntergeladen" -Level 'INFO'
-                
-                # Heruntergeladenes Icon laden
-                $script:TrayIcon.Icon = New-Object System.Drawing.Icon($customIconPath)
-                $iconSource = "Custom Icon (heruntergeladen von GitHub)"
+                $script:TrayIcon.Icon = [System.Drawing.SystemIcons]::Application
+                $iconPath = "Windows Application Icon"
+                Write-Log -Message "Verwende Standard-Windows-Icon" -Level 'DEBUG'
             }
             catch {
-                Write-Log -Message "Fehler beim Download des Tray-Icons von GitHub: $($_.Exception.Message)" -Level 'WARN'
-                
-                # 3. Fallback: Application Icon (Standard Windows-Icon)
-                $script:TrayIcon.Icon = [System.Drawing.SystemIcons]::Application
-                $iconSource = "Application Icon (Fallback)"
-                Write-Log -Message "Verwende Application Icon als Fallback" -Level 'DEBUG'
+                Write-Log -Message "Konnte Standard-Icon nicht laden: $($_.Exception.Message)" -Level 'WARN'
             }
         }
         
         $script:TrayIcon.Text = "DATEV-Toolbox 2.0"
         $script:TrayIcon.Visible = $true
-        
-        Write-Log -Message "Tray-Icon initialisiert mit: $iconSource" -Level 'DEBUG'
         
         # Kontextmenü erstellen
         $contextMenu = New-Object System.Windows.Forms.ContextMenuStrip
@@ -3775,17 +3742,17 @@ Rotate-LogFile -LogFilePath $script:Config.Paths.ErrorLog -MaxSizeInMB 5 -MaxArc
 # Startup-Log schreiben
 Write-Log -Message "DATEV-Toolbox 2.0 gestartet (Performance-optimiert)" -Level 'INFO'
 
-# Tray-Icon initialisieren (VOR ShowDialog!)
+# GUI anzeigen und auf Benutzerinteraktion warten
+# Tray-Icon wird VOR ShowDialog initialisiert, damit es existiert bevor das Fenster modal wird
 Initialize-TrayIcon
 
-# GUI anzeigen und auf Benutzerinteraktion warten
-# Verwende Show() + Application.Run() statt ShowDialog() für Tray-Icon-Kompatibilität
-$window.Show()
-
-# WPF-Application-Loop für Tray-Icon-Support
-$app = [System.Windows.Application]::Current
-if ($null -eq $app) {
-    $app = New-Object System.Windows.Application
+# Verwende ShowDialog für zuverlässigen Betrieb in wiederholten PowerShell-Sessions
+# Hinweis: ShowDialog ist modal, aber Tray-Icon funktioniert trotzdem da es bereits initialisiert wurde
+try {
+    Write-Log -Message "Zeige Hauptfenster an" -Level 'DEBUG'
+    $window.ShowDialog() | Out-Null
 }
-$app.Run($window) | Out-Null
+catch {
+    Write-Log -Message "Fehler beim Anzeigen des Fensters: $($_.Exception.Message)" -Level 'ERROR'
+}
 #endregion
