@@ -21,9 +21,20 @@ Blogpost-*.md
 Teams-*.txt
 Teams-*.md
 
+# Temporäre Implementierungspläne
+*-IMPLEMENTATION-PLAN.md
+IMPLEMENTATION-PLAN-*.md
+
+# Backup-Dateien
+*.backup
+*.bak
+*.old
+*.orig
+
 # System-Dateien
 *.DS_Store
 Thumbs.db
+desktop.ini
 
 # IDE-Ordner
 .vscode/settings.json
@@ -34,5 +45,15 @@ Thumbs.db
 
 # Playwright MCP Downloads (Testdateien)
 .playwright-mcp/
+
+# Toolbox-Scripts (Zusatzskripte/Tests)
+toolbox-scripts/
+
+# PowerShell Debug/Test-Dateien
+*-Test.ps1.log
+*-Debug.txt
+
+# Windows Temp-Dateien
+~$*
 
 
