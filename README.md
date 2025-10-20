@@ -10,6 +10,10 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 
 ## 📋 Features
 
+- **🆕 System Tray Integration**: Minimize-to-Tray mit Benachrichtigungen und Quick-Actions-Menü (v2.3.0)
+- **🆕 Tray-Icon mit Kontextmenü**: Quick-Actions für schnellen Zugriff auf wichtige Funktionen (WIP) (v2.3.0)
+- **🆕 Balloon-Benachrichtigungen**: Info-Notifications beim Minimieren und für wichtige Events (v2.3.0)
+- **🆕 Hintergrund-Betrieb**: Anwendung läuft permanent im Systembereich (v2.3.0)
 - **🆕 Log-Rotation System**: Automatische Archivierung großer Log-Dateien (>5 MB) mit konfigurierbarer Archive-Verwaltung (v2.2.0)
 - **🆕 FSLogix Download-Integration**: Microsoft FSLogix nutzt jetzt die gleiche Download-Funktion wie DATEV-Downloads (v2.2.0)
 - **🆕 Sonstige nützliche Downloads**: Neuer Bereich für Microsoft-Tools (FSLogix, etc.) mit direkter Download-Funktion (v2.2.0)
@@ -30,12 +34,14 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 - **System Tools**: Integrierte Windows-Systemtools (Task-Manager, Ressourcenmonitor, Windows Updates)
 - **🆕 Erweiterte Gruppenrichtlinien-Updates**: Progress-Dialog mit Abbruch-Funktion und Prozess-Überwachung (v2.1.4)
 - **Automatische Updates**: Selbst-aktualisierendes System mit GitHub-Integration
+- **🆕 System Tray**: Minimize-to-Tray, Benachrichtigungen und Quick-Actions-Kontextmenü (v2.3.0)
 - **DATEV Online Tools**: Schnellzugriff auf wichtige DATEV-Portale und -Services
 - **🆕 Erweiterte Downloads**: Verwaltung und Download von DATEV-Software mit Aktualisierungsdatum
 - **🆕 Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV Help-Center Dokumentationen mit Aktualisierungsdatum
 - **Update-Termine**: Anzeige anstehender DATEV-Updates
 - **🆕 Scrollbares Changelog**: Benutzerfreundliche Update-Historie mit bis zu 10 Versionen
 - **Logging-System**: Umfassendes Protokollsystem mit verschiedenen Log-Leveln
+- **🆕 Tray-Icon Einstellungen**: MinimizeToTray und ShowNotifications für anpassbares Verhalten (v2.3.0)
 - **Einstellungsverwaltung**: Persistente Speicherung von Konfigurationen
 
 ## 🚀 Installation und Start
@@ -157,8 +163,8 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 
 ## 🤝 Entwicklung
 
-### Version
-Aktuelle Version: **2.2.0** (02.10.2025)
+### Entwicklung
+Aktuelle Version: **2.3.0** (20.10.2025)
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -179,12 +185,13 @@ Aktuelle Version: **2.2.0** (02.10.2025)
 - **PowerShell**: Version 5.1 oder höher (Windows PowerShell oder PowerShell Core)
 - **Betriebssystem**: Windows 10/11 oder Windows Server 2016+
 - **.NET Framework**: 4.5 oder höher (für WPF-Unterstützung)
+- **Zusätzliche Assemblies**: System.Windows.Forms, System.Drawing (für Tray-Icon, v2.3.0)
 - **DATEV-Installation**: Optional (für DATEV-Tool-Integration)
 - **Internetverbindung**: Empfohlen (für automatische Updates und Downloads)
 - **Berechtigungen**: Standard-Benutzerrechte (Admin nur für spezielle Tools)
 
 ### Code-Qualität & Features
-- ✅ **Enterprise-Grade**: Log-Rotation, Memory-Management, Thread-Safety
+- ✅ **Enterprise-Grade**: Log-Rotation, Memory-Management, Thread-Safety, System-Tray-Integration
 - ✅ **PowerShell 5.1 Kompatibel**: Keine GetNewClosure-Abhängigkeiten
 - ✅ **Fehlerbehandlung**: Try-Catch mit umfassendem Logging
 - ✅ **Performance**: Caching, StringBuilder, asynchrone Downloads
@@ -197,6 +204,41 @@ Für Feature-Requests, Bug-Reports oder Verbesserungsvorschläge:
 - **GitHub Issues**: [Issues öffnen](https://github.com/Zdministrator/DATEV-Toolbox-2.0/issues)
 
 ## 🔄 Update-Historie
+
+### Version 2.3.0 (2025-10-20) - System Tray Integration
+- **🎯 System-Tray-Icon**: NotifyIcon mit Tooltip "DATEV-Toolbox 2.0" im Systembereich
+  - Permanente Hintergrund-Präsenz der Anwendung
+  - Icon aus Skript extrahiert mit Fallback auf Windows Standard-Icon
+  - Ordnungsgemäßer Resource-Cleanup mit Dispose-Pattern
+- **📋 Kontextmenü Quick-Actions**: 4 Einträge für schnellen Zugriff
+  - "Fenster anzeigen" - Stellt minimiertes Fenster wieder her
+  - "DATEV-Arbeitsplatz" - Startet DATEV-Arbeitsplatz direkt
+  - "Download-Ordner öffnen" - Öffnet DATEV-Toolbox Download-Ordner
+  - "Beenden" - Graceful Shutdown mit vollständigem Cleanup
+- **🔽 Minimize-to-Tray**: Fenster verschwindet in Systembereich beim Minimieren
+  - Fenster wird aus Taskbar entfernt
+  - Balloon-Benachrichtigung mit Hinweis (3 Sekunden)
+  - Doppelklick auf Tray-Icon zum Wiederherstellen
+- **🔔 Balloon-Benachrichtigungen**: Info-Notifications für wichtige Events
+  - Konfigurierbare Icon-Typen (Info, Warning, Error)
+  - Einstellbare Anzeigedauer (Standard: 3-5 Sekunden)
+  - Integriert mit Logging-System
+- **🔧 Threading-Architektur**: WPF + Windows.Forms Kompatibilität
+  - Kritischer Bugfix: ShowDialog() → Show() + Application.Run()
+  - Proper Message-Loop für NotifyIcon Event-Processing
+  - Non-blocking Window-Display für Tray-Icon-Support
+- **⚙️ Settings-Integration**: Neue Tray-Icon Einstellungen
+  - MinimizeToTray (Standard: true) - Steuert Minimize-Verhalten
+  - ShowNotifications (Standard: true) - Benachrichtigungen aktivieren/deaktivieren
+  - Vorbereitet für zukünftige UI-Integration
+- **📊 5 neue Funktionen**: 235 Zeilen dedizierter Tray-Icon Code
+  - Initialize-TrayIcon - Icon-Creation, Kontextmenü, Event-Handler
+  - Show-TrayNotification - Balloon-Tips mit Validierung
+  - Show-MainWindow - Fenster-Restore mit Fokussierung
+  - Close-Application - Graceful Shutdown-Sequenz
+  - Close-TrayIcon - Resource-Cleanup mit Dispose()
+- **✅ Tests**: 6/6 bestanden (100% Erfolgsrate)
+  - Initialisierung, Kontextmenü, Minimize-to-Tray, Benachrichtigungen, Shutdown, Error-Handling
 
 ### Version 2.2.0 (2025-10-02) - Enterprise-Grade Erweiterungen
 - **📝 Log-Rotation System**: Automatische Archivierung großer Log-Dateien (>5 MB)
