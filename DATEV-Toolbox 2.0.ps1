@@ -3815,7 +3815,8 @@ $window.Add_Closing({
 # Window StateChanged Event für Minimize-to-Tray
 $window.Add_StateChanged({
     if ($window.WindowState -eq [System.Windows.WindowState]::Minimized) {
-        $window.Hide()
+        # WICHTIG: Bei ShowDialog() darf Hide() NICHT verwendet werden!
+        # Hide() würde ShowDialog() beenden. Stattdessen nur aus Taskbar entfernen.
         $window.ShowInTaskbar = $false
         
         # Benachrichtigung anzeigen
@@ -3824,7 +3825,12 @@ $window.Add_StateChanged({
             -Icon 'Info' `
             -Duration 3000
         
-        Write-Log -Message "Fenster in System-Tray minimiert" -Level 'DEBUG'
+        Write-Log -Message "Fenster in System-Tray minimiert (ShowInTaskbar=false)" -Level 'DEBUG'
+    }
+    elseif ($window.WindowState -eq [System.Windows.WindowState]::Normal) {
+        # Fenster wieder hergestellt: In Taskbar anzeigen
+        $window.ShowInTaskbar = $true
+        Write-Log -Message "Fenster wiederhergestellt (ShowInTaskbar=true)" -Level 'DEBUG'
     }
 })
 
