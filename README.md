@@ -164,7 +164,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Entwicklung
-Aktuelle Version: **2.3.0** (20.10.2025)
+Aktuelle Version: **2.3.1** (10.11.2025)
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -204,6 +204,17 @@ Für Feature-Requests, Bug-Reports oder Verbesserungsvorschläge:
 - **GitHub Issues**: [Issues öffnen](https://github.com/Zdministrator/DATEV-Toolbox-2.0/issues)
 
 ## 🔄 Update-Historie
+
+### Version 2.3.1 (2025-11-10) - Bugfix: Tray-Icon Stabilität
+- **🐛 KRITISCHER BUGFIX**: Tray-Icon verschwindet nicht mehr beim Minimieren
+  - ShowDialog() Kompatibilität: Hide() entfernt, nur ShowInTaskbar=false verwendet
+  - Stabilität verbessert: Fenster bleibt minimiert ohne ShowDialog() zu beenden
+- **🔧 StateChanged Event erweitert**: Wiederherstellung setzt ShowInTaskbar=true zurück
+  - Robustes Minimize-to-Tray: Tray-Icon bleibt dauerhaft sichtbar und funktional
+  - Logging erweitert: ShowInTaskbar-Status wird protokolliert
+- **✅ Produktions-getestet**: Bug auf Test-System identifiziert und behoben
+  - Vollständig stabiles Tray-Icon-System ohne Verschwinden beim Minimieren
+  - Doppelklick-Restore und Kontextmenü funktionieren zuverlässig
 
 ### Version 2.3.0 (2025-10-20) - System Tray Integration
 - **🎯 System-Tray-Icon**: NotifyIcon mit Tooltip "DATEV-Toolbox 2.0" im Systembereich

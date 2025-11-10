@@ -1,24 +1,39 @@
 {
-  "version": "2.3.0",
-  "releaseDate": "2025-10-20",
+  "version": "2.3.1",
+  "releaseDate": "2025-11-10",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "System Tray Integration: Minimize-to-Tray mit Benachrichtigungen und Quick-Actions",
-    "• System-Tray-Icon: NotifyIcon mit Tooltip und Kontextmenü für permanente Hintergrund-Präsenz",
-    "• Minimize-to-Tray: Fenster verschwindet in Systembereich beim Minimieren mit Benachrichtigung",
-    "• Kontextmenü Quick-Actions: 6 Einträge (Fenster anzeigen, DATEV-Arbeitsplatz, Download-Ordner, Beenden)",
-    "• Balloon-Benachrichtigungen: Info-Notifications beim Minimize mit konfigurierbarer Dauer",
-    "• Doppelklick-Restore: Fenster durch Doppelklick auf Tray-Icon wiederherstellen",
-    "• Resource-Management: Ordnungsgemäßer Dispose-Pattern für NotifyIcon-Cleanup",
-    "• Threading-Fix: Application.Run() Pattern für WPF + Windows.Forms Kompatibilität",
-    "• Settings-Integration: MinimizeToTray und ShowNotifications Einstellungen vorbereitet",
-    "• 5 neue Funktionen: Initialize/Show/Close TrayIcon, Show-MainWindow, Close-Application",
-    "• 235 Zeilen neuer Code in dedizierter 'Tray-Icon System' Region",
-    "• Vollständige Fehlerbehandlung und Logging-Integration für alle Tray-Operationen",
-    "• Tests: 6/6 bestanden (Initialisierung, Kontextmenü, Minimize, Notifications, Shutdown, Error-Handling)",
-    "Professionelle System-Tray-Integration für verbesserte User Experience und Hintergrund-Betrieb"
+    "Bugfix: Tray-Icon Minimize-to-Tray Stabilität",
+    "• KRITISCHER BUGFIX: Tray-Icon verschwindet nicht mehr beim Minimieren",
+    "• ShowDialog() Kompatibilität: Hide() entfernt, nur ShowInTaskbar=false verwendet",
+    "• Stabilität verbessert: Fenster bleibt minimiert ohne ShowDialog() zu beenden",
+    "• StateChanged Event erweitert: Wiederherstellung setzt ShowInTaskbar=true",
+    "• Robustes Minimize-to-Tray: Tray-Icon bleibt dauerhaft sichtbar und funktional",
+    "• Logging erweitert: ShowInTaskbar-Status wird protokolliert",
+    "• Produktions-getestet: Bug auf Test-System identifiziert und behoben",
+    "Vollständig stabiles Tray-Icon-System ohne Verschwinden beim Minimieren"
   ],
   "previousVersions": [
+    {
+      "version": "2.3.0",
+      "releaseDate": "2025-10-20",
+      "changelog": [
+        "System Tray Integration: Minimize-to-Tray mit Benachrichtigungen und Quick-Actions",
+        "• System-Tray-Icon: NotifyIcon mit Tooltip und Kontextmenü für permanente Hintergrund-Präsenz",
+        "• Minimize-to-Tray: Fenster verschwindet in Systembereich beim Minimieren mit Benachrichtigung",
+        "• Kontextmenü Quick-Actions: 6 Einträge (Fenster anzeigen, DATEV-Arbeitsplatz, Download-Ordner, Beenden)",
+        "• Balloon-Benachrichtigungen: Info-Notifications beim Minimize mit konfigurierbarer Dauer",
+        "• Doppelklick-Restore: Fenster durch Doppelklick auf Tray-Icon wiederherstellen",
+        "• Resource-Management: Ordnungsgemäßer Dispose-Pattern für NotifyIcon-Cleanup",
+        "• Threading-Fix: Application.Run() Pattern für WPF + Windows.Forms Kompatibilität",
+        "• Settings-Integration: MinimizeToTray und ShowNotifications Einstellungen vorbereitet",
+        "• 5 neue Funktionen: Initialize/Show/Close TrayIcon, Show-MainWindow, Close-Application",
+        "• 235 Zeilen neuer Code in dedizierter 'Tray-Icon System' Region",
+        "• Vollständige Fehlerbehandlung und Logging-Integration für alle Tray-Operationen",
+        "• Tests: 6/6 bestanden (Initialisierung, Kontextmenü, Minimize, Notifications, Shutdown, Error-Handling)",
+        "Professionelle System-Tray-Integration für verbesserte User Experience und Hintergrund-Betrieb"
+      ]
+    },
     {
       "version": "2.2.0",
       "releaseDate": "2025-10-02",
