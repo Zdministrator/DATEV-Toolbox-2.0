@@ -1,19 +1,38 @@
 {
-  "version": "2.3.1",
-  "releaseDate": "2025-11-10",
+  "version": "2.3.2",
+  "releaseDate": "2025-11-11",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Bugfix: Tray-Icon Minimize-to-Tray Stabilität",
-    "• KRITISCHER BUGFIX: Tray-Icon verschwindet nicht mehr beim Minimieren",
-    "• ShowDialog() Kompatibilität: Hide() entfernt, nur ShowInTaskbar=false verwendet",
-    "• Stabilität verbessert: Fenster bleibt minimiert ohne ShowDialog() zu beenden",
-    "• StateChanged Event erweitert: Wiederherstellung setzt ShowInTaskbar=true",
-    "• Robustes Minimize-to-Tray: Tray-Icon bleibt dauerhaft sichtbar und funktional",
-    "• Logging erweitert: ShowInTaskbar-Status wird protokolliert",
-    "• Produktions-getestet: Bug auf Test-System identifiziert und behoben",
-    "Vollständig stabiles Tray-Icon-System ohne Verschwinden beim Minimieren"
+    "Feature: Service-Anwendungen online - Neuer Bereich im DATEV Online Tab",
+    "• Neuer Bereich 'Service-Anwendungen online' im DATEV Online Tab hinzugefügt",
+    "• 5 neue Service-Buttons: Rechnungsdaten, Personendaten, Beraternummern, Vertragsübersichten",
+    "• Rechnungsdaten online: PDF-Rechnungen im ZUGFeRD-Format abrufen",
+    "• Personendaten verwalten: Personen im DATEV-Rechenzentrum anlegen, bearbeiten, löschen",
+    "• Meine Personendaten verwalten: Eigene bei DATEV gespeicherte Daten einsehen und bearbeiten",
+    "• Beraternummern verwalten: Beraternummern einsehen, ändern, SEPA-Mandate verwalten",
+    "• Vertragsübersichten: Verträge für Hard-/Software und PC-Zähler verwalten",
+    "• ToolTip-Optimierung: Maximale Breite 400px mit automatischem Zeilenumbruch",
+    "• Code-Bereinigung: Doppelten 'Vertragsübersichten Online' Button aus 'Verwaltung und Technik' entfernt",
+    "• Konsistente Icons: 📄 💁 👤 🔢 📋 für bessere visuelle Unterscheidung",
+    "• Alle Service-URLs zentral konfiguriert und per URL-Handler automatisch verarbeitet",
+    "Professionelle Service-Integration für zentrale DATEV-Verwaltungsaufgaben"
   ],
   "previousVersions": [
+    {
+      "version": "2.3.1",
+      "releaseDate": "2025-11-10",
+      "changelog": [
+        "Bugfix: Tray-Icon Minimize-to-Tray Stabilität",
+        "• KRITISCHER BUGFIX: Tray-Icon verschwindet nicht mehr beim Minimieren",
+        "• ShowDialog() Kompatibilität: Hide() entfernt, nur ShowInTaskbar=false verwendet",
+        "• Stabilität verbessert: Fenster bleibt minimiert ohne ShowDialog() zu beenden",
+        "• StateChanged Event erweitert: Wiederherstellung setzt ShowInTaskbar=true",
+        "• Robustes Minimize-to-Tray: Tray-Icon bleibt dauerhaft sichtbar und funktional",
+        "• Logging erweitert: ShowInTaskbar-Status wird protokolliert",
+        "• Produktions-getestet: Bug auf Test-System identifiziert und behoben",
+        "Vollständig stabiles Tray-Icon-System ohne Verschwinden beim Minimieren"
+      ]
+    },
     {
       "version": "2.3.0",
       "releaseDate": "2025-10-20",

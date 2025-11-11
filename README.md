@@ -10,6 +10,8 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 
 ## 📋 Features
 
+- **🆕 Service-Anwendungen online**: Neuer Bereich im DATEV Online Tab mit 5 Service-Buttons (v2.3.2)
+- **🆕 ToolTip-Optimierung**: Maximale Breite 400px mit automatischem Zeilenumbruch (v2.3.2)
 - **🆕 System Tray Integration**: Minimize-to-Tray mit Benachrichtigungen und Quick-Actions-Menü (v2.3.0)
 - **🆕 Tray-Icon mit Kontextmenü**: Quick-Actions für schnellen Zugriff auf wichtige Funktionen (WIP) (v2.3.0)
 - **🆕 Balloon-Benachrichtigungen**: Info-Notifications beim Minimieren und für wichtige Events (v2.3.0)
@@ -17,7 +19,6 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 - **🆕 Log-Rotation System**: Automatische Archivierung großer Log-Dateien (>5 MB) mit konfigurierbarer Archive-Verwaltung (v2.2.0)
 - **🆕 FSLogix Download-Integration**: Microsoft FSLogix nutzt jetzt die gleiche Download-Funktion wie DATEV-Downloads (v2.2.0)
 - **🆕 Sonstige nützliche Downloads**: Neuer Bereich für Microsoft-Tools (FSLogix, etc.) mit direkter Download-Funktion (v2.2.0)
-- **🆕 Vertragsübersichten Online**: Direkter Zugriff auf DATEV Vertragsübersichten-Portal im DATEV-Online Tab (v2.2.0)
 - **🆕 Erweiterbares Download-System**: Modularer Download-Handler für einfache Integration weiterer Downloads (v2.2.0)
 - **🆕 Server-Anpassungs-Assistent**: Neuer Button für DATEV Server-Konfiguration (DvServerChange.exe) (v2.1.10)
 - **🆕 Windows Updates Integration**: System-Tab unterstützt jetzt Windows Updates für Client und Server (v2.1.10)  
@@ -35,7 +36,7 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 - **🆕 Erweiterte Gruppenrichtlinien-Updates**: Progress-Dialog mit Abbruch-Funktion und Prozess-Überwachung (v2.1.4)
 - **Automatische Updates**: Selbst-aktualisierendes System mit GitHub-Integration
 - **🆕 System Tray**: Minimize-to-Tray, Benachrichtigungen und Quick-Actions-Kontextmenü (v2.3.0)
-- **DATEV Online Tools**: Schnellzugriff auf wichtige DATEV-Portale und -Services
+- **DATEV Online Tools**: Schnellzugriff auf wichtige DATEV-Portale, -Services und Verwaltungstools
 - **🆕 Erweiterte Downloads**: Verwaltung und Download von DATEV-Software mit Aktualisierungsdatum
 - **🆕 Dokumente-Tab**: Direkter Zugriff auf wichtige DATEV Help-Center Dokumentationen mit Aktualisierungsdatum
 - **Update-Termine**: Anzeige anstehender DATEV-Updates
@@ -103,9 +104,15 @@ Vollständige DATEV-Integration mit drei Kategorien:
 
 ### 🌐 DATEV Online
 Schnellzugriff auf wichtige DATEV-Online-Services:
-- **Hilfe und Support**: DATEV Hilfe Center, Servicekontakte, myUpdates
+- **Hilfe und Support**: DATEV Hilfe Center, Servicekontakte, myUpdates, Community
 - **Cloud**: myDATEV Portal, DUO, LAO, Lizenzverwaltung, Rechteraum, RVO
-- **Verwaltung**: SmartLogin Administration, Bestandsmanagement, **🆕 Vertragsübersichten Online (v2.2.0)**
+- **Verwaltung**: SmartLogin Administration, Bestandsmanagement, Weitere Cloud Anwendungen
+- **🆕 Service-Anwendungen online (v2.3.2)**: 
+  - 📄 Rechnungsdaten online - PDF-Rechnungen im ZUGFeRD-Format
+  - 👥 Personendaten verwalten - Personen anlegen, bearbeiten, löschen
+  - 👤 Meine Personendaten verwalten - Eigene Daten einsehen und bearbeiten
+  - 🔢 Beraternummern verwalten - Beraternummern und SEPA-Mandate verwalten
+  - 📋 Vertragsübersichten - Verträge für Hard-/Software und PC-Zähler
 
 ### 📥 Downloads
 - **🆕 Sonstige nützliche Downloads**: Neuer Bereich für Microsoft-Tools (FSLogix, etc.) (v2.2.0)
@@ -164,7 +171,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Entwicklung
-Aktuelle Version: **2.3.1** (10.11.2025)
+Aktuelle Version: **2.3.2** (11.11.2025)
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -204,6 +211,31 @@ Für Feature-Requests, Bug-Reports oder Verbesserungsvorschläge:
 - **GitHub Issues**: [Issues öffnen](https://github.com/Zdministrator/DATEV-Toolbox-2.0/issues)
 
 ## 🔄 Update-Historie
+
+### Version 2.3.2 (2025-11-11) - Feature: Service-Anwendungen online
+- **🆕 Neuer Bereich**: Service-Anwendungen online im DATEV Online Tab
+  - 5 neue Service-Buttons für zentrale DATEV-Verwaltungsaufgaben
+  - Konsistente Icons (📄 👥 👤 🔢 📋) für bessere visuelle Unterscheidung
+- **📄 Rechnungsdaten online**: PDF-Rechnungen im ZUGFeRD-Format abrufen
+  - Festlegung des Rechnungswegs (E-Mail, Portal, etc.)
+  - Authentifizierung via SmartCard/mIDentity, SmartLogin oder DATEV-Benutzer
+- **👥 Personendaten verwalten**: Personen im DATEV-Rechenzentrum verwalten
+  - Neue Personen anlegen, bestehende bearbeiten, Personen löschen
+  - Zentrale Verwaltung aller Personen für die Beraternummer
+- **👤 Meine Personendaten**: Eigene bei DATEV gespeicherte Daten einsehen und bearbeiten
+- **🔢 Beraternummern verwalten**: Beraternummern einsehen, ändern, anlegen
+  - Beraternummern-Kennwort anzeigen lassen
+  - SEPA-Mandate für DATEV-Rechnung anlegen und ändern
+  - Geschäftsbeziehung ändern (Leistungsverbund ↔ Mitgliedsgebundenes Geschäft)
+- **📋 Vertragsübersichten**: Verträge für Hard-/Software und PC-Zähler anzeigen
+  - Lizenztyp oder Anzahl der PC-Zähler ändern
+  - Hard- und Software kündigen
+- **🎨 ToolTip-Optimierung**: Maximale Breite 400px mit automatischem Zeilenumbruch
+  - Window.Resources mit globalem ToolTip-Style
+  - Bessere Lesbarkeit bei langen Beschreibungen
+- **🧹 Code-Bereinigung**: Doppelten "Vertragsübersichten Online" Button entfernt
+  - Button aus "Verwaltung und Technik" entfernt (jetzt nur noch in Service-Anwendungen)
+  - URL-Konfiguration und Button-Mapping bereinigt
 
 ### Version 2.3.1 (2025-11-10) - Bugfix: Tray-Icon Stabilität
 - **🐛 KRITISCHER BUGFIX**: Tray-Icon verschwindet nicht mehr beim Minimieren
