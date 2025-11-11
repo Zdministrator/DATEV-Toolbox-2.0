@@ -86,7 +86,6 @@ $script:Config = @{
             RVO                  = "https://apps.datev.de/rvo-administration"
             SmartLogin           = "https://go.datev.de/smartlogin-administration"
             Bestandsmanagement   = "https://apps.datev.de/mydata/"
-            Vertragsuebersichten = "https://apps.datev.de/vertragsuebersichten-online"
             WeitereApps          = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
             
             # Service-Anwendungen online
@@ -168,7 +167,6 @@ $script:Config = @{
         'btnRVO'                  = @{ Type = 'URL'; UrlKey = 'RVO' }
         'btnSmartLogin'           = @{ Type = 'URL'; UrlKey = 'SmartLogin' }
         'btnBestandsmanagement'   = @{ Type = 'URL'; UrlKey = 'Bestandsmanagement' }
-        'btnVertragsuebersichten' = @{ Type = 'URL'; UrlKey = 'Vertragsuebersichten' }
         'btnWeitereApps'          = @{ Type = 'URL'; UrlKey = 'WeitereApps' }
         
         # Service-Anwendungen online (URL-Handler)
@@ -649,8 +647,6 @@ function Close-RunspacePool {
                                         ToolTip="Verwaltet DATEV SmartLogin Einstellungen und Benutzer"/>
                                 <Button Name="btnBestandsmanagement" Content="myDATEV Bestandsmanagement" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Öffnet das myDATEV Bestandsmanagement für Kundenverwaltung"/>
-                                <Button Name="btnVertragsuebersichten" Content="Vertragsübersichten Online" Height="25" Margin="0,3,0,3" 
-                                        ToolTip="Öffnet die DATEV Vertragsübersichten Online für Verwaltung von Verträgen und Lizenzen"/>
                                 <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Zeigt weitere verfügbare DATEV Cloud-Anwendungen"/>
                             </StackPanel>
