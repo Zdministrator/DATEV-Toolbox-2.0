@@ -89,6 +89,13 @@ $script:Config = @{
             Vertragsuebersichten = "https://apps.datev.de/vertragsuebersichten-online"
             WeitereApps          = "https://www.datev.de/web/de/mydatev/datev-cloud-anwendungen/"
             
+            # Service-Anwendungen online
+            RechnungsdatenOnline       = "https://apps.datev.de/rechnungsdaten-online"
+            PersonendatenVerwalten     = "https://apps.datev.de/personendaten-verwalten/people/"
+            MeinePersonendaten         = "https://apps.datev.de/personendaten-verwalten/people/editme"
+            BeraternummernVerwalten    = "https://apps.datev.de/beraternummern-verwalten"
+            VertragsuebersichtenService = "https://apps.datev.de/vertragsuebersichten-online"
+            
             # Download-Bereiche
             Downloadbereich      = "https://apps.datev.de/myupdates/download-v2/lists/products/"
             SmartDocs            = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
@@ -163,6 +170,13 @@ $script:Config = @{
         'btnBestandsmanagement'   = @{ Type = 'URL'; UrlKey = 'Bestandsmanagement' }
         'btnVertragsuebersichten' = @{ Type = 'URL'; UrlKey = 'Vertragsuebersichten' }
         'btnWeitereApps'          = @{ Type = 'URL'; UrlKey = 'WeitereApps' }
+        
+        # Service-Anwendungen online (URL-Handler)
+        'btnRechnungsdatenOnline'       = @{ Type = 'URL'; UrlKey = 'RechnungsdatenOnline' }
+        'btnPersonendatenVerwalten'     = @{ Type = 'URL'; UrlKey = 'PersonendatenVerwalten' }
+        'btnMeinePersonendaten'         = @{ Type = 'URL'; UrlKey = 'MeinePersonendaten' }
+        'btnBeraternummernVerwalten'    = @{ Type = 'URL'; UrlKey = 'BeraternummernVerwalten' }
+        'btnVertragsuebersichtenService' = @{ Type = 'URL'; UrlKey = 'VertragsuebersichtenService' }
         
         # DATEV Online Downloads (URL-Handler)
         'btnDATEVDownloadbereich' = @{ Type = 'URL'; UrlKey = 'Downloadbereich' }
@@ -623,6 +637,25 @@ function Close-RunspacePool {
                                         ToolTip="Öffnet die DATEV Vertragsübersichten Online für Verwaltung von Verträgen und Lizenzen"/>
                                 <Button Name="btnWeitereApps" Content="Weitere Cloud Anwendungen" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Zeigt weitere verfügbare DATEV Cloud-Anwendungen"/>
+                            </StackPanel>
+                        </GroupBox>
+                        
+                        <!-- Service-Anwendungen online -->
+                        <GroupBox Margin="3,3,3,5">
+                            <GroupBox.Header>
+                                <TextBlock Text="Service-Anwendungen online" FontWeight="Bold" FontSize="12"/>
+                            </GroupBox.Header>
+                            <StackPanel Orientation="Vertical" Margin="8">
+                                <Button Name="btnRechnungsdatenOnline" Content="📄 Rechnungsdaten online" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Rufen Sie Ihre DATEV-Rechnungen als PDF-Dateien im ZUGFeRD-Format ab. Legen Sie zudem fest, auf welchem Weg Sie Ihre DATEV-Rechnung erhalten. Nutzen Sie zur Authentifizierung Ihre(n) SmartCard/mIDentity-Stick, SmartLogin oder den verknüpften DATEV-Benutzer."/>
+                                <Button Name="btnPersonendatenVerwalten" Content="👥 Personendaten verwalten" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Lassen Sie sich die Personen anzeigen, die im DATEV-Rechenzentrum für Ihre Beraternummer gespeichert sind. Sie können neue Personen anlegen, die Daten bestehender Personen bearbeiten und Personen löschen. Nutzen Sie zur Authentifizierung Ihre(n) SmartCard / mIDentity-Stick, SmartLogin oder den verknüpften DATEV-Benutzer."/>
+                                <Button Name="btnMeinePersonendaten" Content="👤 Meine Personendaten verwalten" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Mit Meine Personendaten verwalten sehen Sie die für Sie bei DATEV gespeicherten Personendaten und können diese bearbeiten. Nutzen Sie zur Authentifizierung Ihre(n) SmartCard / mIDentity-Stick, SmartLogin oder den verknüpften DATEV-Benutzer."/>
+                                <Button Name="btnBeraternummernVerwalten" Content="🔢 Beraternummern verwalten" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Hier können Sie Ihre bei DATEV gespeicherten Beraternummern einsehen, ändern, neue Beraternummern anlegen und sich das jeweilige Beraternummern-Kennwort anzeigen lassen. Außerdem ist es möglich, SEPA-Mandate für die DATEV-Rechnung anzulegen oder bestehende SEPA-Mandate zu ändern. DATEV-Mitglieder können die Geschäftsbeziehung von Mandanten von Leistungsverbund auf Mitgliedsgebundenes Mandantengeschäft ändern. Nutzen Sie zur Authentifizierung Ihre(n) SmartCard/mIDentity-Stick, SmartLogin oder den verknüpften DATEV-Benutzer."/>
+                                <Button Name="btnVertragsuebersichtenService" Content="📋 Vertragsübersichten" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Hier können Sie sich Ihre Verträge für Hard- und Software sowie Ihre PC-Zähler anzeigen lassen. Darüber hinaus können Sie bei Bedarf den Lizenztyp oder die Anzahl der PC-Zähler ändern. Es besteht auch eine Funktion zum Kündigen von Hard- und Software. Nutzen Sie zur Authentifizierung Ihre(n) SmartCard / mIDentity-Stick, SmartLogin oder den verknüpften DATEV-Benutzer."/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
