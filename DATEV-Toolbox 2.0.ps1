@@ -535,7 +535,23 @@ function Close-RunspacePool {
         Height="700" Width="480" 
         MinHeight="500" MinWidth="400"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResize">    <Grid>
+        ResizeMode="CanResize">
+    
+    <Window.Resources>
+        <!-- Globaler ToolTip-Style mit maximaler Breite -->
+        <Style TargetType="ToolTip">
+            <Setter Property="MaxWidth" Value="400"/>
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="120" MinHeight="100"/>
