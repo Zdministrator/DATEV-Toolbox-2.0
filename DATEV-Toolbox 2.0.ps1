@@ -100,6 +100,9 @@ $script:Config = @{
             SmartDocs            = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/download-bereich/it-loesungen-und-security/datev-smartdocs-skripte-zur-analyse-oder-reparatur/"
             DatentraegerPortal   = "https://www.datev.de/web/de/service-und-support/software-bereitstellung/datentraeger-portal/"
             
+            # DATEV Admin-Tools
+            CookieSettings       = "https://apps.datev.de/cookie-settings/#/methods"
+            
             # Update-Termine
             Jahresplanung        = "https://apps.datev.de/myupdates/assets/files/Jahresplanung_2025.ics"
         }
@@ -192,6 +195,7 @@ $script:Config = @{
         'btnEODBconfig'           = @{ Type = 'DATEV'; ProgramName = 'EODBconfig'; Description = 'EODBconfig' }
         'btnEOAufgabenplanung'    = @{ Type = 'DATEV'; ProgramName = 'EOAufgabenplanung'; Description = 'EO Aufgabenplanung' }
         'btnDvServerChange'       = @{ Type = 'DATEV'; ProgramName = 'DvServerChange'; Description = 'Server-Anpassungs-Assistent' }
+        'btnCookieSettings'       = @{ Type = 'URL'; UrlKey = 'CookieSettings' }
         'btnNGENALL40'            = @{ Type = 'DATEV'; ProgramName = 'NGENALL40'; Description = 'NGENALL 4.0' }
         
         # System Tools (SystemTool-Handler)
@@ -584,6 +588,8 @@ function Close-RunspacePool {
                                         ToolTip="Öffnet die DATEV Enterprise Objects Aufgabenplanung"/>
                                 <Button Name="btnDvServerChange" Content="Server-Anpassungs-Assistent" Height="25" Margin="0,3,0,3" 
                                         ToolTip="Startet den DATEV Server-Anpassungs-Assistenten"/>
+                                <Button Name="btnCookieSettings" Content="🍪 Cookie-Einstellungen" Height="25" Margin="0,3,0,3" 
+                                        ToolTip="Öffnet die DATEV Cookie-Einstellungen und Anmeldemethoden-Verwaltung"/>
                             </StackPanel>
                         </GroupBox>
                           <!-- Performance Tools -->

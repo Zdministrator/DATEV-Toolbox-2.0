@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-08-20",
+  "lastUpdated": "2025-11-14",
   "documents": [
     {
       "id": "1080019",
@@ -36,6 +36,18 @@
       "title": "Serverumzüge planen und durchführen",
       "url": "https://apps.datev.de/help-center/documents/1012173",
       "description": "In diesem Dokument erfahren Sie, wie Sie Serverumzüge planen und durchführen."
+    },
+    {
+      "id": "1002326",
+      "title": "DATEV-Cloud-Lösungen für Mandanten über MyDATEV Mandantenregistrierung bestellen und einrichten",
+      "url": "https://apps.datev.de/help-center/documents/1002326",
+      "description": "Sie möchten für Ihre Mandanten schnell und effizient DATEV-Cloud-Lösungen bestellen, um die digitale Zusammenarbeit mit Ihren Mandanten zu forcieren. MyDATEV Mandantenregistrierung ist der zentrale Prozess, um Ihre Mandanten für DATEV-Cloud-Lösungen einzurichten."
+    },
+    {
+      "id": "9299886",
+      "title": "Bestandsoptimierung Eigenorganisation",
+      "url": "https://apps.datev.de/help-center/documents/9299886",
+      "description": "In diesem Dokument erfahren Sie, wie Sie einfach und schnell die offenen Kosten und Gebühren auf Aktualität prüfen sowie Prozessoptimierungs- und Abrechnungspotentiale erkennen. Das Werkzeug bietet eine einfache Möglichkeit, Ihren aktuellen Datenbestand auf Auffälligkeiten hinsichtlich Aktualität, Abrechnungs- und Prozessoptimierungspotential zu prüfen."
     }
   ]
 }
