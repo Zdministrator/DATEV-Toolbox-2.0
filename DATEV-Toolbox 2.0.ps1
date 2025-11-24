@@ -967,11 +967,11 @@ function Rotate-LogFile {
     }
 }
 
-# Logging-System (Performance-optimiert mit automatischer Rotation)
+# Logging-System (Performance-optimiert mit automatischer Rotation und Thread-Safety)
 function Write-Log {
     <#
     .SYNOPSIS
-    Zentrale Logging-Funktion für die Anwendung (Performance-optimiert)
+    Zentrale Logging-Funktion für die Anwendung (Performance-optimiert und Thread-sicher)
     #>
     param(
         [Parameter(Mandatory = $true)][string]$Message,
@@ -998,10 +998,20 @@ function Write-Log {
         $null = $script:LogStringBuilder.Append($timestamp).Append(' ').Append($prefix).Append($Message).Append("`r`n")
         $logEntry = $script:LogStringBuilder.ToString()
         
-        # UI-Update nur wenn TextBox verfügbar
+        # Thread-sichere UI-Updates mit Dispatcher.Invoke
         if ($null -ne $txtLog) {
-            $txtLog.AppendText($logEntry)
-            $txtLog.ScrollToEnd()
+            if ($txtLog.Dispatcher.CheckAccess()) {
+                # Bereits im UI-Thread
+                $txtLog.AppendText($logEntry)
+                $txtLog.ScrollToEnd()
+            }
+            else {
+                # Nicht im UI-Thread: Dispatcher verwenden
+                $txtLog.Dispatcher.Invoke([action]{
+                    $txtLog.AppendText($logEntry)
+                    $txtLog.ScrollToEnd()
+                }, [System.Windows.Threading.DispatcherPriority]::Normal)
+            }
         }
         
         # Fehler-Log nur bei WARN/ERROR
@@ -2908,9 +2918,14 @@ function Update-DATEVDownloads {
             Write-Log -Message "Downloads-Verzeichnis erstellt: $downloadsDir" -Level 'DEBUG'
         }
         
-        # Button während Download deaktivieren
+        # Button während Download deaktivieren (Thread-sicher)
         if ($null -ne $btnUpdateDownloads) {
-            $btnUpdateDownloads.IsEnabled = $false
+            if ($btnUpdateDownloads.Dispatcher.CheckAccess()) {
+                $btnUpdateDownloads.IsEnabled = $false
+            }
+            else {
+                $btnUpdateDownloads.Dispatcher.Invoke([action]{ $btnUpdateDownloads.IsEnabled = $false }, [System.Windows.Threading.DispatcherPriority]::Normal)
+            }
         }
         
         # TLS 1.2 für sichere Downloads erzwingen
@@ -2930,14 +2945,19 @@ function Update-DATEVDownloads {
         Write-Log -Message "Fehler beim Aktualisieren der Downloads-JSON: $($_.Exception.Message)" -Level 'ERROR'
     }
     finally {
-        # Button wieder aktivieren
+        # Button wieder aktivieren (Thread-sicher)
         if ($null -ne $btnUpdateDownloads) {
-            $btnUpdateDownloads.IsEnabled = $true
+            if ($btnUpdateDownloads.Dispatcher.CheckAccess()) {
+                $btnUpdateDownloads.IsEnabled = $true
+            }
+            else {
+                $btnUpdateDownloads.Dispatcher.Invoke([action]{ $btnUpdateDownloads.IsEnabled = $true }, [System.Windows.Threading.DispatcherPriority]::Normal)
+            }
         }
     }
 }
 
-# Funktion zum Befüllen der Dropdown-Liste
+# Funktion zum Befüllen der Dropdown-Liste (Thread-sicher)
 function Initialize-DownloadsComboBox {
     try {
         # Prüfen ob ComboBox verfügbar ist
@@ -2946,17 +2966,20 @@ function Initialize-DownloadsComboBox {
             return
         }
         
-        # Event-Handler Memory Leak Fix: Handler neu registrieren
-        if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler) {
-            $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
-            Write-Log -Message "ComboBox Event-Handler für Neuinitialisierung entfernt" -Level 'DEBUG'
-        }
-        
+        # Daten vorbereiten (außerhalb UI-Thread)
         $downloadsData = Get-DATEVDownloads
         $downloads = $downloadsData.downloads
         $lastUpdated = $downloadsData.lastUpdated
         
-        $cmbDirectDownloads.Items.Clear()
+        # Thread-sichere UI-Updates
+        $updateAction = {
+            # Event-Handler Memory Leak Fix: Handler neu registrieren
+            if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler) {
+                $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+                Write-Log -Message "ComboBox Event-Handler für Neuinitialisierung entfernt" -Level 'DEBUG'
+            }
+            
+            $cmbDirectDownloads.Items.Clear()
         
         # Platzhalter-Element mit Datum hinzufügen
         $placeholderItem = New-Object System.Windows.Controls.ComboBoxItem
@@ -2991,18 +3014,27 @@ function Initialize-DownloadsComboBox {
             $cmbDirectDownloads.Items.Add($item) | Out-Null
         }
         
-        # Platzhalter als Standardauswahl setzen
-        $cmbDirectDownloads.SelectedIndex = 0
-        
-        # Event-Handler neu registrieren nach Initialisierung
-        if ($null -ne $script:ComboBoxHandler) {
-            $cmbDirectDownloads.Add_SelectionChanged($script:ComboBoxHandler)
-            $script:ComboBoxEventRegistered = $true
-            Write-Log -Message "ComboBox Event-Handler nach Initialisierung neu registriert" -Level 'DEBUG'
+            # Platzhalter als Standardauswahl setzen
+            $cmbDirectDownloads.SelectedIndex = 0
+            
+            # Event-Handler neu registrieren nach Initialisierung
+            if ($null -ne $script:ComboBoxHandler) {
+                $cmbDirectDownloads.Add_SelectionChanged($script:ComboBoxHandler)
+                $script:ComboBoxEventRegistered = $true
+                Write-Log -Message "ComboBox Event-Handler nach Initialisierung neu registriert" -Level 'DEBUG'
+            }
+            
+            if ($cmbDirectDownloads.Items.Count -gt 1) {
+                Write-Log -Message "$($cmbDirectDownloads.Items.Count - 1) Downloads geladen" -Level 'DEBUG'
+            }
         }
         
-        if ($cmbDirectDownloads.Items.Count -gt 1) {
-            Write-Log -Message "$($cmbDirectDownloads.Items.Count - 1) Downloads geladen" -Level 'DEBUG'
+        # Dispatcher.Invoke für Thread-Safety
+        if ($cmbDirectDownloads.Dispatcher.CheckAccess()) {
+            & $updateAction
+        }
+        else {
+            $cmbDirectDownloads.Dispatcher.Invoke($updateAction, [System.Windows.Threading.DispatcherPriority]::Normal)
         }
     }
     catch {
@@ -3046,8 +3078,13 @@ function Start-BackgroundDownload {
             }
         }
         
-        # Download-Button während Download deaktivieren
-        $btnDownload.IsEnabled = $false
+        # Download-Button während Download deaktivieren (Thread-sicher)
+        if ($btnDownload.Dispatcher.CheckAccess()) {
+            $btnDownload.IsEnabled = $false
+        }
+        else {
+            $btnDownload.Dispatcher.Invoke([action]{ $btnDownload.IsEnabled = $false }, [System.Windows.Threading.DispatcherPriority]::Normal)
+        }
         Write-Log -Message "Download gestartet: $FileName" -Level 'INFO'
         
         # TLS 1.2 für sichere Downloads erzwingen
@@ -3098,9 +3135,14 @@ function Start-BackgroundDownload {
                     Write-Log -Message "Fehler im Download-Completion-Handler: $($_.Exception.Message)" -Level 'ERROR'
                 }
                 finally {
-                    # UI zurücksetzen (immer ausführen)
+                    # UI zurücksetzen (immer ausführen, Thread-sicher)
                     try {
-                        $btnDownload.IsEnabled = $true
+                        if ($btnDownload.Dispatcher.CheckAccess()) {
+                            $btnDownload.IsEnabled = $true
+                        }
+                        else {
+                            $btnDownload.Dispatcher.Invoke([action]{ $btnDownload.IsEnabled = $true }, [System.Windows.Threading.DispatcherPriority]::Normal)
+                        }
                     }
                     catch {
                         Write-Log -Message "Fehler beim Zurücksetzen der UI: $($_.Exception.Message)" -Level 'WARN'
@@ -3126,9 +3168,14 @@ function Start-BackgroundDownload {
     catch {
         Write-Log -Message "Fehler beim Starten des Downloads: $($_.Exception.Message)" -Level 'ERROR'
         
-        # UI zurücksetzen bei Fehler
+        # UI zurücksetzen bei Fehler (Thread-sicher)
         try {
-            $btnDownload.IsEnabled = $true
+            if ($btnDownload.Dispatcher.CheckAccess()) {
+                $btnDownload.IsEnabled = $true
+            }
+            else {
+                $btnDownload.Dispatcher.Invoke([action]{ $btnDownload.IsEnabled = $true }, [System.Windows.Threading.DispatcherPriority]::Normal)
+            }
         }
         catch {
             Write-Log -Message "Fehler beim Zurücksetzen der UI nach Download-Fehler: $($_.Exception.Message)" -Level 'WARN'
@@ -3313,7 +3360,7 @@ function Update-DATEVDocuments {
 function Initialize-DocumentsList {
     <#
     .SYNOPSIS
-    Initialisiert die Dokumente-Liste im GUI
+    Initialisiert die Dokumente-Liste im GUI (Thread-sicher)
     #>
     try {
         $documentsPanel = $window.FindName("spDocumentsList")
@@ -3322,16 +3369,18 @@ function Initialize-DocumentsList {
             return
         }
         
-        # Panel leeren
-        $documentsPanel.Children.Clear()
-        
-        # Lade Dokumente
+        # Daten vorbereiten (außerhalb UI-Thread)
         $documentsResult = Get-DATEVDocuments
         $documents = $documentsResult.documents
         $lastUpdated = $documentsResult.lastUpdated
         
-        # Aktualisiere lastUpdated-Anzeige
-        $lastUpdatedText = $window.FindName("txtDocumentsLastUpdated")
+        # Thread-sichere UI-Updates
+        $updateAction = {
+            # Panel leeren
+            $documentsPanel.Children.Clear()
+            
+            # Aktualisiere lastUpdated-Anzeige
+            $lastUpdatedText = $window.FindName("txtDocumentsLastUpdated")
         if ($lastUpdatedText) {
             if ($lastUpdated -and $lastUpdated -ne "Unbekannt") {
                 try {
@@ -3348,18 +3397,18 @@ function Initialize-DocumentsList {
             }
         }
         
-        if ($documents.Count -eq 0) {
-            $noDocsText = New-Object System.Windows.Controls.TextBlock
-            $noDocsText.Text = "Keine Dokumente verfügbar"
-            $noDocsText.FontStyle = "Italic"
-            $noDocsText.Foreground = "Gray"
-            $noDocsText.Margin = "0,10,0,10"
-            $documentsPanel.Children.Add($noDocsText)
-            return
-        }
-        
-        # Erstelle Links für jedes Dokument
-        foreach ($doc in $documents) {
+            if ($documents.Count -eq 0) {
+                $noDocsText = New-Object System.Windows.Controls.TextBlock
+                $noDocsText.Text = "Keine Dokumente verfügbar"
+                $noDocsText.FontStyle = "Italic"
+                $noDocsText.Foreground = "Gray"
+                $noDocsText.Margin = "0,10,0,10"
+                $documentsPanel.Children.Add($noDocsText)
+                return
+            }
+            
+            # Erstelle Links für jedes Dokument
+            foreach ($doc in $documents) {
             # Titel als anklickbarer Link (ohne Container-Box)
             $titleLink = New-Object System.Windows.Controls.TextBlock
             $titleLink.Text = "$($doc.id) - $($doc.title)"
@@ -3383,11 +3432,20 @@ function Initialize-DocumentsList {
                         [System.Windows.MessageBox]::Show("Fehler beim Öffnen des Dokuments: $($_.Exception.Message)", "Fehler", "OK", "Error")
                     }
                 })
+                
+                $documentsPanel.Children.Add($titleLink)
+            }
             
-            $documentsPanel.Children.Add($titleLink)
+            Write-Log -Message "Dokumente-Liste initialisiert: $($documents.Count) Dokumente" -Level 'INFO'
         }
         
-        Write-Log -Message "Dokumente-Liste initialisiert: $($documents.Count) Dokumente" -Level 'INFO'
+        # Dispatcher.Invoke für Thread-Safety
+        if ($documentsPanel.Dispatcher.CheckAccess()) {
+            & $updateAction
+        }
+        else {
+            $documentsPanel.Dispatcher.Invoke($updateAction, [System.Windows.Threading.DispatcherPriority]::Normal)
+        }
     }
     catch {
         Write-Log -Message "Fehler beim Initialisieren der Dokumente-Liste: $($_.Exception.Message)" -Level 'ERROR'
@@ -3526,7 +3584,7 @@ function Add-EventToUI {
     }
 }
 
-# Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei
+# Funktion zum Anzeigen der nächsten DATEV Update-Termine aus ICS-Datei (Thread-sicher)
 function Show-NextUpdateDates {
     Write-Log -Message "Lese Update-Termine aus ICS-Datei..." -Level 'DEBUG'
     $icsFile = $script:Config.Paths.ICSFile
@@ -3536,51 +3594,62 @@ function Show-NextUpdateDates {
         return
     }
     
-    $spUpdateDates.Children.Clear()
-    
-    if (-not (Test-Path $icsFile)) {
-        Write-Log -Message "Keine lokale ICS-Datei gefunden: $icsFile" -Level 'WARN'
-        $tb = New-Object System.Windows.Controls.TextBlock
-        $tb.Text = "Keine lokale ICS-Datei gefunden. Bitte erst aktualisieren."
-        $tb.FontStyle = 'Italic'
-        $tb.Foreground = 'Red'
-        $spUpdateDates.Children.Add($tb) | Out-Null
-        return
-    }
-    
-    try {
-        $icsContent = Get-Content $icsFile -Raw -Encoding UTF8
-        $allEvents = ConvertFrom-IcsContent -ICSContent $icsContent
-        Write-Log -Message "ICS: $($allEvents.Count) VEVENTs gefunden" -Level 'DEBUG'
-
-        $upcoming = Get-UpcomingEvents -Events $allEvents -MaxCount 3
-        Write-Log -Message "$($upcoming.Count) anstehende Termine werden angezeigt" -Level 'DEBUG'
+    # Thread-sichere UI-Updates
+    $updateAction = {
+        $spUpdateDates.Children.Clear()
         
-        if ($upcoming.Count -eq 0) {
-            Write-Log -Message "Keine anstehenden Termine gefunden" -Level 'DEBUG'
+        if (-not (Test-Path $icsFile)) {
+            Write-Log -Message "Keine lokale ICS-Datei gefunden: $icsFile" -Level 'WARN'
             $tb = New-Object System.Windows.Controls.TextBlock
-            $tb.Text = "Keine anstehenden Termine gefunden."
+            $tb.Text = "Keine lokale ICS-Datei gefunden. Bitte erst aktualisieren."
             $tb.FontStyle = 'Italic'
-            $tb.Foreground = 'Gray'
+            $tb.Foreground = 'Red'
             $spUpdateDates.Children.Add($tb) | Out-Null
+            return
         }
-        else {
-            foreach ($ev in $upcoming) {
-                Add-EventToUI -Event $ev -Container $spUpdateDates
-                $parsedDate = ConvertFrom-ICSDate -ICSDate $ev.DTSTART
-                if ($parsedDate) {
-                    Write-Log -Message "Termin: $($parsedDate.ToString('dd.MM.yyyy')) - $($ev.SUMMARY)" -Level 'DEBUG'
+    
+        try {
+            $icsContent = Get-Content $icsFile -Raw -Encoding UTF8
+            $allEvents = ConvertFrom-IcsContent -ICSContent $icsContent
+            Write-Log -Message "ICS: $($allEvents.Count) VEVENTs gefunden" -Level 'DEBUG'
+
+            $upcoming = Get-UpcomingEvents -Events $allEvents -MaxCount 3
+            Write-Log -Message "$($upcoming.Count) anstehende Termine werden angezeigt" -Level 'DEBUG'
+            
+            if ($upcoming.Count -eq 0) {
+                Write-Log -Message "Keine anstehenden Termine gefunden" -Level 'DEBUG'
+                $tb = New-Object System.Windows.Controls.TextBlock
+                $tb.Text = "Keine anstehenden Termine gefunden."
+                $tb.FontStyle = 'Italic'
+                $tb.Foreground = 'Gray'
+                $spUpdateDates.Children.Add($tb) | Out-Null
+            }
+            else {
+                foreach ($ev in $upcoming) {
+                    Add-EventToUI -Event $ev -Container $spUpdateDates
+                    $parsedDate = ConvertFrom-ICSDate -ICSDate $ev.DTSTART
+                    if ($parsedDate) {
+                        Write-Log -Message "Termin: $($parsedDate.ToString('dd.MM.yyyy')) - $($ev.SUMMARY)" -Level 'DEBUG'
+                    }
                 }
             }
         }
+        catch {
+            Write-Log -Message "Fehler beim Laden oder Parsen der ICS-Datei: $($_.Exception.Message)" -Level 'ERROR'
+            $tb = New-Object System.Windows.Controls.TextBlock
+            $tb.Text = "Fehler beim Laden der Termine."
+            $tb.FontStyle = 'Italic'
+            $tb.Foreground = 'Red'
+            $spUpdateDates.Children.Add($tb) | Out-Null
+        }
     }
-    catch {
-        Write-Log -Message "Fehler beim Laden oder Parsen der ICS-Datei: $($_.Exception.Message)" -Level 'ERROR'
-        $tb = New-Object System.Windows.Controls.TextBlock
-        $tb.Text = "Fehler beim Laden der Termine."
-        $tb.FontStyle = 'Italic'
-        $tb.Foreground = 'Red'
-        $spUpdateDates.Children.Add($tb) | Out-Null
+    
+    # Dispatcher.Invoke für Thread-Safety
+    if ($spUpdateDates.Dispatcher.CheckAccess()) {
+        & $updateAction
+    }
+    else {
+        $spUpdateDates.Dispatcher.Invoke($updateAction, [System.Windows.Threading.DispatcherPriority]::Normal)
     }
 }
 
@@ -3595,17 +3664,27 @@ function Initialize-UpdateDates {
     else {
         Write-Log -Message "Keine lokale ICS-Datei gefunden. Update-Termine können manuell aktualisiert werden." -Level 'DEBUG'
         if ($null -ne $spUpdateDates) {
-            $spUpdateDates.Children.Clear()
-            $tb = New-Object System.Windows.Controls.TextBlock
-            $tb.Text = "Klicken Sie auf 'Update-Termine aktualisieren'."
-            $tb.FontStyle = 'Italic'
-            $tb.Foreground = 'Gray'
-            $spUpdateDates.Children.Add($tb) | Out-Null
+            # Thread-sichere UI-Updates
+            $updateAction = {
+                $spUpdateDates.Children.Clear()
+                $tb = New-Object System.Windows.Controls.TextBlock
+                $tb.Text = "Klicken Sie auf 'Update-Termine aktualisieren'."
+                $tb.FontStyle = 'Italic'
+                $tb.Foreground = 'Gray'
+                $spUpdateDates.Children.Add($tb) | Out-Null
+            }
+            
+            if ($spUpdateDates.Dispatcher.CheckAccess()) {
+                & $updateAction
+            }
+            else {
+                $spUpdateDates.Dispatcher.Invoke($updateAction, [System.Windows.Threading.DispatcherPriority]::Normal)
+            }
         }
     }
 }
 
-# Funktion zum Laden der ICS-Datei von DATEV
+# Funktion zum Laden der ICS-Datei von DATEV (Thread-sicher)
 function Update-UpdateDates {
     $icsUrl = $script:Config.URLs.DATEV.Jahresplanung
     $icsFile = $script:Config.Paths.ICSFile
@@ -3615,12 +3694,22 @@ function Update-UpdateDates {
         return
     }
     
-    $spUpdateDates.Children.Clear()
-    $tb = New-Object System.Windows.Controls.TextBlock
-    $tb.Text = "Lade ICS-Datei..."
-    $tb.FontStyle = 'Italic'
-    $tb.Foreground = 'Blue'
-    $spUpdateDates.Children.Add($tb) | Out-Null
+    # Thread-sichere UI-Updates für Lade-Status
+    $showLoadingAction = {
+        $spUpdateDates.Children.Clear()
+        $tb = New-Object System.Windows.Controls.TextBlock
+        $tb.Text = "Lade ICS-Datei..."
+        $tb.FontStyle = 'Italic'
+        $tb.Foreground = 'Blue'
+        $spUpdateDates.Children.Add($tb) | Out-Null
+    }
+    
+    if ($spUpdateDates.Dispatcher.CheckAccess()) {
+        & $showLoadingAction
+    }
+    else {
+        $spUpdateDates.Dispatcher.Invoke($showLoadingAction, [System.Windows.Threading.DispatcherPriority]::Normal)
+    }
     
     Write-Log -Message "Benutzeraktion: Update-Termine aktualisieren geklickt. Lade ICS von $icsUrl" -Level 'DEBUG'
     
@@ -3630,23 +3719,44 @@ function Update-UpdateDates {
         
         Invoke-WebRequest -Uri $icsUrl -OutFile $icsFile -UseBasicParsing -TimeoutSec $script:Config.Timeouts.ICSDownload
         
-        $spUpdateDates.Children.Clear()
-        $tb = New-Object System.Windows.Controls.TextBlock
-        $tb.Text = "ICS-Datei geladen. Lese Termine..."
-        $tb.FontStyle = 'Italic'
-        $tb.Foreground = 'Blue'
-        $spUpdateDates.Children.Add($tb) | Out-Null
+        # Thread-sichere UI-Updates für Erfolgs-Status
+        $showSuccessAction = {
+            $spUpdateDates.Children.Clear()
+            $tb = New-Object System.Windows.Controls.TextBlock
+            $tb.Text = "ICS-Datei geladen. Lese Termine..."
+            $tb.FontStyle = 'Italic'
+            $tb.Foreground = 'Blue'
+            $spUpdateDates.Children.Add($tb) | Out-Null
+        }
+        
+        if ($spUpdateDates.Dispatcher.CheckAccess()) {
+            & $showSuccessAction
+        }
+        else {
+            $spUpdateDates.Dispatcher.Invoke($showSuccessAction, [System.Windows.Threading.DispatcherPriority]::Normal)
+        }
         
         Write-Log -Message "ICS-Datei erfolgreich geladen: $icsFile" -Level 'DEBUG'
         Show-NextUpdateDates
     }
     catch {
-        $spUpdateDates.Children.Clear()
-        $tb = New-Object System.Windows.Controls.TextBlock
-        $tb.Text = "Fehler beim Laden der ICS-Datei."
-        $tb.FontStyle = 'Italic'
-        $tb.Foreground = 'Red'
-        $spUpdateDates.Children.Add($tb) | Out-Null
+        # Thread-sichere UI-Updates für Fehler-Status
+        $showErrorAction = {
+            $spUpdateDates.Children.Clear()
+            $tb = New-Object System.Windows.Controls.TextBlock
+            $tb.Text = "Fehler beim Laden der ICS-Datei."
+            $tb.FontStyle = 'Italic'
+            $tb.Foreground = 'Red'
+            $spUpdateDates.Children.Add($tb) | Out-Null
+        }
+        
+        if ($spUpdateDates.Dispatcher.CheckAccess()) {
+            & $showErrorAction
+        }
+        else {
+            $spUpdateDates.Dispatcher.Invoke($showErrorAction, [System.Windows.Threading.DispatcherPriority]::Normal)
+        }
+        
         Write-Log -Message "Fehler beim Laden der ICS-Datei: $($_.Exception.Message)" -Level 'ERROR'
     }
 }
