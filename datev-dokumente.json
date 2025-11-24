@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-11-14",
+  "lastUpdated": "2025-11-24",
   "documents": [
     {
       "id": "1080019",
@@ -48,6 +48,24 @@
       "title": "Bestandsoptimierung Eigenorganisation",
       "url": "https://apps.datev.de/help-center/documents/9299886",
       "description": "In diesem Dokument erfahren Sie, wie Sie einfach und schnell die offenen Kosten und Gebühren auf Aktualität prüfen sowie Prozessoptimierungs- und Abrechnungspotentiale erkennen. Das Werkzeug bietet eine einfache Möglichkeit, Ihren aktuellen Datenbestand auf Auffälligkeiten hinsichtlich Aktualität, Abrechnungs- und Prozessoptimierungspotential zu prüfen."
+    },
+    {
+      "id": "0908710",
+      "title": "Daten im Rechenzentrum – Zugriff für anderes DATEV-Mitglied oder Solution Partner beauftragen",
+      "url": "https://apps.datev.de/help-center/documents/0908710",
+      "description": "In diesem Dokument erfahren Sie, wie Sie den Zugriff auf Ihre Daten im Rechenzentrum für ein anderes DATEV-Mitglied oder einen Solution Partner beauftragen."
+    },
+    {
+      "id": "1036470",
+      "title": "Belege aus DATEV Belege online nach Dokumentenablage oder DATEV DMS holen",
+      "url": "https://apps.datev.de/help-center/documents/1036470",
+      "description": "In diesem Dokument erfahren Sie, wie Sie Belege aus DATEV Belege online in die Dokumentenablage oder DATEV DMS übertragen."
+    },
+    {
+      "id": "datev-format",
+      "title": "DATEV-Format",
+      "url": "https://developer.datev.de/de/file-format/details/datev-format/getting-started",
+      "description": "Technische Dokumentation zum DATEV-Format für Entwickler. Erfahren Sie, wie Sie Daten im DATEV-Format korrekt strukturieren und verarbeiten."
     }
   ]
 }

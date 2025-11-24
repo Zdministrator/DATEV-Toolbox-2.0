@@ -11,7 +11,7 @@
     - Dateimanagement-Funktionen
 
 .NOTES
-    Version:        2.3.2
+    Version:        2.3.3
     Autor:          Norman Zamponi
     PowerShell:     5.1+ (kompatibel)
     .NET Framework: 4.5+ (für WPF)
@@ -25,7 +25,7 @@
 # DATEV-Toolbox 2.0
 
 # Version und Update-Konfiguration
-$script:AppVersion = "2.3.2"
+$script:AppVersion = "2.3.3"
 $script:AppName = "DATEV-Toolbox 2.0"
 $script:GitHubRepo = "Zdministrator/DATEV-Toolbox-2.0"
 $script:UpdateCheckUrl = "https://github.com/$script:GitHubRepo/raw/main/version.json"
@@ -279,6 +279,9 @@ $script:PathCacheExpiry = @{}
 # Event-Handler Memory Leak Prevention
 $script:ComboBoxEventRegistered = $false
 $script:ComboBoxHandler = $null
+
+# WebClient Resource Management
+$script:ActiveDownloadClient = $null
 
 # Thread-Safety für Settings-Timer
 $script:SettingsLock = New-Object System.Object
@@ -2231,22 +2234,43 @@ function Show-ChangelogDialog {
         [System.Windows.Controls.Grid]::SetRow($textBox, 0)
         $grid.Children.Add($textBox)
         
-        # Schließen-Button
+        # Schließen-Button mit Event-Handler-Cleanup
         $closeButton = New-Object System.Windows.Controls.Button
         $closeButton.Content = "Schließen"
         $closeButton.Width = 100
         $closeButton.Height = 30
         $closeButton.HorizontalAlignment = "Right"
         $closeButton.VerticalAlignment = "Top"
-        $closeButton.Add_Click({
+        
+        # Event-Handler mit schwacher Referenz für Memory Leak Prevention
+        $closeHandler = {
+            param($sender, $e)
+            try {
                 $changelogWindow.Close()
-            })
+            }
+            catch {
+                Write-Log -Message "Fehler beim Schließen des Changelog-Dialogs: $($_.Exception.Message)" -Level 'WARN'
+            }
+        }
+        $closeButton.Add_Click($closeHandler)
         
         [System.Windows.Controls.Grid]::SetRow($closeButton, 1)
         $grid.Children.Add($closeButton)
         
         # Grid zum Fenster hinzufügen
         $changelogWindow.Content = $grid
+        
+        # Window Closed Event für Cleanup
+        $changelogWindow.Add_Closed({
+            # Event-Handler explizit entfernen
+            try {
+                $closeButton.Remove_Click($closeHandler)
+                Write-Log -Message "Changelog-Dialog Event-Handler bereinigt" -Level 'DEBUG'
+            }
+            catch {
+                Write-Log -Message "Fehler beim Bereinigen der Changelog-Dialog Handler: $($_.Exception.Message)" -Level 'DEBUG'
+            }
+        })
         
         # Fenster anzeigen
         $changelogWindow.ShowDialog() | Out-Null
@@ -2931,15 +2955,25 @@ function Update-DATEVDownloads {
         # TLS 1.2 für sichere Downloads erzwingen
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         
-        # JSON-Datei herunterladen
-        Invoke-WebRequest -Uri $downloadsUrl -OutFile $localFile -UseBasicParsing -TimeoutSec $script:Config.Timeouts.DownloadJSON
-        
-        Write-Log -Message "Downloads-JSON erfolgreich aktualisiert: $localFile" -Level 'DEBUG'
-        
-        # ComboBox neu initialisieren mit aktualisierten Daten
-        Initialize-DownloadsComboBox
-        
-        Write-Log -Message "Downloads-Liste erfolgreich aktualisiert" -Level 'INFO'
+        # JSON-Datei herunterladen mit Fehlerbehandlung
+        try {
+            Invoke-WebRequest -Uri $downloadsUrl -OutFile $localFile -UseBasicParsing -TimeoutSec $script:Config.Timeouts.DownloadJSON -ErrorAction Stop
+            Write-Log -Message "Downloads-JSON erfolgreich aktualisiert: $localFile" -Level 'DEBUG'
+            
+            # ComboBox neu initialisieren mit aktualisierten Daten
+            Initialize-DownloadsComboBox
+            
+            Write-Log -Message "Downloads-Liste erfolgreich aktualisiert" -Level 'INFO'
+        }
+        catch {
+            Write-Log -Message "Fehler beim Herunterladen der Downloads-JSON: $($_.Exception.Message)" -Level 'ERROR'
+            [System.Windows.MessageBox]::Show(
+                "Fehler beim Aktualisieren der Downloads-Liste:`n$($_.Exception.Message)`n`nPrüfen Sie Ihre Internetverbindung.",
+                "Download-Fehler",
+                [System.Windows.MessageBoxButton]::OK,
+                [System.Windows.MessageBoxImage]::Error
+            )
+        }
     }
     catch {
         Write-Log -Message "Fehler beim Aktualisieren der Downloads-JSON: $($_.Exception.Message)" -Level 'ERROR'
@@ -3095,8 +3129,11 @@ function Start-BackgroundDownload {
         # Hinweis: WebClient in PowerShell 5.1 hat keine Timeout-Eigenschaft
         # Standard-Timeout wird verwendet (ca. 100 Sekunden)
         
+        # Script-Scope Variable für Cleanup
+        $script:ActiveDownloadClient = $webClient
+        
         # Event-Handler für Download-Completion (mit verbessertem Disposal)
-        $webClient.add_DownloadFileCompleted({
+        $downloadCompletedHandler = {
                 param($webClientSender, $downloadEventArgs)
             
                 try {
@@ -3151,15 +3188,21 @@ function Start-BackgroundDownload {
                     # WebClient sicher entsorgen (immer ausführen)
                     try {
                         if ($null -ne $webClientSender -and $webClientSender -is [System.Net.WebClient]) {
+                            # Event-Handler explizit entfernen vor Disposal
+                            $webClientSender.remove_DownloadFileCompleted($downloadCompletedHandler)
                             $webClientSender.Dispose()
-                            Write-Log -Message "WebClient ordnungsgemäß disposed" -Level 'DEBUG'
+                            $script:ActiveDownloadClient = $null
+                            Write-Log -Message "WebClient ordnungsgemäß disposed (Event-Handler entfernt)" -Level 'DEBUG'
                         }
                     }
                     catch {
                         Write-Log -Message "Fehler beim Entsorgen des WebClients: $($_.Exception.Message)" -Level 'WARN'
                     }
                 }
-            })
+            }
+        
+        # Event-Handler registrieren
+        $webClient.add_DownloadFileCompleted($downloadCompletedHandler)
         
         # Asynchronen Download starten mit Dateiname als UserState
         $webClient.DownloadFileAsync($Url, $filePath, $FileName)
@@ -3184,8 +3227,13 @@ function Start-BackgroundDownload {
         # WebClient entsorgen falls erstellt aber nicht erfolgreich gestartet
         if ($null -ne $webClient) {
             try {
+                # Event-Handler entfernen falls registriert
+                if ($null -ne $downloadCompletedHandler) {
+                    $webClient.remove_DownloadFileCompleted($downloadCompletedHandler)
+                }
                 $webClient.Dispose()
-                Write-Log -Message "WebClient nach Fehler ordnungsgemäß disposed" -Level 'DEBUG'
+                $script:ActiveDownloadClient = $null
+                Write-Log -Message "WebClient nach Fehler ordnungsgemäß disposed (Event-Handler entfernt)" -Level 'DEBUG'
             }
             catch {
                 Write-Log -Message "Fehler beim Entsorgen des WebClients nach Hauptfehler: $($_.Exception.Message)" -Level 'WARN'
@@ -3314,10 +3362,11 @@ function Update-DATEVDocuments {
         # TLS 1.2 für sichere Downloads erzwingen
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         
-        $webClient = New-Object System.Net.WebClient
-        $webClient.Encoding = [System.Text.Encoding]::UTF8
-        
+        $webClient = $null
         try {
+            $webClient = New-Object System.Net.WebClient
+            $webClient.Encoding = [System.Text.Encoding]::UTF8
+            
             $documentsJson = $webClient.DownloadString($documentsUrl)
             
             # Speichere die Datei lokal
@@ -3344,8 +3393,15 @@ function Update-DATEVDocuments {
             Write-Log -Message "DATEV-Dokumente erfolgreich aktualisiert: $($documents.Count) Dokumente" -Level 'INFO'
             return $result
         }
+        catch {
+            Write-Log -Message "Fehler beim Download der Dokumente: $($_.Exception.Message)" -Level 'ERROR'
+            throw
+        }
         finally {
-            $webClient.Dispose()
+            if ($null -ne $webClient) {
+                $webClient.Dispose()
+                Write-Log -Message "WebClient für Dokumente-Update ordnungsgemäß disposed" -Level 'DEBUG'
+            }
         }
     }
     catch {
@@ -3771,12 +3827,17 @@ Write-Log -Message "Starte zentrale Button-Handler-Registrierung..." -Level 'DEB
 Register-ButtonHandlers -Window $window
 Write-Log -Message "Zentrale Button-Handler-Registrierung abgeschlossen" -Level 'DEBUG'
 
-# Event-Handler für DATEV Downloads ComboBox (Memory Leak Fix)
+# Event-Handler für DATEV Downloads ComboBox (Memory Leak Fix mit ordnungsgemäßem Cleanup)
 if ($null -ne $cmbDirectDownloads) {
     # Alte Event-Handler entfernen vor Neuregistrierung
     if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler) {
-        $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
-        Write-Log -Message "Alter ComboBox Event-Handler entfernt" -Level 'DEBUG'
+        try {
+            $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+            Write-Log -Message "Alter ComboBox Event-Handler entfernt" -Level 'DEBUG'
+        }
+        catch {
+            Write-Log -Message "Fehler beim Entfernen des alten ComboBox Handlers: $($_.Exception.Message)" -Level 'DEBUG'
+        }
     }
     
     # Neuen Handler erstellen und speichern
@@ -3929,21 +3990,41 @@ Initialize-UpdateCheck
 Initialize-RunspacePool
 
 # Window-Closing Event für ordnungsgemäße Bereinigung
-$window.Add_Closing({
+$windowClosingHandler = {
         Write-Log -Message "Anwendung wird beendet, bereinige Ressourcen..." -Level 'INFO'
     
         # Tray-Icon bereinigen
         Close-TrayIcon
     
+        # Aktive Downloads abbrechen und bereinigen
+        if ($null -ne $script:ActiveDownloadClient) {
+            try {
+                $script:ActiveDownloadClient.CancelAsync()
+                $script:ActiveDownloadClient.Dispose()
+                $script:ActiveDownloadClient = $null
+                Write-Log -Message "Aktiver Download abgebrochen und WebClient bereinigt" -Level 'INFO'
+            }
+            catch {
+                Write-Log -Message "Fehler beim Abbrechen des aktiven Downloads: $($_.Exception.Message)" -Level 'WARN'
+            }
+        }
+    
         # Settings sofort speichern falls noch ausstehend
         if ($script:SettingsNeedSave) {
-            Save-Settings
+            try {
+                Save-Settings
+            }
+            catch {
+                Write-Log -Message "Fehler beim Speichern der Settings beim Beenden: $($_.Exception.Message)" -Level 'ERROR'
+            }
         }
     
         # Event-Handler bereinigen (Memory Leak Prevention)
         if ($script:ComboBoxEventRegistered -and $null -ne $script:ComboBoxHandler -and $null -ne $cmbDirectDownloads) {
             try {
                 $cmbDirectDownloads.Remove_SelectionChanged($script:ComboBoxHandler)
+                $script:ComboBoxHandler = $null
+                $script:ComboBoxEventRegistered = $false
                 Write-Log -Message "ComboBox Event-Handler beim Cleanup entfernt" -Level 'DEBUG'
             }
             catch {
@@ -3971,7 +4052,9 @@ $window.Add_Closing({
         }
     
         Write-Log -Message "DATEV-Toolbox 2.0 ordnungsgemäß beendet" -Level 'INFO'
-    })
+    }
+
+$window.Add_Closing($windowClosingHandler)
 
 # Window StateChanged Event für Minimize-to-Tray
 $window.Add_StateChanged({

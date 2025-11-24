@@ -1,23 +1,43 @@
 {
-  "version": "2.3.2",
-  "releaseDate": "2025-11-11",
+  "version": "2.3.3",
+  "releaseDate": "2025-11-24",
   "downloadUrl": "https://github.com/Zdministrator/DATEV-Toolbox-2.0/raw/main/DATEV-Toolbox 2.0.ps1",
   "changelog": [
-    "Feature: Service-Anwendungen online - Neuer Bereich im DATEV Online Tab",
-    "• Neuer Bereich 'Service-Anwendungen online' im DATEV Online Tab hinzugefügt",
-    "• 5 neue Service-Buttons: Rechnungsdaten, Personendaten, Beraternummern, Vertragsübersichten",
-    "• Rechnungsdaten online: PDF-Rechnungen im ZUGFeRD-Format abrufen",
-    "• Personendaten verwalten: Personen im DATEV-Rechenzentrum anlegen, bearbeiten, löschen",
-    "• Meine Personendaten verwalten: Eigene bei DATEV gespeicherte Daten einsehen und bearbeiten",
-    "• Beraternummern verwalten: Beraternummern einsehen, ändern, SEPA-Mandate verwalten",
-    "• Vertragsübersichten: Verträge für Hard-/Software und PC-Zähler verwalten",
-    "• ToolTip-Optimierung: Maximale Breite 400px mit automatischem Zeilenumbruch",
-    "• Code-Bereinigung: Doppelten 'Vertragsübersichten Online' Button aus 'Verwaltung und Technik' entfernt",
-    "• Konsistente Icons: 📄 💁 👤 🔢 📋 für bessere visuelle Unterscheidung",
-    "• Alle Service-URLs zentral konfiguriert und per URL-Handler automatisch verarbeitet",
-    "Professionelle Service-Integration für zentrale DATEV-Verwaltungsaufgaben"
+    "Kritische Bugfixes: Thread-Safety und Resource-Management",
+    "• Thread-Safety: Alle UI-Updates jetzt mit Dispatcher.Invoke für Multi-Threading-Sicherheit",
+    "• Resource Leaks behoben: WebClient und Event-Handler werden ordnungsgemäß disposed",
+    "• Write-Log Thread-sicher: UI-Updates prüfen CheckAccess() und nutzen Dispatcher bei Bedarf",
+    "• Download-System verbessert: Event-Handler werden explizit entfernt vor Disposal",
+    "• WebClient-Tracking: ActiveDownloadClient für Cleanup beim Beenden",
+    "• Window Closing Handler: Aktive Downloads werden abgebrochen, alle Handler bereinigt",
+    "• ComboBox Memory Leak: Event-Handler werden ordnungsgemäß entfernt und auf null gesetzt",
+    "• Changelog-Dialog: Event-Handler-Cleanup mit Window.Add_Closed implementiert",
+    "• Update-DATEVDocuments: WebClient wird in allen Fällen korrekt disposed",
+    "• Update-DATEVDownloads: Strukturierte Fehlerbehandlung mit Try-Catch",
+    "• Thread-sichere UI-Updates: Dokumente-Liste, Update-Termine, Downloads-ComboBox",
+    "• Dokumente-Tab aktualisiert: 3 neue DATEV-Dokumente hinzugefügt (11 gesamt)",
+    "Produktionsreife Stabilität mit vollständigem Resource-Management und Thread-Safety"
   ],
   "previousVersions": [
+    {
+      "version": "2.3.2",
+      "releaseDate": "2025-11-11",
+      "changelog": [
+        "Feature: Service-Anwendungen online - Neuer Bereich im DATEV Online Tab",
+        "• Neuer Bereich 'Service-Anwendungen online' im DATEV Online Tab hinzugefügt",
+        "• 5 neue Service-Buttons: Rechnungsdaten, Personendaten, Beraternummern, Vertragsübersichten",
+        "• Rechnungsdaten online: PDF-Rechnungen im ZUGFeRD-Format abrufen",
+        "• Personendaten verwalten: Personen im DATEV-Rechenzentrum anlegen, bearbeiten, löschen",
+        "• Meine Personendaten verwalten: Eigene bei DATEV gespeicherte Daten einsehen und bearbeiten",
+        "• Beraternummern verwalten: Beraternummern einsehen, ändern, SEPA-Mandate verwalten",
+        "• Vertragsübersichten: Verträge für Hard-/Software und PC-Zähler verwalten",
+        "• ToolTip-Optimierung: Maximale Breite 400px mit automatischem Zeilenumbruch",
+        "• Code-Bereinigung: Doppelten 'Vertragsübersichten Online' Button aus 'Verwaltung und Technik' entfernt",
+        "• Konsistente Icons: 📄 💁 👤 🔢 📋 für bessere visuelle Unterscheidung",
+        "• Alle Service-URLs zentral konfiguriert und per URL-Handler automatisch verarbeitet",
+        "Professionelle Service-Integration für zentrale DATEV-Verwaltungsaufgaben"
+      ]
+    },
     {
       "version": "2.3.1",
       "releaseDate": "2025-11-10",

@@ -10,6 +10,7 @@ Eine moderne WPF-basierte PowerShell-Anwendung für DATEV-Umgebungen mit automat
 
 ## 📋 Features
 
+- **🆕 Thread-Safety & Resource-Management**: Vollständig thread-sichere UI-Updates und behobene Resource Leaks (v2.3.3)
 - **🆕 Service-Anwendungen online**: Neuer Bereich im DATEV Online Tab mit 5 Service-Buttons (v2.3.2)
 - **🆕 ToolTip-Optimierung**: Maximale Breite 400px mit automatischem Zeilenumbruch (v2.3.2)
 - **🆕 System Tray Integration**: Minimize-to-Tray mit Benachrichtigungen und Quick-Actions-Menü (v2.3.0)
@@ -171,7 +172,7 @@ Das integrierte Logging-System protokolliert alle Aktivitäten:
 ## 🤝 Entwicklung
 
 ### Entwicklung
-Aktuelle Version: **2.3.2** (11.11.2025)
+Aktuelle Version: **2.3.3** (24.11.2025)
 
 ### Autor
 **Norman Zamponi** | HEES GmbH | © 2025
@@ -211,6 +212,28 @@ Für Feature-Requests, Bug-Reports oder Verbesserungsvorschläge:
 - **GitHub Issues**: [Issues öffnen](https://github.com/Zdministrator/DATEV-Toolbox-2.0/issues)
 
 ## 🔄 Update-Historie
+
+### Version 2.3.3 (2025-11-24) - Kritische Bugfixes: Thread-Safety und Resource-Management
+- **🔒 Thread-Safety Implementierung**: Alle UI-Updates mit Dispatcher.Invoke
+  - Write-Log Funktion: CheckAccess() und Dispatcher für Multi-Threading-Sicherheit
+  - Download-Button: Thread-sichere Aktivierung/Deaktivierung
+  - ComboBox-Initialisierung: UI-Updates gebündelt im UI-Thread via Dispatcher
+  - Dokumente-Liste: Vollständig thread-sichere Initialisierung
+  - Update-Termine: Thread-sichere Status-Anzeigen (Laden, Erfolg, Fehler)
+- **🛡️ Resource Leak Fixes**: Vollständiges Resource-Management
+  - WebClient Disposal: Ordnungsgemäße Bereinigung in allen Codepfaden
+  - Event-Handler Cleanup: Explizites Entfernen vor Disposal
+  - Download-System: remove_DownloadFileCompleted() vor WebClient.Dispose()
+  - ActiveDownloadClient: Script-Scope Tracking für Cleanup beim Beenden
+  - Window Closing: Aktive Downloads abbrechen, alle Handler bereinigen
+- **📝 Changelog-Dialog**: Event-Handler-Cleanup mit Window.Add_Closed
+- **📄 Update-DATEVDocuments**: WebClient wird in Try-Catch-Finally korrekt disposed
+- **📅 Update-DATEVDownloads**: Strukturierte Fehlerbehandlung mit ErrorAction Stop
+- **📚 Dokumente-Tab**: 3 neue DATEV-Dokumente hinzugefügt (11 Dokumente gesamt)
+  - Daten im Rechenzentrum – Zugriff beauftragen (ID: 0908710)
+  - Belege aus DATEV Belege online holen (ID: 1036470)
+  - DATEV-Format Entwickler-Dokumentation (ID: datev-format)
+- **✅ Produktionsreif**: Vollständige Thread-Safety und Resource-Management
 
 ### Version 2.3.2 (2025-11-11) - Feature: Service-Anwendungen online
 - **🆕 Neuer Bereich**: Service-Anwendungen online im DATEV Online Tab
